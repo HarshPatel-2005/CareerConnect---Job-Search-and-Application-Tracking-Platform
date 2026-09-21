@@ -60,8 +60,6 @@ CareerConnect centralizes job-search activity into a single application:
 
 | Name | Student ID | GitHub Username |
 
-| --- | --- | --- | --- |
-
 | [Lucas] | [ID] | [@username] |
 
 | [Joelle] | [ID] | [@username] |
@@ -75,15 +73,25 @@ CareerConnect centralizes job-search activity into a single application:
 ## Technologies
 
 | Area | Technology |
+
 | Frontend | |
+
 | Backend | |
+
 | Database | |
+
 | Authentication | |
+
 | File Storage (resumes) | |
+
 | Generative AI | |
+
 | Testing | |
+
 | Continuous Integration | GitHub Actions |
+
 | Version Control | Git and GitHub |
+
 | Project Management | GitHub Issues and GitHub Projects |
 
 ---
