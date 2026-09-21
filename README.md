@@ -59,10 +59,15 @@ CareerConnect centralizes job-search activity into a single application:
 ## Team Members
 
 | Name | Student ID | GitHub Username |
+
 | --- | --- | --- | --- |
+
 | [Lucas] | [ID] | [@username] |
+
 | [Joelle] | [ID] | [@username] |
+
 | [Maz] | [ID] | [@username] |
+
 | [Harsh] | [40341498] | [@HarshPatel-2005] |
 
 ---
