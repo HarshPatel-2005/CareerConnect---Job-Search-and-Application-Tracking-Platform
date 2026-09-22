@@ -137,10 +137,6 @@ The two features implemented and demonstrated in Sprint 1 are:
 
 ### Running Tests
 
-```bash
-npm test
-```
-
 ---
 
 ## Repository Structure
