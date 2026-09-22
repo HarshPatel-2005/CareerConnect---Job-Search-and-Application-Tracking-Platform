@@ -82,11 +82,7 @@ CareerConnect centralizes job-search activity into a single application:
 
 | Authentication | |
 
-| File Storage (resumes) | |
-
 | Generative AI | |
-
-| Testing | |
 
 | Continuous Integration | GitHub Actions |
 
@@ -137,54 +133,7 @@ The two features implemented and demonstrated in Sprint 1 are:
 
 ### Installation
 
-1. Clone the repository:
-
-   ```bash
-   git clone [YOUR REPOSITORY LINK]
-   cd CareerConnect
-   ```
-
-2. Install backend dependencies:
-
-   ```bash
-   cd backend
-   npm install
-   ```
-
-3. Install frontend dependencies:
-
-   ```bash
-   cd ../frontend
-   npm install
-   ```
-
-4. Create a `.env` file in the `backend` folder and add your configuration values:
-
-   ```
-   PORT=[port number]
-   DATABASE_URL=[your database connection string]
-   JWT_SECRET=[a secret string]
-   ```
-
-   Never commit the `.env` file to the repository.
-
 ### Running the Application
-
-1. Start the backend:
-
-   ```bash
-   cd backend
-   npm start
-   ```
-
-2. In a second terminal, start the frontend:
-
-   ```bash
-   cd frontend
-   npm start
-   ```
-
-3. Open the application in your browser at `http://localhost:[port]`.
 
 ### Running Tests
 
