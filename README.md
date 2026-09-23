@@ -38,7 +38,7 @@ Primary users: Job Seekers and Recruiters.
 
 ## Identified Problem
 
-Job seekers often apply to many positions across different websites, email threads, and company portals. Information ends up scattered: which resume version was sent, when the application was submitted, whether an interview was scheduled, and when the next deadline is. This makes it easy to miss deadlines, lose track of application statuses, and send the wrong resume to the wrong employer.
+Job seekers often apply to many positions across different websites, email threads, and company portals. Information ends up scattered, which resume version was sent, when the application was submitted, whether an interview was scheduled, and when the next deadline is, etc. This makes it easy to miss deadlines, lose track of application statuses, and send the wrong resume to the wrong employer.
 
 Recruiters face a related problem: receiving applications in inconsistent formats and having no simple, central way to manage postings and applicants.
 
