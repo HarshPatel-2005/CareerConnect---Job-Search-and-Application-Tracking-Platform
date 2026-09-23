@@ -62,7 +62,7 @@ CareerConnect centralizes job-search activity into a single application:
 
 | [Lucas] | [ID] | [@username] |
 
-| [Joelle] | [ID] | [@username] |
+| [Joelle] | [40325417] | [@joellealhaddad] |
 
 | [Maz] | [ID] | [@username] |
 
