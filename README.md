@@ -59,35 +59,25 @@ CareerConnect centralizes job-search activity into a single application:
 ## Team Members
 
 | Name | Student ID | GitHub Username |
-
-| [Lucas] | [ID] | [@username] |
-
-| [Joelle] | [40325417] | [@joellealhaddad] |
-
-| [Maz] | [ID] | [@username] |
-
-| [Harsh] | [40341498] | [@HarshPatel-2005] |
+| ---- | ---------- | --------------- |
+| Lucas | 40333425 | @Lucgnl |
+| Joelle | 40325417 | @joellealhaddad |
+| Maz | [ID] | @username |
+| Harsh | 40341498 | @HarshPatel-2005 |
 
 ---
 
 ## Technologies
 
 | Area | Technology |
-
+| ---- | ---------- |
 | Frontend | |
-
 | Backend | |
-
 | Database | |
-
 | Authentication | |
-
 | Generative AI | |
-
 | Continuous Integration | GitHub Actions |
-
 | Version Control | GitHub |
-
 | Project Management | GitHub Issues and GitHub Projects |
 
 ---
