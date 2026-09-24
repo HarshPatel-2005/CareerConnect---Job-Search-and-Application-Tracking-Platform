@@ -71,10 +71,10 @@ CareerConnect centralizes job-search activity into a single application:
 
 | Area | Technology |
 | ---- | ---------- |
-| Frontend | |
-| Backend | |
-| Database | |
-| Authentication | |
+| Frontend | HTML/CSS/JS |
+| Backend | Node.JS |
+| Database | MySQL |
+| Authentication | JWT Authentication |
 | Generative AI | |
 | Continuous Integration | GitHub Actions |
 | Version Control | GitHub |
