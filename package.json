@@ -1,0 +1,12 @@
+{
+    "name": "CareerConnect",
+    "version": "0.0.1",
+    "main": "index.js",
+    "scripts": {
+        "start": "node src/api/index.js",
+        "dev": "node --watch src/api/index.js"
+    },
+    "dependencies": {
+        "express": "^5.2.1"
+    }
+}
