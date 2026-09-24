@@ -62,7 +62,7 @@ CareerConnect centralizes job-search activity into a single application:
 | ---- | ---------- | --------------- |
 | Lucas | 40333425 | @Lucgnl |
 | Joelle | 40325417 | @joellealhaddad |
-| Maz | [ID] | @username |
+| Maz | 40328977 | @Mazmou |
 | Harsh | 40341498 | @HarshPatel-2005 |
 
 ---
