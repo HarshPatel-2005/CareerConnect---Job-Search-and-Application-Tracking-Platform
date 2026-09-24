@@ -40,7 +40,7 @@ Primary users: Job Seekers and Recruiters.
 
 Job seekers often apply to many positions across different websites, email threads, and company portals. Information ends up scattered, which resume version was sent, when the application was submitted, whether an interview was scheduled, and when the next deadline is, etc. This makes it easy to miss deadlines, lose track of application statuses, and send the wrong resume to the wrong employer.
 
-Recruiters face a related problem: receiving applications in inconsistent formats and having no simple, central way to manage postings and applicants.
+Recruiters face a related problem: receiving applications in inconsistent formats and having no simple way to manage postings and applicants.
 
 ---
 
@@ -86,7 +86,7 @@ CareerConnect centralizes job-search activity into a single application:
 
 | Continuous Integration | GitHub Actions |
 
-| Version Control | Git and GitHub |
+| Version Control | GitHub |
 
 | Project Management | GitHub Issues and GitHub Projects |
 
