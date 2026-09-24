@@ -8,7 +8,7 @@ From: Joelle, Lucas, Harsh, Maz
 
 GitHub Repository: [https://github.com/HarshPatel-2005/CareerConnect---Job-Search-and-Application-Tracking-Platform.git]
 
----
+----
 
 ## Table of Contents
 
