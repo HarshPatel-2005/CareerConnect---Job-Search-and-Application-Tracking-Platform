@@ -1,0 +1,61 @@
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background-color: #f9fafb;
+    color: #1f2937;
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.container {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+h1 { margin-top: 0; font-size: 1.5rem; text-align: center; }
+
+fieldset {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    margin-bottom: 1.25rem;
+    padding: 1rem;
+}
+
+legend { font-weight: 600; padding: 0 0.5rem; font-size: 0.9rem; }
+
+label { display: block; margin-bottom: 0.25rem; font-size: 0.9rem; font-weight: 500; }
+.radio-label { display: flex; align-items: center; font-weight: 400; margin-bottom: 0.5rem; cursor: pointer; }
+.radio-label input { margin-right: 0.5rem; }
+
+input[type="text"], input[type="email"], input[type="password"] {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+button {
+    width: 100%;
+    padding: 0.75rem;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+}
+button:disabled { background: #9ca3af; cursor: not-allowed; }
+button:hover:not(:disabled) { background: #1d4ed8; }
+
+.hidden { display: none !important; }
+.dynamic-inputs { margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed #d1d5db; }
+
+.alert { padding: 0.75rem; border-radius: 4px; margin-bottom: 1rem; display: none; }
+.alert.error { background-color: #fee2e2; color: #991b1b; display: block; }
+.alert.success { background-color: #dcfce3; color: #166534; display: block; }

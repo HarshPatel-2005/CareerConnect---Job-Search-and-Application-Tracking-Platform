@@ -12,17 +12,27 @@ GitHub Repository: [https://github.com/HarshPatel-2005/CareerConnect---Job-Searc
 
 ## Table of Contents
 
-1. [Project Description](#project-description)
-2. [Identified Problem](#identified-problem)
-3. [Proposed Solution](#proposed-solution)
-4. [Team Members](#team-members)
-5. [Technologies](#technologies)
-6. [Proposed Features](#proposed-features)
-7. [Setup Instructions](#setup-instructions)
-8. [Repository Structure](#repository-structure)
-9. [Team Process](#team-process)
-10. [Project Management](#project-management)
-11. [Generative AI Usage](#generative-ai-usage)
+- [CareerConnect](#careerconnect)
+  - [Table of Contents](#table-of-contents)
+  - [Project Description](#project-description)
+  - [Identified Problem](#identified-problem)
+  - [Proposed Solution](#proposed-solution)
+  - [Team Members](#team-members)
+  - [Technologies](#technologies)
+  - [Proposed Features](#proposed-features)
+    - [Core Features](#core-features)
+    - [Generative AI Feature (required)](#generative-ai-feature-required)
+    - [Additional Original Feature](#additional-original-feature)
+    - [Sprint 1 Scope](#sprint-1-scope)
+  - [Setup Instructions](#setup-instructions)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+    - [Running the Application](#running-the-application)
+    - [Running Tests](#running-tests)
+  - [Repository Structure](#repository-structure)
+  - [Team Process](#team-process)
+  - [Project Management](#project-management)
+  - [Generative AI Usage](#generative-ai-usage)
 
 ---
 
@@ -73,10 +83,10 @@ CareerConnect centralizes job-search activity into a single application:
 | ---- | ---------- |
 | Frontend | HTML/CSS/JS |
 | Backend | Node.JS |
-| Database | MySQL |
+| Database | MySQL (Running in Docker) |
 | Authentication | JWT Authentication |
 | Generative AI | |
-| Continuous Integration | GitHub Actions |
+| Continuous Integration | GitHub Actions, Jest, Supertest |
 | Version Control | GitHub |
 | Project Management | GitHub Issues and GitHub Projects |
 
@@ -98,11 +108,11 @@ CareerConnect centralizes job-search activity into a single application:
 
 ### Generative AI Feature (required)
 
-- 
+-
 
 ### Additional Original Feature
 
-- 
+-
 
 ### Sprint 1 Scope
 
@@ -146,11 +156,9 @@ CareerConnect/
 
 ## Team Process
 
-Full details are in [`docs/team-process.md`](docs/team-process.md). 
+Full details are in [`docs/team-process.md`](docs/team-process.md).
 
 Summary:
-
-
 
 ---
 
