@@ -1,5 +1,9 @@
 const mysql = require('mysql2/promise');
-require('dotenv').config();
+
+// Only load environment variables from .env file if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+    require('dotenv').config();
+}
 
 // Set up a MySQL connection pool using environment variables for configuration
 const db = mysql.createPool({

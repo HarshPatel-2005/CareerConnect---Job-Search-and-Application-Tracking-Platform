@@ -16,8 +16,8 @@ describe('POST /api/auth/register', () => {
 
     // ======= General & Job Seeker Tests =======
     it('should register a new Job Seeker successfully (201 Created)', async () => {
-        db.query.mockResolvedValueOnce([[]]);               // Mock db check: Email does not exist
-        db.query.mockResolvedValueOnce([{ insertId: 1 }]);  // Mock db insert: Successful insertion
+        db.query.mockResolvedValueOnce([[]]);               // Mock db 1: Email does not exist
+        db.query.mockResolvedValueOnce([{ insertId: 1 }]);  // Mock db 2: Successful insertion
 
         const res = await request(app)
             .post('/api/auth/register')
@@ -64,10 +64,10 @@ describe('POST /api/auth/register', () => {
 
     // ======= Recruiter Tests (Create Company) =======
     it('should register a Recruiter and create a new company (201 Created)', async () => {
-        db.query.mockResolvedValueOnce([[]]);                       // Mock db check: Email check
-        db.query.mockResolvedValueOnce([[]]);                       // Mock db check: Company name check
-        db.query.mockResolvedValueOnce([[{ insertId: 10 }]]);       // Mock db insert: Insert into company
-        db.query.mockResolvedValueOnce([[{ insertId: 2 }]]);        // Mock db insert: Insert into users
+        db.query.mockResolvedValueOnce([[]]);               // Mock db 1: Email check
+        db.query.mockResolvedValueOnce([[]]);               // Mock db 2: Company name check
+        db.query.mockResolvedValueOnce([{ insertId: 10 }]); // Mock db 3: Insert into company
+        db.query.mockResolvedValueOnce([{ insertId: 2 }]);  // Mock db 4: Insert into users
 
         const res = await request(app)
             .post('/api/auth/register')
@@ -85,8 +85,8 @@ describe('POST /api/auth/register', () => {
     });
 
     it('should return 409 if recruiter tries to create a company that already exists', async () => {
-        db.query.mockResolvedValueOnce([[]]);                               // Mock db check: Email check (empty)
-        db.query.mockResolvedValueOnce([[{ id: 10, name: 'TechCorp' }]]);   // Mock db check: Company exists
+        db.query.mockResolvedValueOnce([[]]);                               // Mock db 1: Email check (empty)
+        db.query.mockResolvedValueOnce([[{ id: 10, name: 'TechCorp' }]]);   // Mock db 2: Company exists
 
         const res = await request(app)
             .post('/api/auth/register')
@@ -104,10 +104,10 @@ describe('POST /api/auth/register', () => {
 
     // ======= Recruiter Tests (Join Company) =======
     it('should register a Recruiter joining via invite code (201 Created)', async () => {
-        db.query.mockResolvedValueOnce([[]]); // Mock 1: Email check (empty)
+        db.query.mockResolvedValueOnce([[]]);                   // Mock 1: Email check (empty)
         db.query.mockResolvedValueOnce([[{ company_id: 10 }]]); // Mock 2: Invite code is valid
-        db.query.mockResolvedValueOnce([{ insertId: 3 }]); // Mock 3: Insert user
-        db.query.mockResolvedValueOnce([{ affectedRows: 1 }]); // Mock 4: Update invite to is_used = TRUE
+        db.query.mockResolvedValueOnce([{ insertId: 3 }]);      // Mock 3: Insert user
+        db.query.mockResolvedValueOnce([{ affectedRows: 1 }]);  // Mock 4: Update invite to is_used = TRUE
 
         const res = await request(app)
             .post('/api/auth/register')
