@@ -47,15 +47,34 @@ Registers a new user. Supports creating standard Job Seeker, or Recruiters (who 
 - `400 Bad Request`: Missing required fields or invalid invite code.
 - `409 Conflict`: Email already in use, or Recruiter trying to create a company that already exists.
 
+## Generate Invite Code (Debug Only/Testing)
+
+`POST /api/auth/generate-invite`
+
+Generates a new invite code for a company. This endpoint is intended for testing and debugging purposes, and should not be included in production.
+
+**Request Body:**
+
+```json
+{
+    "company_id": 1
+}
+```
+
+**Responses:**
+
+- `201 Created`: Invite code generated successfully. Returns ``{"message": "Invite code generated successfully", "company_id": <company_id>, "invite_code": <invite_code>}``.
+- `400 Bad Request`: Missing `company_id`.
+
 ## Environment Variables (`.env`)
 
 Available environment variables for the API:
 
 ```env
-DB_HOST=localhost
+DB_HOST=127.0.0.1
 DB_USER=root
 DB_PASSWORD=your_local_password
-DB_NAME=careerconnect
+DB_NAME=career_connect
 ```
 
 *You can also find these in the [.env.example](../../.env.example) file.*
