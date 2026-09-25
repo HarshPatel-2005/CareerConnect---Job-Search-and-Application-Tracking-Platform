@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const db = require('../../config/db');
 
 async function registerUser(req, res) {
@@ -28,7 +29,7 @@ async function registerUser(req, res) {
             if (invite_code) {
                 // Join existing company via invite code
                 const [invites] = await db.query(
-                    'SELECT company_id FROM invites WHERE code = ? AND is_used = FALSE', 
+                    'SELECT company_id FROM company_invites WHERE code = ? AND is_used = FALSE', 
                     [invite_code]
                 );
 
@@ -68,7 +69,7 @@ async function registerUser(req, res) {
         // If they used an invite code, mark it as used
         if (usedInviteCode) {
             await db.query(
-                'UPDATE invites SET is_used = TRUE WHERE code = ?',
+                'UPDATE company_invites SET is_used = TRUE WHERE code = ?',
                 [usedInviteCode]
             );
         }
@@ -90,4 +91,31 @@ async function registerUser(req, res) {
     }
 }
 
-module.exports = { registerUser };
+async function generateDebugInviteCode(req, res) {
+    try {
+        const { company_id } = req.body;
+
+        if (!company_id) {
+            return res.status(400).json({ error: 'Please provide a company_id' });
+        }
+
+        // Generate a random 8-character alphanumeric invite code
+        const inviteCode = crypto.randomBytes(4).toString('hex').toUpperCase();
+
+        await db.query(
+            'INSERT INTO company_invites (company_id, code, is_used) VALUES (?, ?, FALSE)',
+            [company_id, inviteCode]
+        );
+
+        res.status(201).json({ 
+            message: 'Invite code generated successfully', 
+            company_id: company_id,
+            invite_code: inviteCode 
+        });
+    } catch (error) {
+        console.error('Error generating invite code:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+module.exports = { registerUser, generateDebugInviteCode };
