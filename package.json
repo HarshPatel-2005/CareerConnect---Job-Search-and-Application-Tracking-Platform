@@ -2,13 +2,17 @@
     "name": "CareerConnect",
     "version": "0.0.1",
     "main": "index.js",
+    "engines": {
+        "node": ">=22.5.0"
+    },
     "scripts": {
         "start": "node src/api/server.js",
         "dev": "node --watch src/api/server.js",
         "test": "jest --detectOpenHandles --runInBand"
     },
     "dependencies": {
-        "express": "^5.2.1"
+        "express": "^5.2.1",
+        "multer": "^2.4.0"
     },
     "devDependencies": {
         "jest": "^30.5.2",

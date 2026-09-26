@@ -3,9 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CareerConnect</title>
+    <title>CareerConnect | Resume Manager</title>
+    <link rel="stylesheet" href="/css/resumes.css">
 </head>
 <body>
-    <h1>CareerConnect</h1>
+    <main class="page-shell">
+        <header>
+            <a class="brand" href="/">CareerConnect</a>
+            <span class="eyebrow">Job seeker workspace</span>
+            <h1>Keep every resume ready for the right opportunity.</h1>
+            <p class="intro">Upload PDF or DOCX files, replace outdated versions, and download the one you need for an application.</p>
+        </header>
+
+        <section class="panel" aria-labelledby="upload-title">
+            <div>
+                <h2 id="upload-title">Add a resume</h2>
+                <p id="upload-help">PDF or DOCX, up to <span id="size-limit">5 MB</span>.</p>
+            </div>
+            <form id="upload-form">
+                <label class="file-picker" for="resume-file">
+                    <span id="selected-file">Choose a file</span>
+                    <input id="resume-file" name="resume" type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" required>
+                </label>
+                <button type="submit">Upload resume</button>
+            </form>
+            <p id="message" class="message" role="status" aria-live="polite"></p>
+        </section>
+
+        <section class="panel" aria-labelledby="resume-title">
+            <div class="section-heading">
+                <div>
+                    <h2 id="resume-title">My resumes</h2>
+                    <p>Choose, replace, or remove a saved document.</p>
+                </div>
+                <span id="resume-count" class="count">0 resumes</span>
+            </div>
+            <div id="resume-list" class="resume-list"></div>
+        </section>
+    </main>
+
+    <input id="replace-file" type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
+    <script src="/js/resumes.js" defer></script>
 </body>
 </html>
