@@ -3,46 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CareerConnect | Resume Manager</title>
-    <link rel="stylesheet" href="/css/resumes.css">
+    <title>CareerConnect | Home</title>
+    <link rel="stylesheet" href="/css/home.css">
 </head>
 <body>
-    <main class="page-shell">
-        <header>
+    <main class="home-shell">
+        <nav aria-label="Primary navigation">
             <a class="brand" href="/">CareerConnect</a>
-            <span class="eyebrow">Job seeker workspace</span>
-            <h1>Keep every resume ready for the right opportunity.</h1>
-            <p class="intro">Upload PDF or DOCX files, replace outdated versions, and download the one you need for an application.</p>
-        </header>
+            <span>Sprint 1 workspace</span>
+        </nav>
 
-        <section class="panel" aria-labelledby="upload-title">
-            <div>
-                <h2 id="upload-title">Add a resume</h2>
-                <p id="upload-help">PDF or DOCX, up to <span id="size-limit">5 MB</span>.</p>
-            </div>
-            <form id="upload-form">
-                <label class="file-picker" for="resume-file">
-                    <span id="selected-file">Choose a file</span>
-                    <input id="resume-file" name="resume" type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" required>
-                </label>
-                <button type="submit">Upload resume</button>
-            </form>
-            <p id="message" class="message" role="status" aria-live="polite"></p>
+        <section class="hero">
+            <p class="eyebrow">Your next opportunity, organized</p>
+            <h1>Build your profile. Keep your best resume ready.</h1>
+            <p class="intro">CareerConnect brings your job-search essentials together in one focused workspace. Choose a feature to get started.</p>
         </section>
 
-        <section class="panel" aria-labelledby="resume-title">
-            <div class="section-heading">
+        <section class="feature-grid" aria-label="Available features">
+            <a class="feature-card registration" href="/register.html">
+                <span class="number">01</span>
                 <div>
-                    <h2 id="resume-title">My resumes</h2>
-                    <p>Choose, replace, or remove a saved document.</p>
+                    <p class="card-label">Account</p>
+                    <h2>Create an account</h2>
+                    <p>Register as a job seeker or recruiter and set up your CareerConnect identity.</p>
                 </div>
-                <span id="resume-count" class="count">0 resumes</span>
-            </div>
-            <div id="resume-list" class="resume-list"></div>
-        </section>
-    </main>
+                <span class="action">Open registration <span aria-hidden="true">→</span></span>
+            </a>
 
-    <input id="replace-file" type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
-    <script src="/js/resumes.js" defer></script>
+            <a class="feature-card resumes" href="/resumes.html">
+                <span class="number">02</span>
+                <div>
+                    <p class="card-label">Documents</p>
+                    <h2>Manage resumes</h2>
+                    <p>Upload, review, replace, download, and remove your PDF or DOCX resumes.</p>
+                </div>
+                <span class="action">Open resume manager <span aria-hidden="true">→</span></span>
+            </a>
+        </section>
+
+        <footer>CareerConnect · SOEN 341 · Fall 2026</footer>
+    </main>
 </body>
 </html>

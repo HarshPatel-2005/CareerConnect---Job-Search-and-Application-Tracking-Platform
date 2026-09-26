@@ -10,3 +10,18 @@ describe('GET /health', () => {
         expect(typeof res.body.uptime).toBe('number');
     });
 });
+
+describe('feature pages', () => {
+    it('serves a home page linking registration and resume management', async () => {
+        const res = await request(app).get('/');
+
+        expect(res.statusCode).toBe(200);
+        expect(res.text).toContain('/register.html');
+        expect(res.text).toContain('/resumes.html');
+    });
+
+    it.each(['/register.html', '/resumes.html'])('serves %s', async (page) => {
+        const res = await request(app).get(page);
+        expect(res.statusCode).toBe(200);
+    });
+});
