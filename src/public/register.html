@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create an Account</title>
+    <link rel="stylesheet" href="./css/register.css">
+    <script src="./js/register.js" defer></script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Create an Account</h1>
+
+        <!-- Message Containers -->
+        <div id="message-container" class="alert hidden"></div>
+
+        <form id="register-form">
+            <!-- Standard Fields -->
+            <fieldset>
+                <label for="first-name">First Name:</label>
+                <input type="text" id="first-name" name="firstName" required />
+
+                <label for="last-name">Last Name:</label>
+                <input type="text" id="last-name" name="lastName" required />
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required />
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required minlength="6" />
+            </fieldset>
+
+            <!-- Role Selection -->
+            <fieldset>
+                <legend>I am a...</legend>
+                <label class="radio-label">
+                    <input type="radio" name="role" value="job_seeker" checked />
+                    Job Seeker
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="role" value="recruiter" />
+                    Recruiter
+                </label>
+            </fieldset>
+
+            <!-- Conditional Recruiter Fields -->
+            <fieldset id="recruiter-fields" class="hidden">
+                <legend>Company Details</legend>
+
+                <label class="radio-label">
+                    <input type="radio" name="recruiterAction" value="create" checked />
+                    Create a new company
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="recruiterAction" value="join" />
+                    Join an existing company
+                </label>
+
+                <div class="dynamic-inputs">
+                    <div id="company-name-group">
+                        <label for="company-name">Company Name:</label>
+                        <input type="text" id="company-name" name="companyName" />
+                    </div>
+
+                    <div id="invite-code-group" class="hidden">
+                        <label for="invite-code">Invite Code</label>
+                        <input type="text" id="invite-code" name="inviteCode" />
+                    </div>
+                </div>
+            </fieldset>
+
+            <button type="submit" id="submit-btn">Register</button>
+        </form>
+    </div>
+</body>
+
+</html>
