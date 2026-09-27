@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Account Settings — CareerConnect</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/profile.css" />
+
+</head>
+
+<body>
+
+  <header class="page-header">
+    <div class="page-header__inner">
+      <span class="brand">CareerConnect</span>
+      <nav class="nav">
+        <a href="index.html">Dashboard</a>
+        <span class="nav__sep">›</span>
+        <span class="nav__current">Account Settings</span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page">
+    <h1 class="page__title">Account Settings</h1>
+    <p class="page__subtitle">Manage the details on your CareerConnect profile.</p>
+
+    <div id="banner" class="banner" hidden></div>
+
+    <section class="settings-card" aria-label="Account details">
+
+      <!-- Full name -->
+      <div class="setting-row" data-field="full_name">
+        <div class="setting-row__view">
+          <div class="setting-row__text">
+            <span class="setting-row__label">Name</span>
+            <span class="setting-row__value" data-value>Loading…</span>
+          </div>
+          <button type="button" class="btn-link" data-action="edit">Edit</button>
+        </div>
+        <form class="setting-row__edit" data-form hidden>
+          <label class="field-label" for="full_name-input">Full name</label>
+          <input id="full_name-input" name="full_name" type="text" autocomplete="name" required />
+          <p class="field-error" data-error hidden></p>
+          <div class="setting-row__actions">
+            <button type="submit" class="btn-primary">Save changes</button>
+            <button type="button" class="btn-secondary" data-action="cancel">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Email -->
+      <div class="setting-row" data-field="email">
+        <div class="setting-row__view">
+          <div class="setting-row__text">
+            <span class="setting-row__label">Email</span>
+            <span class="setting-row__value" data-value>Loading…</span>
+          </div>
+          <button type="button" class="btn-link" data-action="edit">Edit</button>
+        </div>
+        <form class="setting-row__edit" data-form hidden>
+          <label class="field-label" for="email-input">Email address</label>
+          <input id="email-input" name="email" type="email" autocomplete="email" required />
+          <p class="field-error" data-error hidden></p>
+          <div class="setting-row__actions">
+            <button type="submit" class="btn-primary">Save changes</button>
+            <button type="button" class="btn-secondary" data-action="cancel">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Password -->
+      <div class="setting-row" data-field="password">
+        <div class="setting-row__view">
+          <div class="setting-row__text">
+            <span class="setting-row__label">Password</span>
+            <span class="setting-row__value" data-value>••••••••</span>
+          </div>
+          <button type="button" class="btn-link" data-action="edit">Edit</button>
+        </div>
+        <form class="setting-row__edit" data-form hidden>
+          <label class="field-label" for="current_password-input">Current password</label>
+          <input id="current_password-input" name="current_password" type="password" autocomplete="current-password" required />
+
+          <label class="field-label" for="new_password-input">New password</label>
+          <input id="new_password-input" name="new_password" type="password" autocomplete="new-password" minlength="6" required />
+
+          <label class="field-label" for="confirm_password-input">Confirm new password</label>
+          <input id="confirm_password-input" name="confirm_password" type="password" autocomplete="new-password" minlength="6" required />
+
+          <p class="field-error" data-error hidden></p>
+          <div class="setting-row__actions">
+            <button type="submit" class="btn-primary">Save changes</button>
+            <button type="button" class="btn-secondary" data-action="cancel">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+    </section>
+  </main>
+
+  <script src="js/profile.js"></script>
+</body>
+</html>

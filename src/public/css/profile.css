@@ -1,0 +1,259 @@
+/* Color/spacing tokens reused throughout the page below */
+:root {
+  --ink: #1F2937;
+  --ink-soft: #5B6472;
+  --line: #E2E6EC;
+  --surface: #FFFFFF;
+  --bg: #F5F7FA;
+  --accent: #1B6E68;
+  --accent-hover: #15544F;
+  --accent-soft: #E7F2F1;
+  --danger: #B3261E;
+  --danger-soft: #FBEAEA;
+  --radius: 8px;
+}
+
+* { 
+  box-sizing: border-box; 
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+/* ===== Top bar: brand + nav ===== */
+
+.page-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
+.page-header__inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--accent);
+}
+
+.nav {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+.nav a {
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+
+.nav a:hover { 
+  text-decoration: underline; 
+}
+
+.nav__sep { 
+  margin: 0 6px; 
+}
+
+.nav__current { 
+  color: var(--ink); 
+  font-weight: 500; 
+}
+
+/* ===== Page title + subtitle ===== */
+
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+.page__title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.page__subtitle {
+  color: var(--ink-soft);
+  margin: 0 0 28px;
+  font-size: 0.95rem;
+}
+
+/* ===== Success/error message bar (toggled by profile.js) ===== */
+
+.banner {
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+
+.banner--success {
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+  border: 1px solid #BFDEDC;
+}
+
+.banner--error {
+  background: var(--danger-soft);
+  color: var(--danger);
+  border: 1px solid #F0C6C3;
+}
+
+/* ===== The card holding all three rows, and the rows themselves ===== */
+
+.settings-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.setting-row {
+  border-bottom: 1px solid var(--line);
+  padding: 20px 24px;
+}
+
+.setting-row:last-child { border-bottom: none; }
+
+.setting-row__view {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.setting-row__text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.setting-row__label {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.setting-row__value {
+  font-size: 1rem;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: #2563EB;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 4px 0;
+  white-space: nowrap;
+}
+
+.btn-link:hover { text-decoration: underline; }
+
+/* ===== The inline edit form that appears when "Edit" is clicked ===== */
+
+.setting-row__edit {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ink);
+  margin-top: 10px;
+}
+
+.field-label:first-child { 
+  margin-top: 0; 
+}
+
+.setting-row__edit input {
+  padding: 10px 12px;
+  border: 1px solid #C9CFD8;
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  font-family: inherit;
+  width: 100%;
+  max-width: 360px;
+}
+
+.setting-row__edit input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.field-error {
+  color: var(--danger);
+  font-size: 0.85rem;
+  margin: 2px 0 0;
+}
+
+.setting-row__actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+/* ===== Buttons: Save (primary) and Cancel (secondary) ===== */
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primary:hover { 
+  background: var(--accent-hover); 
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: none;
+  border: 1px solid #C9CFD8;
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.btn-secondary:hover { 
+  background: #F1F3F6; 
+}
+
+@media (max-width: 480px) {
+  .setting-row__view { 
+    flex-direction: row; 
+  }
+  .setting-row__edit input { 
+    max-width: 100%; 
+  }
+}
