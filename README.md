@@ -22,7 +22,7 @@ GitHub Repository: [https://github.com/HarshPatel-2005/CareerConnect---Job-Searc
   - [Proposed Features](#proposed-features)
     - [Core Features](#core-features)
     - [Generative AI Feature (required)](#generative-ai-feature-required)
-    - [Additional Original Feature](#additional-original-feature)
+    - [Additional Original Feature(s)](#additional-original-features)
     - [Sprint 1 Scope](#sprint-1-scope)
   - [Setup Instructions](#setup-instructions)
     - [Prerequisites](#prerequisites)
@@ -34,7 +34,7 @@ GitHub Repository: [https://github.com/HarshPatel-2005/CareerConnect---Job-Searc
   - [Project Management](#project-management)
   - [Generative AI Usage](#generative-ai-usage)
 
----
+----
 
 ## Project Description
 
@@ -44,7 +44,7 @@ The platform is developed over four sprints using Agile practices, GitHub-based 
 
 Primary users: Job Seekers and Recruiters.
 
----
+----
 
 ## Identified Problem
 
@@ -52,7 +52,7 @@ Job seekers often apply to many positions across different websites, email threa
 
 Recruiters face a related problem: receiving applications in inconsistent formats and having no simple way to manage postings and applicants.
 
----
+----
 
 ## Proposed Solution
 
@@ -64,7 +64,7 @@ CareerConnect centralizes job-search activity into a single application:
 - Recruiters get a dedicated way to publish job postings and receive applications.
 - Generative AI features provide resume feedback and/or job-matching suggestions to help users improve their applications.
 
----
+----
 
 ## Team Members
 
@@ -75,22 +75,22 @@ CareerConnect centralizes job-search activity into a single application:
 | Maz | 40328977 | @Mazmou |
 | Harsh | 40341498 | @HarshPatel-2005 |
 
----
+----
 
 ## Technologies
 
 | Area | Technology |
 | ---- | ---------- |
 | Frontend | HTML/CSS/JS |
-| Backend | Node.JS |
+| Backend | Node.js, Express.js |
 | Database | MySQL (Running in Docker) |
-| Authentication | JWT Authentication |
+| Authentication | bcrypt (hashing), JWT Authentication |
 | Generative AI | |
 | Continuous Integration | GitHub Actions, Jest, Supertest |
-| Version Control | GitHub |
-| Project Management | GitHub Issues and GitHub Projects |
+| Version Control | Git & GitHub |
+| Project Management | GitHub Issues, GitHub Projects |
 
----
+----
 
 ## Proposed Features
 
@@ -108,20 +108,22 @@ CareerConnect centralizes job-search activity into a single application:
 
 ### Generative AI Feature (required)
 
--
+- **AI Resume Review:** Use generative AI to provide feedback on uploaded resumes, suggesting improvements in formatting, content, and keyword optimization for better job matching.
 
-### Additional Original Feature
+### Additional Original Feature(s)
 
--
+- **Following Companies:** Allow job seekers to follow companies of interest. When a followed company posts a new job, the user receives a notification. This feature helps users stay updated on opportunities from their preferred employers.
 
 ### Sprint 1 Scope
 
 The two features implemented and demonstrated in Sprint 1 are:
 
-1. User registration and login
-2. [Resume upload / User profile management]
+1. Express Server, MySQL Database, and CI/CD Pipeline Architecture
+2. Job Seeker and Recruiter Registration/Login
+3. Resume upload
+4. User Profile management
 
----
+----
 
 ## Setup Instructions
 
@@ -129,52 +131,94 @@ The two features implemented and demonstrated in Sprint 1 are:
 
 - [Git](https://git-scm.com/)
 - [Node.js](https://nodejs.org/)
-- [Database software]
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Required for MySQL database)
 
 ### Installation
 
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/HarshPatel-2005/CareerConnect---Job-Search-and-Application-Tracking-Platform.git
+   cd CareerConnect---Job-Search-and-Application-Tracking-Platform
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. Set up environment variables:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   *(Ensure `DB_HOST=127.0.0.1` in your `.env` file)*
+
 ### Running the Application
+
+To start both the MySQL database container and the backend Node server simultaneously:
+
+```bash
+npm run dev
+```
+
+The frontend will be accessible at `http://localhost:3000`.
 
 ### Running Tests
 
----
+To run the automated Jest test suite locally:
+
+```bash
+npm test
+```
+
+----
 
 ## Repository Structure
 
-```
+```text
 CareerConnect/
-- README.md
-- docs/                   Project documentation and team process
-- meeting-minutes/        Minutes for every team meeting
-- sprint-deliverables/    Deliverables for each sprint
-- AI_Log/                 AI usage reports, one subfolder per team member
-- frontend/               Client application code
-- backend/                Server application code
+├─── .github/workflows/   # CI/CD workflows
+├─── AI-Log/              # AI usage logs for each team member
+├─── docs/                # Project documentation (API, team process, etc.)
+├─── db/                  # Database initialization scripts
+├─── meeting-minutes/     # Minutes for every team meeting
+├─── sprint-deliverables/ # Deliverables for each sprint  
+├─── src/                 # Source code
+├─── tests/               # Jest unit and integration tests
+├─── .env.example         # Environment variable template
+├─── .gitignore           # Git ignore file
+├─── docker-compose.yml   # Docker Compose configuration for MySQL
+├─── package.json         # Node.js project configuration
+├─── package-lock.json    # Lock file for npm dependencies
+├─── README.md            # Project overview and setup instructions
 ```
 
----
+----
 
 ## Team Process
 
 Full details are in [`docs/team-process.md`](docs/team-process.md).
 
-Summary:
+Summary: We utilize a feature-branch Git workflow (`feature/<author>/<feature-name>`). PRs require peer code review and passing GitHub Actions tests before merging into the `development` branch.
 
----
+----
 
 ## Project Management
 
-- **User stories and tasks:** tracked as GitHub Issues with labels.
-- **Sprint board:** GitHub Projects (Kanban board).
-- **Meeting minutes:** stored in [`meeting-minutes/`](meeting-minutes/).
-- **Sprint plans:** stored in [`sprint-deliverables/`](sprint-deliverables/).
+- **User stories and tasks:** Tracked as GitHub Issues with labels.
+- **Sprint board:** Managed via GitHub Projects (Kanban board).
+- **Meeting minutes:** Stored in [`meeting-minutes/`](meeting-minutes/).
+- **Sprint plans:** Stored in [`sprint-deliverables/`](sprint-deliverables/).
 
----
+----
 
 ## Generative AI Usage
 
 Our team uses Generative AI responsibly to support software engineering activities. All AI-generated content is reviewed, validated, and documented by the team.
 
-- Each member keeps a PDF log of their AI usage in `AI_Log/<member-name>/`.
+- Each member keeps a log of their AI usage in `AI_Log/<member-name>/`.
 - Each log entry records the task, purpose, prompt and response (or chat link), AI-suggested content, validation performed, our decision (accepted, modified, or rejected), a reflection, and the responsible person.
 - AI-generated user stories and team-generated user stories are documented separately and are never mixed.
