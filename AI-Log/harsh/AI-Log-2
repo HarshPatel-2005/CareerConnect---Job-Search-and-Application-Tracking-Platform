@@ -1,0 +1,11 @@
+AI Log #2:
+
+Task: Generate the route, controller and the JS for the profile page
+Purpose of AI: Code generation
+Link: https://claude.ai/share/b95a5daa-27d4-46b1-a706-f86026be7c10
+AI-Suggested Content: The AI generated the code which makes the HTML and CSS that I worked on responsive
+Validation: Manual review by testing the database. I also forced using a fixed user since we do not have a login page ready on this test so instead I tested it
+using a fake user by taking the id of the user #1, which is the first registered user
+Decision: Accepted
+Reflection: It was useful because it was able to get the task done in a short amount of time while understanding how the logic works manually. I was reading through it to make sure the logic follows the way it should. Most of which was just a quality change, I was manually understanding and making sure it produced what I wanted to produce.
+Responsible Person: Harsh Patel (40341498)
