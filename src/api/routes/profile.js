@@ -1,12 +1,18 @@
-// Maps HTTP requests for /api/profile to the functions in profileController.js.
-// Mounted in app.js with: app.use('/api/profile', require('./routes/profile'));
-
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { getProfile, updateProfile, updatePassword } = require('../controllers/profileController');
+const {
+    getProfile,
+    updateProfile,
+    updatePassword,
+} = require("../controllers/profileController");
 
-router.get('/', getProfile);              // GET  /api/profile          -> load current values
-router.put('/', updateProfile);           // PUT  /api/profile          -> update name/email
-router.put('/password', updatePassword);  // PUT  /api/profile/password -> change password
+// GET /api/profile/:id
+router.get("/:id", getProfile);
+
+// PUT /api/profile/:id  -> update full_name and/or email
+router.put("/:id", updateProfile);
+
+// PUT /api/profile/:id/password -> change password (requires current password)
+router.put("/:id/password", updatePassword);
 
 module.exports = router;

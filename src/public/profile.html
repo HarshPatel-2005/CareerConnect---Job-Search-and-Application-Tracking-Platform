@@ -1,20 +1,23 @@
 <!DOCTYPE html>
+<!--
+  Account Settings page. Lists Name / Email / Password like a typical
+  "Login & Security" screen, but each row edits in place (like Amazon's
+  Edit Address form) instead of navigating to a separate page.
 
+  Every row below follows the same pattern:
+    .setting-row__view  -> the read-only label + current value + Edit button
+    .setting-row__edit  -> the hidden form that appears when Edit is clicked
+  profile.js toggles between these two on click and handles saving.
+-->
 <html lang="en">
-
-<head>
-
+  <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>Account Settings — CareerConnect</title>
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/profile.css" />
-
 </head>
-
 <body>
 
   <header class="page-header">
@@ -32,9 +35,11 @@
     <h1 class="page__title">Account Settings</h1>
     <p class="page__subtitle">Manage the details on your CareerConnect profile.</p>
 
+    <!-- profile.js fills this in and un-hides it after a save or a load error -->
     <div id="banner" class="banner" hidden></div>
 
     <section class="settings-card" aria-label="Account details">
+
 
       <!-- Full name -->
       <div class="setting-row" data-field="full_name">
@@ -76,7 +81,9 @@
         </form>
       </div>
 
-      <!-- Password -->
+      <!-- Password: shown as dots and never fetched from the server.
+           Editing needs three inputs instead of one: the current password
+           (to prove it's really you) plus the new one, typed twice. -->
       <div class="setting-row" data-field="password">
         <div class="setting-row__view">
           <div class="setting-row__text">
