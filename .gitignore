@@ -1,2 +1,11 @@
 node_modules/
 .env
+
+# Runtime data and uploaded resumes
+data/
+uploads/
+
+# Microsoft Word documents
+*.doc
+*.docx
+~$*.doc*
