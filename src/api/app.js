@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const { createResumeRouter } = require('./routes/resumes');
 const authRoutes = require('./routes/auth');
+const profileRoutes = require('./routes/profile');
 
 function createApp(options = {}) {
     const app = express();
@@ -10,6 +11,7 @@ function createApp(options = {}) {
     app.use(express.static(path.join(__dirname, '../public')));
 
     app.use('/api/auth', authRoutes);
+    app.use('/api/profile', profileRoutes);
     app.use('/api/resumes', createResumeRouter(options.resume || {}));
 
     // Health check endpoint
