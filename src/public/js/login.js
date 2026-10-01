@@ -6,14 +6,18 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+
         showMessage('');
+
+        if (!email || !password) {
+            showMessage('Please enter your email and password.', 'error');
+            return;
+        }
+
         submitButton.disabled = true;
         submitButton.textContent = 'Logging in...';
-
-        const payload = {
-            email: document.getElementById('email').value.trim(),
-            password: document.getElementById('password').value
-        };
 
         try {
             const response = await fetch('/api/auth/login', {
@@ -21,7 +25,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(payload)
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                })
             });
 
             const data = await response.json();
@@ -34,8 +41,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             console.log('Logged in user:', data.user);
 
+            // Later you can redirect the user to a dashboard here.
+            // Example:
+            // window.location.href = '/index.html';
+
         } catch (error) {
-            showMessage(error.message, 'error');
+            console.error('Login error:', error);
+            showMessage(error.message || 'Unable to log in.', 'error');
         } finally {
             submitButton.disabled = false;
             submitButton.textContent = 'Login';
