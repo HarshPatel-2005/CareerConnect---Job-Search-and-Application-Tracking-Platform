@@ -1,0 +1,15 @@
+Meeting Minutes #2:
+
+Attendance: Joelle, Lucas, Harsh, Maz
+
+Discussions:
+
+- Discussing what must be completed for the upcoming weeks
+- Discussing what each team member will be working on
+- Creating the new issues regarding the sprint #2 requirements
+
+Decisions:
+
+- We have discussed what must be done for sprint #2
+- We have discussed who will take which tasks for sprint #2
+- We have created the different issues that must be worked on for sprint #2
