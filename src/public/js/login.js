@@ -31,8 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             showMessage('Login successful!', 'success');
-
-            console.log('Logged in user:', data.user);
+            localStorage.setItem('careerConnectUser', JSON.stringify(data.user));
+            window.location.href = './resumes.html';
 
         } catch (error) {
             showMessage(error.message, 'error');

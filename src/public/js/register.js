@@ -85,10 +85,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(payload)
             });
 
-            const data = await response.json();
+            const data = await response.json().catch(() => ({}));
 
             if (!response.ok) {
-                throw new Error(data.error || 'Registration failed');
+                throw new Error(data.error || `Registration failed (${response.status})`);
             }
 
             showMessage('Registration successful! You can now log in.', 'success');

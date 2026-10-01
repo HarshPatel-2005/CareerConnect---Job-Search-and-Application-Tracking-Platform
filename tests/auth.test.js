@@ -62,6 +62,40 @@ describe('POST /api/auth/register', () => {
         expect(res.body).toHaveProperty('error', 'Email already in use');
     });
 
+    it('should return 400 for an unsupported role', async () => {
+        const res = await request(app)
+            .post('/api/auth/register')
+            .send({
+                full_name: 'Admin User',
+                email: 'admin@example.com',
+                password: 'Password123!',
+                role: 'admin'
+            });
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body).toHaveProperty('error', 'Invalid role');
+        expect(db.query).not.toHaveBeenCalled();
+    });
+
+    it('should report an unavailable database as 503', async () => {
+        const connectionError = Object.assign(new Error('connect ECONNREFUSED'), {
+            code: 'ECONNREFUSED'
+        });
+        db.query.mockRejectedValueOnce(connectionError);
+
+        const res = await request(app)
+            .post('/api/auth/register')
+            .send({
+                full_name: 'John Doe',
+                email: 'john.doe@example.com',
+                password: 'Password123!',
+                role: 'job_seeker'
+            });
+
+        expect(res.statusCode).toBe(503);
+        expect(res.body).toHaveProperty('error', 'Database unavailable. Please try again shortly.');
+    });
+
     // ======= Recruiter Tests (Create Company) =======
     it('should register a Recruiter and create a new company (201 Created)', async () => {
         db.query.mockResolvedValueOnce([[]]);               // Mock db 1: Email check

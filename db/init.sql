@@ -28,4 +28,18 @@ CREATE TABLE IF NOT EXISTS users (
     company_id INT DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE SET NULL
-)
+);
+
+-- Resume files live on disk; their metadata and ownership live in MySQL.
+CREATE TABLE IF NOT EXISTS resumes (
+    id CHAR(36) PRIMARY KEY,
+    user_id INT NOT NULL,
+    original_name VARCHAR(255) NOT NULL,
+    stored_name VARCHAR(255) UNIQUE NOT NULL,
+    mime_type VARCHAR(100) NOT NULL,
+    size_bytes INT UNSIGNED NOT NULL,
+    created_at DATETIME(3) NOT NULL,
+    updated_at DATETIME(3) NOT NULL,
+    INDEX idx_resumes_user_id (user_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);

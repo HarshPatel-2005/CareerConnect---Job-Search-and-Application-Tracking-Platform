@@ -133,9 +133,24 @@ The two features implemented and demonstrated in Sprint 1 are:
 
 ### Installation
 
+1. Copy `.env.example` to `.env` and replace `your_local_password` with a local
+   MySQL root password.
+2. Install dependencies with `npm install`.
+3. Start Docker Desktop, then start MySQL with `npm run db:up`.
+
 ### Running the Application
 
+Run `npm start`, then open <http://localhost:3000>.
+
+If registration reports that the database is unavailable, confirm Docker Desktop
+is running and run `npm run db:up`. If this project was previously run with an
+older database schema, `npm run db:reset` followed by `npm run db:up` recreates
+the development database. **This deletes all data in the local Docker database.**
+
 ### Running Tests
+
+Run `npm test`. The automated tests use mocks/local test storage and do not
+require the MySQL container.
 
 ---
 

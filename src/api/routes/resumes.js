@@ -41,9 +41,8 @@ function createResumeRouter(options = {}) {
     const router = express.Router();
     const root = path.resolve(__dirname, '../../..');
     const uploadDir = path.resolve(options.uploadDir || path.join(root, 'uploads/resumes'));
-    const dbPath = path.resolve(options.dbPath || path.join(root, 'data/careerconnect.sqlite'));
     const maxSize = options.maxSize || Number(process.env.RESUME_MAX_SIZE_BYTES) || DEFAULT_MAX_SIZE;
-    const store = options.store || new ResumeStore(dbPath);
+    const store = options.store || new ResumeStore();
 
     fs.mkdirSync(uploadDir, { recursive: true });
 
@@ -66,7 +65,16 @@ function createResumeRouter(options = {}) {
         }
     });
 
-    const userId = (req) => req.get('x-user-id') || 'demo-job-seeker';
+    const userId = (req) => {
+        const value = req.get('x-user-id');
+        return /^\d+$/.test(value || '') ? Number(value) : null;
+    };
+    const requireUser = (req, res, next) => {
+        const id = userId(req);
+        if (!id) return res.status(401).json({ error: 'Log in to manage resumes.' });
+        req.userId = id;
+        next();
+    };
     const removeUploadedFile = (file) => {
         if (file?.path && fs.existsSync(file.path)) fs.unlinkSync(file.path);
     };
@@ -85,17 +93,24 @@ function createResumeRouter(options = {}) {
         return true;
     }
 
-    router.get('/', (req, res) => {
-        res.json({ resumes: store.list(userId(req)).map(publicResume), maxSize });
+    router.use(requireUser);
+
+    router.get('/', async (req, res, next) => {
+        try {
+            const resumes = await store.list(req.userId);
+            res.json({ resumes: resumes.map(publicResume), maxSize });
+        } catch (error) {
+            next(error);
+        }
     });
 
-    router.post('/', upload.single('resume'), (req, res, next) => {
+    router.post('/', upload.single('resume'), async (req, res, next) => {
         if (!validateUploadedFile(req, res)) return;
-        const now = new Date().toISOString();
+        const now = new Date();
         try {
-            const record = store.create({
+            const record = await store.create({
                 id: crypto.randomUUID(),
-                user_id: userId(req),
+                user_id: req.userId,
                 original_name: path.basename(req.file.originalname),
                 stored_name: req.file.filename,
                 mime_type: req.file.mimetype,
@@ -110,21 +125,21 @@ function createResumeRouter(options = {}) {
         }
     });
 
-    router.put('/:id', upload.single('resume'), (req, res, next) => {
+    router.put('/:id', upload.single('resume'), async (req, res, next) => {
         if (!validateUploadedFile(req, res)) return;
-        const existing = store.get(req.params.id, userId(req));
-        if (!existing) {
-            removeUploadedFile(req.file);
-            return res.status(404).json({ error: 'Resume not found.' });
-        }
 
         try {
-            const record = store.replace(req.params.id, userId(req), {
+            const existing = await store.get(req.params.id, req.userId);
+            if (!existing) {
+                removeUploadedFile(req.file);
+                return res.status(404).json({ error: 'Resume not found.' });
+            }
+            const record = await store.replace(req.params.id, req.userId, {
                 original_name: path.basename(req.file.originalname),
                 stored_name: req.file.filename,
                 mime_type: req.file.mimetype,
                 size_bytes: req.file.size,
-                updated_at: new Date().toISOString()
+                updated_at: new Date()
             });
             fs.rmSync(path.join(uploadDir, existing.stored_name), { force: true });
             res.json({ resume: publicResume(record) });
@@ -134,19 +149,22 @@ function createResumeRouter(options = {}) {
         }
     });
 
-    router.get('/:id/download', (req, res) => {
-        const resume = store.get(req.params.id, userId(req));
-        if (!resume) return res.status(404).json({ error: 'Resume not found.' });
-        res.download(path.join(uploadDir, resume.stored_name), resume.original_name);
+    router.get('/:id/download', async (req, res, next) => {
+        try {
+            const resume = await store.get(req.params.id, req.userId);
+            if (!resume) return res.status(404).json({ error: 'Resume not found.' });
+            res.download(path.join(uploadDir, resume.stored_name), resume.original_name);
+        } catch (error) {
+            next(error);
+        }
     });
 
-    router.delete('/:id', (req, res, next) => {
-        const resume = store.get(req.params.id, userId(req));
-        if (!resume) return res.status(404).json({ error: 'Resume not found.' });
-
+    router.delete('/:id', async (req, res, next) => {
         try {
+            const resume = await store.get(req.params.id, req.userId);
+            if (!resume) return res.status(404).json({ error: 'Resume not found.' });
             fs.rmSync(path.join(uploadDir, resume.stored_name), { force: true });
-            store.delete(req.params.id, userId(req));
+            await store.delete(req.params.id, req.userId);
             res.status(204).send();
         } catch (error) {
             next(error);

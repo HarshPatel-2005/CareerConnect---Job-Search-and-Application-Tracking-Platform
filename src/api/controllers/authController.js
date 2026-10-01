@@ -2,13 +2,45 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const db = require('../../config/db');
 
+const ALLOWED_ROLES = new Set(['job_seeker', 'recruiter']);
+const DATABASE_CONNECTION_ERRORS = new Set([
+    'ECONNREFUSED',
+    'ENOTFOUND',
+    'ETIMEDOUT',
+    'PROTOCOL_CONNECTION_LOST'
+]);
+
+function sendServerError(res, error, action) {
+    console.error(`Error ${action}:`, error);
+
+    if (DATABASE_CONNECTION_ERRORS.has(error.code)) {
+        return res.status(503).json({
+            error: 'Database unavailable. Please try again shortly.'
+        });
+    }
+
+    return res.status(500).json({ error: 'Internal server error' });
+}
+
 async function registerUser(req, res) {
     try {
-        const { full_name, email, password, role, company_name, invite_code } = req.body;
+        const fullName = req.body.full_name?.trim();
+        const email = req.body.email?.trim().toLowerCase();
+        const { password, role } = req.body;
+        const companyName = req.body.company_name?.trim();
+        const inviteCode = req.body.invite_code?.trim().toUpperCase();
 
         // Basic validation
-        if (!full_name || !email || !password || !role) {
+        if (!fullName || !email || !password || !role) {
             return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        if (!ALLOWED_ROLES.has(role)) {
+            return res.status(400).json({ error: 'Invalid role' });
+        }
+
+        if (password.length < 6) {
+            return res.status(400).json({ error: 'Password must be at least 6 characters' });
         }
 
         // Check if email is already in use
@@ -26,11 +58,11 @@ async function registerUser(req, res) {
 
         // Handle recruiter registration
         if (role === 'recruiter') {
-            if (invite_code) {
+            if (inviteCode) {
                 // Join existing company via invite code
                 const [invites] = await db.query(
                     'SELECT company_id FROM company_invites WHERE code = ? AND is_used = FALSE', 
-                    [invite_code]
+                    [inviteCode]
                 );
 
                 if (invites.length === 0) {
@@ -38,11 +70,11 @@ async function registerUser(req, res) {
                 }
 
                 companyId = invites[0].company_id;
-                usedInviteCode = invite_code;
-            } else if (company_name) {
+                usedInviteCode = inviteCode;
+            } else if (companyName) {
                 const [existingCompanies] = await db.query(
                     'SELECT id FROM companies WHERE name = ?', 
-                    [company_name]
+                    [companyName]
                 );
 
                 if (existingCompanies.length > 0) {
@@ -51,7 +83,7 @@ async function registerUser(req, res) {
 
                 const [newCompany] = await db.query(
                     'INSERT INTO companies (name) VALUES (?)',
-                    [company_name] 
+                    [companyName]
                 );
 
                 companyId = newCompany.insertId;
@@ -63,7 +95,7 @@ async function registerUser(req, res) {
         // Insert new user into the database
         const [newUser] = await db.query(
             'INSERT INTO users (full_name, email, password_hash, role, company_id) VALUES (?, ?, ?, ?, ?)',
-            [full_name, email, passwordHash, role, companyId]
+            [fullName, email, passwordHash, role, companyId]
         );
 
         // If they used an invite code, mark it as used
@@ -86,8 +118,7 @@ async function registerUser(req, res) {
 
         return res.status(201).json(responsePayload);
     } catch (error) {
-        console.error('Error registering user:', error);
-        return res.status(500).json({ error: 'Internal server error' });
+        return sendServerError(res, error, 'registering user');
     }
 }
 
@@ -141,10 +172,7 @@ async function loginUser(req, res) {
             }
         });
     } catch (error) {
-        console.error('Error logging in user:', error);
-        return res.status(500).json({
-            error: 'Internal server error'
-        });
+        return sendServerError(res, error, 'logging in user');
     }
 }
 
@@ -172,8 +200,7 @@ async function generateDebugInviteCode(req, res) {
             invite_code: inviteCode 
         });
     } catch (error) {
-        console.error('Error generating invite code:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        return sendServerError(res, error, 'generating invite code');
     }
 }
 

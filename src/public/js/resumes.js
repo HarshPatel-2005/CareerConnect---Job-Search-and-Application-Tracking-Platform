@@ -7,6 +7,14 @@ const count = document.querySelector('#resume-count');
 const message = document.querySelector('#message');
 let replacementId = null;
 
+function currentUserId() {
+    try {
+        return JSON.parse(localStorage.getItem('careerConnectUser'))?.id || null;
+    } catch {
+        return null;
+    }
+}
+
 function showMessage(text, type = '') {
     message.textContent = text;
     message.className = `message ${type}`;
@@ -46,7 +54,10 @@ function render(resumes) {
 }
 
 async function request(url, options) {
-    const response = await fetch(url, options);
+    const headers = new Headers(options?.headers);
+    const userId = currentUserId();
+    if (userId) headers.set('x-user-id', userId);
+    const response = await fetch(url, { ...options, headers });
     if (response.status === 204) return null;
     const body = await response.json();
     if (!response.ok) throw new Error(body.error || 'Something went wrong.');
@@ -54,6 +65,10 @@ async function request(url, options) {
 }
 
 async function loadResumes() {
+    if (!currentUserId()) {
+        showMessage('Log in to manage resumes.', 'error');
+        return;
+    }
     try {
         const body = await request('/api/resumes');
         render(body.resumes);
@@ -92,6 +107,28 @@ uploadForm.addEventListener('submit', async (event) => {
 });
 
 list.addEventListener('click', async (event) => {
+    const downloadLink = event.target.closest('.download');
+    if (downloadLink) {
+        event.preventDefault();
+        try {
+            const response = await fetch(downloadLink.href, {
+                headers: { 'x-user-id': String(currentUserId()) }
+            });
+            if (!response.ok) throw new Error('Unable to download resume.');
+
+            const blobUrl = URL.createObjectURL(await response.blob());
+            const temporaryLink = document.createElement('a');
+            temporaryLink.href = blobUrl;
+            temporaryLink.download = downloadLink.closest('.resume-row')
+                .querySelector('.resume-name').textContent;
+            temporaryLink.click();
+            URL.revokeObjectURL(blobUrl);
+        } catch (error) {
+            showMessage(error.message, 'error');
+        }
+        return;
+    }
+
     const replaceButton = event.target.closest('[data-replace]');
     if (replaceButton) {
         replacementId = replaceButton.dataset.replace;
