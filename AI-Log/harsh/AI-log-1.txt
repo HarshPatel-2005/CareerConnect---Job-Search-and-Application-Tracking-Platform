@@ -1,0 +1,10 @@
+AI Log #1:
+
+Task: Generate 10 User Stories for the Project
+Purpose of AI: Brainstorming in order to develop the different user stories
+Link: https://claude.ai/share/8cac0af5-754f-40ab-91bb-d02a8de5d742
+AI-Suggested Content: The AI generated the different user stories
+Validation: Manual review and peer review. Verified the output with our team to make sure that it makes sense and that the generated content is valid
+Decision: Accepted
+Reflection: We learned how to write user stories which was useful to us to create the 5 user stories by brainstorming.
+Responsible Person: Harsh Patel (40341498)

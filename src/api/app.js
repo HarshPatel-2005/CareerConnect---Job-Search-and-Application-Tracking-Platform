@@ -1,22 +1,27 @@
 const express = require('express');
 const path = require('path');
+const { createResumeRouter } = require('./routes/resumes');
 const authRoutes = require('./routes/auth');
+const profileRoutes = require('./routes/profile');
 
+function createApp(options = {}) {
+    const app = express();
 
-const app = express();
+    app.use(express.json());
+    app.use(express.static(path.join(__dirname, '../public')));
 
-app.use(express.json());
-app.use(express.static(path.join(__dirname, '../public')));
+    app.use('/api/auth', authRoutes);
+    app.use('/api/profile', profileRoutes);
+    app.use('/api/resumes', createResumeRouter(options.resume || {}));
 
-// ===== API routes =====
+    // Health check endpoint
+    app.get('/health', (req, res) => {
+        res.status(200).json({ status: 'ok', uptime: process.uptime() });
+    });
 
-app.use('/api/auth', authRoutes);
+    return app;
+}
 
-
-// Health check endpoint
-app.get('/health', (req, res) => {
-    res.status(200).json({ status: 'ok', uptime: process.uptime() });
-});
-
-
+const app = createApp();
 module.exports = app;
+module.exports.createApp = createApp;

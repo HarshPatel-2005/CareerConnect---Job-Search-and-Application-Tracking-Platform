@@ -1,0 +1,17 @@
+Meeting Minutes #1:
+
+Attendance: Joelle, Lucas, Harsh, Maz
+
+Discussions:
+
+Defining the team processes
+Deciding the frameworks that will be used
+Deciding and writing down our user stories
+Deciding our generative AI features & our extra features (if we have any)
+
+Decisions:
+
+We decided how our team will work on the project individually using the branches. We decided how we’ll check the state of our issues, whether it is ready or done
+We decided that we will stick to using JavaScript, HTML, CSS, Node.JS, Express.JS, MySQL, Bcrypt, and other tools that were used from SOEN 287.
+We have submitted 15 user stories using the issues tab on the GitHub repository, where 10 of them are AI-Generated and the other 5 were brainstormed
+The generative AI feature and the extra features were written in the GitHub issues. The extra 5 issues that were brainstormed are the extra features. The generative AI feature will be the AI resume feedback

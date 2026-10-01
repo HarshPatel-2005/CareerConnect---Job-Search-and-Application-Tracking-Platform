@@ -1,0 +1,123 @@
+Task ID/Title: US-04: Resume upload and management (AI)
+Purpose of AI Use: AI was used to draft and implement the feature
+Chat Link or Prompt/Response: Link to the conversation or the full prompt and AI response.
+
+    As a job seeker, I want to upload, replace, download, and delete my resumes so that I can keep my documents current and reuse them across job applications.
+
+    ### Acceptance Criteria
+
+    Users can upload PDF and DOCX files.
+    Unsupported file types are rejected with a clear message.
+    Files exceeding the 5 MB limit are rejected.
+    File contents are validated, not only the filename extension.
+    Users can see a list of their uploaded resumes.
+    Each resume displays its filename, size, and last-updated date.
+    Users can download an uploaded resume.
+    Users can replace an existing resume while retaining its record.
+    Users can delete a resume.
+    Users cannot access another user’s resumes.
+    Uploaded files and metadata persist after restarting the server.
+    Failed operations do not leave orphaned files or metadata.
+
+    ### Task Breakdown
+
+    Task    Description                                        Priority    Estimate
+    ━━━━━━  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  ━━━━━━━━━━  ━━━━━━━━━━
+    4.1     Define resume requirements and API endpoints           High      1 hour
+    ──────  ─────────────────────────────────────────────────  ──────────  ──────────
+    4.2     Implement PDF/DOCX upload and validation               High     3 hours
+    ──────  ─────────────────────────────────────────────────  ──────────  ──────────
+    4.3     Create the resume metadata table                       High     2 hours
+    ──────  ─────────────────────────────────────────────────  ──────────  ──────────
+    4.4     Configure persistent file storage                      High     2 hours
+    ──────  ─────────────────────────────────────────────────  ──────────  ──────────
+    4.5     Implement resume listing and downloading               High     2 hours
+    ──────  ─────────────────────────────────────────────────  ──────────  ──────────
+    4.6     Implement resume replacement                           High     2 hours
+    ──────  ─────────────────────────────────────────────────  ──────────  ──────────
+    4.7     Implement resume deletion and file cleanup             High     2 hours
+    ──────  ─────────────────────────────────────────────────  ──────────  ──────────
+    4.8     Build the resume-management UI                         High     4 hours
+    ──────  ─────────────────────────────────────────────────  ──────────  ──────────
+    4.9     Connect resumes to authenticated users                 High     3 hours
+    ──────  ─────────────────────────────────────────────────  ──────────  ──────────
+    4.10    Add API and validation tests                           High     3 hours
+    ──────  ─────────────────────────────────────────────────  ──────────  ──────────
+    4.11    Perform manual testing and document the feature      Medium     2 hours
+
+    Estimated effort: 26 hours
+
+    ### API Design
+
+    Method    Endpoint                     Purpose
+    ━━━━━━━━  ━━━━━━━━━━━━━━━━━━━━━━━━━━━  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    GET       /api/resumes                 List the current user’s resumes
+    ────────  ───────────────────────────  ─────────────────────────────────
+    POST      /api/resumes                 Upload a resume
+    ────────  ───────────────────────────  ─────────────────────────────────
+    GET       /api/resumes/:id/download    Download a resume
+    ────────  ───────────────────────────  ─────────────────────────────────
+    PUT       /api/resumes/:id             Replace a resume
+    ────────  ───────────────────────────  ─────────────────────────────────
+    DELETE    /api/resumes/:id             Delete a resume
+
+    Uploads use multipart/form-data with a field named resume.
+
+    ### Metadata
+
+    Each resume record should contain:
+
+    Resume ID
+    Owner/user ID
+    Original filename
+    Generated storage filename
+    MIME type
+    File size
+    Creation date
+    Last-updated date
+
+
+AI-Suggested Content: 
+    AI wanted to create functions to validate the files processed to make sure they are within the reasonable range for CVs. It wanted then to create a sqlite table to store the documents in it. 
+    It then wanted to implement persisten file storage which would mean that the files stays after reboot of the server. It opted to add also resume listing and downloading, resume replacement   
+    resume deletion and file cleanup. These were new ideas that we decided to take from it. Of course, there is the UI aspect of it and the connection between user IDS and their respectives CVs. 
+Validation: The output was discussed during our meeting and we have come to the conclusion that what the AI proposed was perfect for our use case. We decided to move forward with this design in mind to implement this.
+Decision: Indicate whether the AI output was:
+    •	Accepted
+    
+Reflection: We learned that there is the implementation side of things, but we must not forget to always include validation tests as to not suffer from technical debt in the futur.
+Responsible Person: Mahmoud Maz
+
+Task ID/Title: US-04: Resume upload and management (AI)
+Purpose of AI Use: Coding 
+Chat Link or Prompt/Response: 
+
+Write me the bare-bone to be able to upload my resume throught the website to the database
+
+ Ran git status --short; Write-Output '--- CURRENT TREE ---'; git ls-tree -r --name-only HEAD; Write-Output '--- DEVELOPMENT TREE ---'; git ls-tree -r --name-only origin/development; Write-Output '--- FEATURE TREE ---'; git ls-tree -r --name-only origin/feature/lucas/user-regis…
+  └ src/public/register.html
+    tests/app.test.js
+    tests/auth.test.js
+• Ran Write-Output '--- development package.json ---'; git show origin/development:package.json; Write-Output '--- development app.js ---'; git show origin/development:src/api/app.js; Write-Output '--- development server.js ---'; git show origin/development:src/api/server.js; Wr…
+  └     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE SET NULL
+    )
+The application scaffold lives on the remote development branch, while the checked-out main branch contains only documentation. I’m basing the feature on development in a dedicated feature branch so it integrates with the team’s stated workflow; I’ll carry forward the Word-document ignore rules created earlier.
+• Ran $backup = Join-Path $env:TEMP ('careerconnect-gitignore-' + [guid]::NewGuid() + '.txt'); Move-Item -LiteralPath '.gitignore' -Destination $backup; git switch -c feature/maz/resume-management origin/development; Write-Output "Backup: $backup"; Get-Content -LiteralPath $back…
+  └ ~$*.doc*
+    --- STATUS ---
+    ?? SOEN341_CareerConnect_Project_Sprint1.docx
+You approved codex to run git switch -c feature/maz/resume-management origin/development this time
+• Ran git switch -c feature/maz/resume-management origin/development
+  └ branch 'feature/maz/resume-management' set up to track 'origin/development'.
+    Switched to a new branch 'feature/maz/resume-management'
+• Ran node --version; npm --version; Get-Content -LiteralPath package.json; Get-Content -LiteralPath .gitignore; git status --short
+  └ node_modules/
+    .env
+    ?? SOEN341_CareerConnect_Project_Sprint1.docx
+
+AI-Suggested Content: Generated code to be able to upload the documents to the database
+Validation: The ask was fairly simple and it managed to stay on track without going astray
+Decision: Modified and partially accepted.
+Reflection: AI helped with the code part,but it was fairly insecure in that any type of document could be sent throught and there was no upper limit to how big the file could be
+Responsible Person: Mahmoud Maz

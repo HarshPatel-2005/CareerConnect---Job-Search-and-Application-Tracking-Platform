@@ -41,10 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             console.log('Logged in user:', data.user);
 
-            // Later you can redirect the user to a dashboard here.
-            // Example:
-            // window.location.href = '/index.html';
-
         } catch (error) {
             console.error('Login error:', error);
             showMessage(error.message || 'Unable to log in.', 'error');

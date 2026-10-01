@@ -2,6 +2,9 @@
     "name": "CareerConnect",
     "version": "0.0.1",
     "main": "index.js",
+    "engines": {
+        "node": ">=22.5.0"
+    },
     "scripts": {
         "db:up": "docker compose up -d",
         "db:down": "docker compose down",
@@ -15,6 +18,7 @@
         "bcryptjs": "^3.0.3",
         "dotenv": "^18.0.4",
         "express": "^5.2.1",
+        "multer": "^2.4.0",
         "mysql2": "^3.24.4"
     },
     "devDependencies": {
