@@ -1,0 +1,38 @@
+Objectives:
+
+For Sprint #2, there are 4 primary features that we plan to integrate at the minimum. 
+
+The first feature of sprint #2 will be user profile and resume management. This will be handled by Lucas, and the goal is to essentially cover the following.
+Polishing the profile management for the job seekers, meaning to have the aesthetic style match the rest of the work and to make any essential changes to it if needed.
+Another sub-feature is to polish the resume management in any way. This will be done simply by making sure that it works properly using test cases and to polish
+anything extra. Finally the last sub-feature would be to display the uploaded resumes and profile management for job recruiters to view. 
+
+The second feature will be the job search and job listing interface. This one will be covered by Joelle, and the goal is to implement a feature that allows the
+job seekers to view the different jobs to apply to. The first sub-feature for this part will be to create a tab that the job seeker can use to view the jobs that
+are publicly listed already. This will allow the user to have an easier time to apply to different jobs. The second sub-feature will be to provide a method for the
+job seeker to be able to seartch and filter jobs. This will be done by implementing search bars that associate what job they're looking for with what jobs exist, and
+also simply creating categories for jobs which the job seeker can filter through using a simple drop-down menu for instance. The last sub-feature for this part 
+will be the ability for the job seeker to view the detailed job posting descriptions. This means that if a job piques their curiosity they will be able to click
+on the job and view the requirements, the responsibilities, etc.
+
+The third feature implemented will be the job application submission and tracking. This one will be covered by Maz, and the goal is to implementing a way for
+the job seekers to apply for the different jobs that are listed. The first sub-feature that will be added will be the ability to apply for the job if the job 
+seeker finds it interesting. This will be done simply by inputting their information (MIGHT CHANGE) and to simply submit it so it gets sent to the job recruiter.
+The second sub-feature will be to have a page that allows the job seeker to track the status of their application. This means that they get to view at which stage
+is their application in, such as if it's under review, if they received an interview, etc. The last sub-feature will be the confirmation to allow the job seeker to
+know that their application got sent, which will most likely be a small message simply informing the user that the application has been sent.
+
+The final feature implemented will be the recruiter dashboard and the posting management. This one will be covered by Harsh, and the goal is to implement a dashboard
+that let's the job recruiter to create and manage the different job postings. The first sub-feature of this task will be to create the page to allow the job recruiter
+to create and manage the jobs. This will be a blank page which will then get filled with the different jobs that the recruiter creates, with each jobs being modifiable.
+It will be similar to the job description page for job seekers but instead the recruiter can change the information about the job. The last sub-feature that will be
+implemented will be to create a page that allows the recruiters to view the different applications that was received regarding this job posting.
+
+Outcomes:
+
+1. We need to start by deciding how the layout of our page will looking
+2. We need to decide the aesthetic the page will have
+3. We need to think of a way to approach this solution
+4. We need to create the front-end of the different pages
+5. We need to create the back-end to send the data towards the database
+6. Log any AI usage
