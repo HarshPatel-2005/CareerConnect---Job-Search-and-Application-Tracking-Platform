@@ -70,7 +70,8 @@ function createResumeRouter(options = {}) {
         }
     });
 
-    const userId = (req) => req.user.id;
+    const userId = (req) => req.user?.userId || req.user?.id;
+
     const removeUploadedFile = (file) => {
         if (file?.path && fs.existsSync(file.path)) fs.unlinkSync(file.path);
     };
