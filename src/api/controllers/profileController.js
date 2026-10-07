@@ -1,11 +1,21 @@
 const bcrypt = require('bcrypt');
 const db = require('../../config/db');
 
+// Helper to check if the authenticated user owns the resource they're trying to access (their own profile).
+function isOwner(req) {
+    return String(req.user.id) === String(req.params.id);
+}
+
 // GET /api/profile/:id
 // Returns the user's name and email. password_hash is never sent to the client.
 async function getProfile(req, res) {
     try {
         const { id } = req.params;
+
+        // Enforce ownership check
+        if (!isOwner(req)) {
+            return res.status(403).json({ error: 'Forbidden: You can only access your own profile' });
+        }
 
         const [rows] = await db.query(
             'SELECT id, full_name, email FROM users WHERE id = ?',
@@ -30,6 +40,10 @@ async function updateProfile(req, res) {
     try {
         const { id } = req.params;
         const { full_name, email } = req.body;
+
+        if (!isOwner(req)) {
+            return res.status(403).json({ error: 'Forbidden: You can only update your own profile' });
+        }
 
         if (!full_name && !email) {
             return res.status(400).json({ error: 'Nothing to update' });
@@ -81,6 +95,10 @@ async function updatePassword(req, res) {
     try {
         const { id } = req.params;
         const { current_password, new_password, confirm_password } = req.body;
+
+        if (!isOwner(req)) {
+            return res.status(403).json({ error: 'Forbidden: You can only update your own password' });
+        }
 
         if (!current_password || !new_password || !confirm_password) {
             return res.status(400).json({ error: 'Missing required fields' });
