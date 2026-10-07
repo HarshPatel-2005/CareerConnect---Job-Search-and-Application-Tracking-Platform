@@ -4,6 +4,7 @@ const path = require('path');
 const express = require('express');
 const multer = require('multer');
 const ResumeStore = require('../db/resumeStore');
+const { authenticateToken } = require('../middleware/authMiddleware');
 
 const DEFAULT_MAX_SIZE = 5 * 1024 * 1024;
 const ALLOWED_FILES = {
@@ -46,6 +47,9 @@ function createResumeRouter(options = {}) {
     const store = options.store || new ResumeStore(dbPath);
 
     fs.mkdirSync(uploadDir, { recursive: true });
+
+    // Enforce JWT authentication for all routes in this router
+    router.use(authenticateToken);
 
     const upload = multer({
         storage: multer.diskStorage({
