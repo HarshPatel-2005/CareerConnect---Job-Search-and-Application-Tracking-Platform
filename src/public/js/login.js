@@ -1,4 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Check if the user is already logged in
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (token && user.id) {
+        // Redirect to profile page if logged in
+        window.location.href = '/profile.html';
+        return;
+    }
+
     const form = document.getElementById('login-form');
     const messageContainer = document.getElementById('message-container');
     const submitButton = document.getElementById('submit-btn');
@@ -30,10 +39,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(data.error || 'Login failed');
             }
 
-            showMessage('Login successful!', 'success');
+            // Store JWT and user details in localStorage
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
 
-            console.log('Logged in user:', data.user);
+            showMessage('Login successful! Redirecting...', 'success');
 
+            // Redirect to profile page after a short delay
+            setTimeout(() => {
+                window.location.href = '/profile.html';
+            }, 1000);
         } catch (error) {
             showMessage(error.message, 'error');
         } finally {

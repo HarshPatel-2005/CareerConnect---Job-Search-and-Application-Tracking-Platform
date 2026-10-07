@@ -1,25 +1,40 @@
-// profile.js
-// Wires up the edit-in-place rows in profile.html to the /api/profile endpoints.
-//
-// There's no login flow yet, so there's no real session to read the current
-// user from. Until auth exists, we hardcode the id of the account to view/edit.
-// To test this: register a user via POST /api/auth/register, then set
-// TEST_USER_ID below to whatever id came back (a fresh DB usually gives you 1).
-// TODO: replace this with the logged-in user's id once auth/sessions exist.
-const TEST_USER_ID = 1;
+// Auth helper variables
+const token = localStorage.getItem('token');
+const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-const API_BASE = `/api/profile/${TEST_USER_ID}`;
+// Redirect to login if not authenticated
+if (!token || !user.id) {
+    window.location.href = '/login.html';
+}
+
+const API_BASE = `/api/profile/${user.id}`;
 
 document.addEventListener('DOMContentLoaded', () => {
     loadProfile();
     document.querySelectorAll('.setting-row').forEach(setUpRow);
 });
 
+function handleAuthError(response) {
+    if (response.status === 401 || response.status === 403) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login.html';
+        return true;
+    }
+
+    return false;
+}
+
 // ---- Loading the current values into the read-only view ----
 
 async function loadProfile() {
     try {
-        const response = await fetch(API_BASE);
+        const response = await fetch(API_BASE, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (handleAuthError(response)) return;
+
         const data = await response.json();
 
         if (!response.ok) {
@@ -112,9 +127,15 @@ async function submitRow(row, field, form) {
     try {
         const response = await fetch(url, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` 
+            },
             body: JSON.stringify(payload),
         });
+
+        if (handleAuthError(response)) return;
+
         const data = await response.json();
 
         if (!response.ok) {
@@ -127,6 +148,9 @@ async function submitRow(row, field, form) {
             form.reset();
         } else {
             setValue(field, payload[field]);
+            // Update stored user object if email/name changed
+            user[field] = payload[field];
+            localStorage.setItem('user', JSON.stringify(user));
         }
 
         form.hidden = true;
