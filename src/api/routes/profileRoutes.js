@@ -5,6 +5,10 @@ const {
     updateProfile,
     updatePassword,
 } = require("../controllers/profileController");
+const { authenticateToken } = require("../middleware/authMiddleware");
+
+// Protect all routes in this router with JWT authentication
+router.use(authenticateToken);
 
 // GET /api/profile/:id
 router.get("/:id", getProfile);
