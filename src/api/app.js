@@ -1,8 +1,8 @@
 const express = require('express');
 const path = require('path');
-const { createResumeRouter } = require('./routes/resumes');
-const authRoutes = require('./routes/auth');
-const profileRoutes = require('./routes/profile');
+const { createResumeRouter } = require('./routes/resumesRoutes');
+const authRoutes = require('./routes/authRoutes');
+const profileRoutes = require('./routes/profileRoutes');
 
 function createApp(options = {}) {
     const app = express();

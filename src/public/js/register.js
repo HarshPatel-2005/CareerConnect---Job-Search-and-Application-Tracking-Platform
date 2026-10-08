@@ -91,11 +91,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(data.error || 'Registration failed');
             }
 
-            showMessage('Registration successful! You can now log in.', 'success');
+            // Save JWT and user details to localStorage
+            if (data.token && data.user) {
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+            }
+
+            showMessage('Registration successful! Redirecting...', 'success');
             form.reset();
 
             document.querySelector('input[value="job_seeker"]').checked = true;
             recruiterSection.classList.add('hidden');
+
+            // Redirect to profile page
+            setTimeout(() => {
+                window.location.href = '/profile.html';
+            }, 1000); // 1 second delay for user to read the message
         } catch (error) {
             showMessage(error.message, 'error');
         } finally {

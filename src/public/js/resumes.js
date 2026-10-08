@@ -1,3 +1,9 @@
+// Check auth on load
+const token = localStorage.getItem('token');
+if (!token) {
+    window.location.href = '/login.html';
+}
+
 const uploadForm = document.querySelector('#upload-form');
 const uploadInput = document.querySelector('#resume-file');
 const replaceInput = document.querySelector('#replace-file');
@@ -30,6 +36,7 @@ function render(resumes) {
         return;
     }
 
+    // Render download control as a button so JS interceptor can attach Bearer token
     list.innerHTML = resumes.map((resume) => `
         <article class="resume-row">
             <div>
@@ -37,7 +44,7 @@ function render(resumes) {
                 <div class="resume-meta">${formatBytes(resume.size)} · Updated ${new Date(resume.updatedAt).toLocaleDateString()}</div>
             </div>
             <div class="actions">
-                <a class="download" href="${resume.downloadUrl}">Download</a>
+                <button type="button" class="download" data-download="${resume.downloadUrl}" data-name="${escapeHtml(resume.name)}">Download</button>
                 <button type="button" data-replace="${resume.id}">Replace</button>
                 <button type="button" class="delete" data-delete="${resume.id}" data-name="${escapeHtml(resume.name)}">Delete</button>
             </div>
@@ -45,8 +52,21 @@ function render(resumes) {
     `).join('');
 }
 
-async function request(url, options) {
+async function request(url, options = {}) {
+    options.headers = {
+        ...options.headers,
+        'Authorization': `Bearer ${token}`
+    };
+
     const response = await fetch(url, options);
+
+    if (response.status === 401 || response.status === 403) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login.html';
+        return null;
+    }
+
     if (response.status === 204) return null;
     const body = await response.json();
     if (!response.ok) throw new Error(body.error || 'Something went wrong.');
@@ -56,6 +76,7 @@ async function request(url, options) {
 async function loadResumes() {
     try {
         const body = await request('/api/resumes');
+        if (!body) return;
         render(body.resumes);
         document.querySelector('#size-limit').textContent = `${Math.round(body.maxSize / 1024 / 1024)} MB`;
     } catch (error) {
@@ -92,6 +113,33 @@ uploadForm.addEventListener('submit', async (event) => {
 });
 
 list.addEventListener('click', async (event) => {
+    // Authenticated download via fetch blob
+    const downloadButton = event.target.closest('[data-download]');
+    if (downloadButton) {
+        const url = downloadButton.dataset.download;
+        const filename = downloadButton.dataset.name || 'resume';
+        try {
+            const res = await fetch(url, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!res.ok) throw new Error('Failed to download resume.');
+
+            const blob = await res.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(blobUrl);
+        } catch (error) {
+            showMessage(error.message, 'error');
+        }
+        return;
+    }
+
     const replaceButton = event.target.closest('[data-replace]');
     if (replaceButton) {
         replacementId = replaceButton.dataset.replace;

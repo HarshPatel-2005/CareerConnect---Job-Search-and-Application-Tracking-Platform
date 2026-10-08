@@ -4,6 +4,7 @@ const path = require('path');
 const express = require('express');
 const multer = require('multer');
 const ResumeStore = require('../db/resumeStore');
+const { authenticateToken } = require('../middleware/authMiddleware');
 
 const DEFAULT_MAX_SIZE = 5 * 1024 * 1024;
 const ALLOWED_FILES = {
@@ -47,6 +48,9 @@ function createResumeRouter(options = {}) {
 
     fs.mkdirSync(uploadDir, { recursive: true });
 
+    // Enforce JWT authentication for all routes in this router
+    router.use(authenticateToken);
+
     const upload = multer({
         storage: multer.diskStorage({
             destination: uploadDir,
@@ -66,7 +70,8 @@ function createResumeRouter(options = {}) {
         }
     });
 
-    const userId = (req) => req.get('x-user-id') || 'demo-job-seeker';
+    const userId = (req) => req.user?.userId || req.user?.id;
+
     const removeUploadedFile = (file) => {
         if (file?.path && fs.existsSync(file.path)) fs.unlinkSync(file.path);
     };

@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+const { generateToken } = require('../utils/jwt');
 const db = require('../../config/db');
 
 async function registerUser(req, res) {
@@ -74,15 +75,26 @@ async function registerUser(req, res) {
             );
         }
 
+        // Generate JWT token for the new user
+        const token = generateToken({
+            id: newUser.insertId,
+            email,
+            role,
+            company_id: companyId
+        });
+
         // Send success response
         const responsePayload = {
             message: 'User registered successfully',
-            userId: newUser.insertId,
+            token,
+            user: {
+                id: newUser.insertId,
+                full_name,
+                email,
+                role,
+                company_id: companyId
+            }
         };
-
-        if (companyId) {
-            responsePayload.companyId = companyId;
-        }
 
         return res.status(201).json(responsePayload);
     } catch (error) {
@@ -129,9 +141,13 @@ async function loginUser(req, res) {
             });
         }
 
+        // Generate JWT token
+        const token = generateToken(user);
+
         // Login successful
         return res.status(200).json({
             message: 'Login successful',
+            token,
             user: {
                 id: user.id,
                 full_name: user.full_name,
