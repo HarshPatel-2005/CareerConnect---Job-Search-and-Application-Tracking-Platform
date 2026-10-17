@@ -1,0 +1,11 @@
+AI Log #3 (Sprint #2):
+
+Task: Generate a user story for the recruiter dashboard
+Purpose of AI: User Story Generation
+Link: https://claude.ai/share/7a95b9db-b409-47c1-8709-3e23dcec42cb
+AI-Suggested Content: The AI generated the user story that gives me a roadmap to follow during the development of the feature
+Validation: Reading through the user story and making sure it's to our liking. Modifying anything we think could be better in order to aid us during our development.
+Decision: Accepted with modification
+Reflection: The user story helped with the brainstorming since it allows us to follow a roadmap and figure out how exactly the feature should be developed. We also modified it to our liking so that 
+we can have an easier time with it's development.
+Responsible Person: Harsh Patel (40341498)
