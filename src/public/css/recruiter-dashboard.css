@@ -1,0 +1,616 @@
+/* =====================================================================
+   CAREER CONNECT – RECRUITER DASHBOARD
+   ---------------------------------------------------------------------
+   Sections (in page order):
+     1. Colors and basics
+     2. Top bar
+     3. Page width and sub-nav
+     4. Form inputs and buttons (shared)
+     5. Filter box
+     6. Jobs table
+     7. Status button and menu
+     8. Messages and interviews boxes
+     9. Footer
+    10. Small screens
+   ===================================================================== */
+
+
+/* =====================================================================
+   1. COLORS AND BASICS
+   ===================================================================== */
+
+:root {
+    --ink: #10231d;
+    --muted: #61706b;
+    --green: #176b52;
+    --green-dark: #0b4937;
+    --cream: #f6f2e8;
+    --white: #fffefa;
+    --mint: #cfeadb;
+    --amber: #e0a526;
+    --red: #a23b2f;
+    --line: rgba(16, 35, 29, .12);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 88% 5%, rgba(202, 235, 216, .9), transparent 30%),
+        linear-gradient(145deg, var(--cream), #f9f7f0 60%);
+    background-attachment: fixed;
+    color: var(--ink);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+a {
+    color: var(--green);
+    text-decoration: none;
+}
+
+button,
+input,
+select {
+    font: inherit;
+    color: inherit;
+}
+
+:focus-visible {
+    outline: 3px solid rgba(23, 107, 82, .45);
+    outline-offset: 2px;
+}
+
+h1,
+h2 {
+    margin: 0;
+    font-family: Georgia, serif;
+    font-weight: 500;
+}
+
+h1 {
+    font-size: 1.9rem;
+    letter-spacing: -.03em;
+}
+
+
+/* =====================================================================
+   2. TOP BAR
+   ===================================================================== */
+
+.topbar {
+    background: var(--green-dark);
+    color: #fff;
+}
+
+.topbar-inner {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+    width: min(1160px, calc(100% - 32px));
+    height: 64px;
+    margin: 0 auto;
+}
+
+/* Logo text */
+.brand {
+    color: #fff;
+    font-family: Georgia, serif;
+    font-size: 1.35rem;
+    letter-spacing: -.02em;
+}
+
+.brand small {
+    display: block;
+    margin-top: -2px;
+    color: #a9d9c1;
+    font-family: Inter, sans-serif;
+    font-size: .62rem;
+    letter-spacing: .04em;
+}
+
+/* Links in the middle of the bar */
+.topnav {
+    display: flex;
+    gap: 6px;
+    height: 100%;
+}
+
+.topnav a {
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    border-bottom: 3px solid transparent;
+    color: #c9d8d2;
+    font-size: .9rem;
+}
+
+.topnav a:hover {
+    color: #fff;
+}
+
+.topnav a.active {
+    border-bottom-color: #a9d9c1;
+    color: #fff;
+}
+
+/* Help link and account circle on the right */
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-left: auto;
+    font-size: .88rem;
+}
+
+.topbar-right a {
+    color: #fff;
+}
+
+.avatar {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #a9d9c1;
+    color: var(--green-dark);
+    font-size: .8rem;
+    font-weight: 800;
+}
+
+
+/* =====================================================================
+   3. PAGE WIDTH AND SUB-NAV (Jobs / Candidates / Messages)
+   ===================================================================== */
+
+.wrap {
+    width: min(1160px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 0 0 48px;
+}
+
+.subnav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 28px;
+    padding: 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.tabs {
+    display: flex;
+    gap: 28px;
+}
+
+.tabs a {
+    padding: 18px 0 14px;
+    border-bottom: 3px solid transparent;
+    color: var(--ink);
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.tabs a.active {
+    border-bottom-color: var(--green);
+    color: var(--green);
+}
+
+/* "Post a job" button area, pushed to the right */
+.subnav-actions {
+    display: flex;
+    flex: 1 1 420px;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;
+    padding: 10px 0;
+}
+
+
+/* =====================================================================
+   4. FORM INPUTS AND BUTTONS (shared)
+   ===================================================================== */
+
+input[type="text"],
+select {
+    height: 42px;
+    padding: 0 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--white);
+    font-size: .92rem;
+}
+
+input[type="text"]::placeholder {
+    color: var(--muted);
+}
+
+input[type="text"]:hover,
+select:hover {
+    border-color: rgba(16, 35, 29, .3);
+}
+
+.btn {
+    height: 42px;
+    padding: 0 22px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--green);
+    color: #fff;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background .15s;
+}
+
+.btn:hover {
+    background: var(--green-dark);
+}
+
+
+/* =====================================================================
+   5. FILTER BOX
+   ===================================================================== */
+
+/* Heading above the filters: "Open and paused jobs (3)" */
+.section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 28px 0 14px;
+}
+
+.count {
+    color: var(--muted);
+    font-size: .95rem;
+}
+
+/* The white box that holds the filters */
+.filters {
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--white);
+    box-shadow: 0 18px 45px rgba(26, 54, 44, .06);
+}
+
+/* Four fields side by side: title, location, sort by, order */
+.filter-row {
+    display: grid;
+    grid-template-columns: 1.3fr 1.1fr .9fr .9fr;
+    gap: 12px;
+}
+
+.field label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--muted);
+    font-size: .78rem;
+    font-weight: 700;
+}
+
+.field input,
+.field select {
+    width: 100%;
+}
+
+
+/* =====================================================================
+   6. JOBS TABLE
+   ===================================================================== */
+
+/* The white box around the whole table */
+.jobs {
+    margin-top: 20px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--white);
+    box-shadow: 0 18px 45px rgba(26, 54, 44, .06);
+    overflow: hidden;
+}
+
+/* Lets the table scroll sideways on narrow screens */
+.jobs-scroll {
+    overflow-x: auto;
+}
+
+/* One row = checkbox | job info | candidates | status */
+.row {
+    display: grid;
+    grid-template-columns: 36px minmax(220px, 1.4fr) minmax(300px, 2fr) 160px;
+    align-items: center;
+    gap: 12px;
+    min-width: 760px;
+    padding: 18px 20px;
+}
+
+.row + .row {
+    border-top: 1px solid var(--line);
+}
+
+/* Header row ("Job title", "Candidates", ...) */
+.row.head {
+    padding-top: 14px;
+    padding-bottom: 14px;
+    background: #efece0;
+    color: var(--ink);
+    font-size: .84rem;
+    font-weight: 800;
+}
+
+/* Rows hidden by the filters */
+.row[hidden] {
+    display: none;
+}
+
+/* ---- Job info (title, city, date) ---- */
+
+.job-title {
+    font-weight: 800;
+}
+
+.job-meta {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: .86rem;
+}
+
+/* ---- Candidates box ---- */
+
+.cand {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: #f2f0e6;
+}
+
+.cand .total {
+    min-width: 92px;
+    color: var(--green);
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.cand .total.empty {
+    color: var(--muted);
+    font-weight: 700;
+}
+
+/* Awaiting / Reviewed / Contacting / Hired numbers */
+.stats {
+    display: flex;
+    gap: 22px;
+    margin-left: auto;
+    text-align: center;
+}
+
+.stats div {
+    color: var(--muted);
+    font-size: .78rem;
+}
+
+.stats b {
+    display: block;
+    color: var(--ink);
+    font-size: 1rem;
+}
+
+.stats .link b {
+    color: var(--green);
+}
+
+/* Message shown when no jobs match the filters */
+.empty-state {
+    padding: 40px 20px;
+    color: var(--muted);
+    text-align: center;
+}
+
+.empty-state[hidden] {
+    display: none;
+}
+
+
+/* =====================================================================
+   7. STATUS BUTTON AND MENU
+   ===================================================================== */
+
+.status {
+    position: relative;
+}
+
+/* The pill button that shows the current status */
+.status-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    height: 38px;
+    padding: 0 14px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--white);
+    font-size: .9rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.status-btn:hover {
+    border-color: rgba(16, 35, 29, .35);
+}
+
+/* Little down arrow on the right of the button */
+.status-btn::after {
+    content: "";
+    width: 7px;
+    height: 7px;
+    margin-left: auto;
+    border-right: 2px solid var(--muted);
+    border-bottom: 2px solid var(--muted);
+    transform: rotate(45deg) translateY(-2px);
+}
+
+/* Colored dot: green = open, amber = paused, red = closed */
+.dot {
+    flex: none;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--green);
+}
+
+.dot.paused {
+    background: var(--amber);
+}
+
+.dot.closed {
+    background: var(--red);
+}
+
+/* The dropdown that appears under the button */
+.menu {
+    position: absolute;
+    z-index: 5;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    padding: 6px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--white);
+    box-shadow: 0 18px 45px rgba(26, 54, 44, .18);
+}
+
+.menu[hidden] {
+    display: none;
+}
+
+.menu button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 9px 10px;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    font-size: .9rem;
+    text-align: left;
+    cursor: pointer;
+}
+
+.menu button:hover {
+    background: var(--mint);
+}
+
+
+/* =====================================================================
+   8. MESSAGES AND INTERVIEWS BOXES
+   ===================================================================== */
+
+.panels {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-top: 24px;
+}
+
+.panel {
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--white);
+    box-shadow: 0 18px 45px rgba(26, 54, 44, .06);
+    overflow: hidden;
+}
+
+.panel h2 {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--line);
+    font-size: 1.15rem;
+}
+
+/* Empty state: icon + short message, centered */
+.panel-body {
+    display: grid;
+    place-items: center;
+    min-height: 190px;
+    padding: 22px;
+    color: var(--muted);
+    font-size: .92rem;
+    text-align: center;
+}
+
+.panel-body svg {
+    display: block;
+    margin: 0 auto 12px;
+}
+
+/* When you have real items, put them inside .panel-body as <ul class="items"> */
+.items {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-align: left;
+}
+
+.items li {
+    padding: 12px 0;
+    border-top: 1px solid var(--line);
+}
+
+.items li:first-child {
+    border-top: 0;
+}
+
+
+/* =====================================================================
+   9. FOOTER
+   ===================================================================== */
+
+footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px;
+    padding-top: 12px;
+    color: var(--muted);
+    font-size: .8rem;
+}
+
+
+/* =====================================================================
+   10. SMALL SCREENS
+   ===================================================================== */
+
+/* Tablets */
+@media (max-width: 900px) {
+    .filter-row {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .panels {
+        grid-template-columns: 1fr;
+    }
+
+    .topnav {
+        display: none;
+    }
+}
+
+/* Phones */
+@media (max-width: 560px) {
+    .filter-row {
+        grid-template-columns: 1fr;
+    }
+
+    .topbar-right a {
+        display: none;
+    }
+}
