@@ -1,10 +1,11 @@
 AI Log #4 (Sprint #2):
 
-Task: 
-Purpose of AI: 
+Task: Help Develop the frontend of the recruiter dashboard
+Purpose of AI: Code Generation
 Link: https://claude.ai/share/a77c6d26-c2f6-42fe-9ce0-a4e337277971
-AI-Suggested Content: 
-Validation: 
-Decision: 
-Reflection: 
+AI-Suggested Content: With references, and explanations, the AI model helped develop a frontend using the data we already have. It generated a frontend with the color scheme we're following and with a style that matches
+the rest of the development
+Validation: Manual Changes alone with some ideas taken from peers
+Decision: Taken with some modifications
+Reflection: I made sure to ask the AI to annotate what is each section to help with development in case there was anything we wanted to change
 Responsible Person: Harsh Patel (40341498)
