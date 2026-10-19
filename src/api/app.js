@@ -3,6 +3,7 @@ const path = require('path');
 const { createResumeRouter } = require('./routes/resumesRoutes');
 const authRoutes = require('./routes/authRoutes');
 const profileRoutes = require('./routes/profileRoutes');
+const recruiterRoutes = require('./routes/recruiterRoutes');
 
 function createApp(options = {}) {
     const app = express();
@@ -13,6 +14,8 @@ function createApp(options = {}) {
     app.use('/api/auth', authRoutes);
     app.use('/api/profile', profileRoutes);
     app.use('/api/resumes', createResumeRouter(options.resume || {}));
+    
+    app.use('/api/recruiter', recruiterRoutes);
 
     // Health check endpoint
     app.get('/health', (req, res) => {

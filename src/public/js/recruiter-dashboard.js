@@ -239,6 +239,85 @@ selectAllBox.addEventListener('change', function () {
     }
 });
 
+// Function to fetch jobs from the backend API and populate the dashboard
+async function loadRecruiterJobs() {
+    try {
+        const response = await fetch('/api/recruiter/jobs');
+        if (!response.ok) throw new Error('Failed to fetch jobs');
+        
+        const jobs = await response.json();
+        
+        // Clear the static list container
+        jobList.innerHTML = '';
+        allJobs.length = 0; // Clear the tracking array
+
+        if (jobs.length === 0) {
+            countLabel.textContent = '(0)';
+            emptyMessage.hidden = false;
+            return;
+        }
+
+        // Build HTML dynamically for each job returned from the database
+        jobs.forEach(job => {
+            const formattedDate = new Date(job.created_at).toISOString().split('T')[0];
+            const displayDate = new Date(job.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'row job';
+            rowDiv.setAttribute('data-title', job.title);
+            rowDiv.setAttribute('data-loc', job.location);
+            rowDiv.setAttribute('data-date', formattedDate);
+            rowDiv.setAttribute('data-candidates', job.candidates_count);
+            rowDiv.setAttribute('data-status', job.status);
+
+            rowDiv.innerHTML = `
+                <span><input type="checkbox" aria-label="Select job"></span>
+                <div>
+                    <div class="job-title">${escapeHTML(job.title)}</div>
+                    <div class="job-meta">${escapeHTML(job.location)}<br>Created: ${displayDate}</div>
+                </div>
+                <div class="cand">
+                    ${job.candidates_count > 0 ? `
+                        <a class="total" href="#">${job.candidates_count} Active<br>Candidates</a>
+                        <div class="stats">
+                            <div><b>${job.awaiting_count}</b>Awaiting</div>
+                            <div class="link"><b>${job.reviewed_count}</b>Reviewed</div>
+                            <div><b>${job.contacting_count}</b>Contacting</div>
+                            <div><b>${job.hired_count}</b>Hired</div>
+                        </div>
+                    ` : `
+                        <div class="total empty">0 Active<br>Candidates</div>
+                        <span class="job-meta" style="margin-left:auto">No candidates yet.</span>
+                    `}
+                </div>
+                <div class="status"></div>
+            `;
+
+            jobList.appendChild(rowDiv);
+            allJobs.push(rowDiv);
+            setupStatus(rowDiv);
+        });
+
+        sortJobs();
+        filterJobs();
+    } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        jobList.innerHTML = '<div class="empty-state">Failed to load jobs. Please try again later.</div>';
+    }
+}
+
+// Simple HTML escape helper to prevent XSS injection
+function escapeHTML(str) {
+    return str.replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+    );
+}
+
+// Call loadRecruiterJobs when the page initializes instead of running sort/filter statically on empty/hardcoded rows
+document.addEventListener('DOMContentLoaded', () => {
+    loadRecruiterJobs();
+});
+
 
 /* =====================================================================
    STEP 7: RUN ONCE WHEN THE PAGE LOADS
