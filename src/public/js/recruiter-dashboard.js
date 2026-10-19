@@ -6,8 +6,6 @@
      2. Hides job cards that don't match what you typed in the filters
      3. Puts the job cards in order (by date or title)
 
-   Reading tip: JavaScript runs top to bottom, one line at a time.
-   A "function" is a named recipe: it does nothing until something calls it.
    ===================================================================== */
 
 
