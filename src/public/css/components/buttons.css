@@ -1,3 +1,71 @@
+/* Base Button Styles */
+.btn,
+button[type="submit"],
+button[type="button"] {
+    font: inherit;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+button:disabled {
+    background: var(--color-text-muted);
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Primary Action Button (Pill) */
+.btn-primary {
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: var(--color-primary-hover);
+    transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Secondary Action Button (Pill) */
+.btn-secondary {
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text-main);
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: var(--color-bg-surface);
+}
+
+/* Text / Link Button */
+.btn-link {
+    background: none;
+    border: none;
+    color: var(--color-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 0;
+    white-space: nowrap;
+}
+
+.btn-link:hover:not(:disabled) {
+    text-decoration: underline;
+}
+
 button[type="submit"],
 .btn {
     width: 100%;
@@ -9,15 +77,4 @@ button[type="submit"],
     font-weight: 600;
     cursor: pointer;
     transition: background-color var(--transition-fast), transform var(--transition-fast);
-}
-
-button:disabled {
-    background: var(--color-text-muted);
-    cursor: not-allowed;
-    transform: none;
-}
-
-button:hover:not(:disabled) {
-    background: var(--color-primary-hover);
-    transform: translateY(-1px);
 }
