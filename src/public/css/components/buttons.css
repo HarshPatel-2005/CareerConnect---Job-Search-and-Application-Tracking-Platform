@@ -5,7 +5,7 @@ button[type="button"] {
     font: inherit;
     font-family: var(--font-sans);
     cursor: pointer;
-    transition: background-color var(--transition-fast), transform var(--transition-fast);
+    transition: background-color var(--transition-fast);
 }
 
 button:disabled {
@@ -27,12 +27,15 @@ button:disabled {
 
 .btn-primary:hover:not(:disabled) {
     background: var(--color-primary-hover);
-    transform: translateY(-1px);
 }
 
 .btn-primary:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+}
+
+button[type="submit"] {
+    width: 100%;
 }
 
 /* Secondary Action Button (Pill) */
@@ -64,17 +67,4 @@ button:disabled {
 
 .btn-link:hover:not(:disabled) {
     text-decoration: underline;
-}
-
-button[type="submit"],
-.btn {
-    width: 100%;
-    padding: 0.75rem;
-    background: var(--color-primary);
-    color: white;
-    border: none;
-    border-radius: var(--radius-md);
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color var(--transition-fast), transform var(--transition-fast);
 }
