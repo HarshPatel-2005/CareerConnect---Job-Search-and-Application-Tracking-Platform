@@ -28,7 +28,7 @@
 }
 
 .nav a {
-  color: var(--ink-soft);
+  color: var(--color-text-muted);
   text-decoration: none;
 }
 
@@ -41,6 +41,6 @@
 }
 
 .nav__current { 
-  color: var(--ink); 
+  color: var(--color-text-main); 
   font-weight: 500; 
 }
