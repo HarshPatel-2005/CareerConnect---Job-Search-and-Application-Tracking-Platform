@@ -25,6 +25,7 @@ body {
     color: var(--color-text-main);
 }
 
+.register-link,
 .login-link {
     text-align: center;
     margin-top: var(--space-lg);
@@ -32,12 +33,14 @@ body {
     color: var(--color-text-muted);
 }
 
+.register-link a,
 .login-link a {
     color: var(--color-primary);
     text-decoration: none;
     font-weight: 600;
 }
 
+.register-link a:hover,
 .login-link a:hover {
     text-decoration: underline;
 }
