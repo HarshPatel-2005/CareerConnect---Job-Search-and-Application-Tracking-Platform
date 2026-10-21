@@ -2,15 +2,24 @@
 *,
 *::after,
 *::before {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 /* Remove default margin and padding */
 body,
-h1, h2, h3, h4, h5, h6,
-p, figure, blockquote, dl, dd {
-  margin: 0;
-  padding: 0;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+figure,
+blockquote,
+dl,
+dd {
+    margin: 0;
+    padding: 0;
 }
 
 /* Set core root defaults */
@@ -22,7 +31,8 @@ html {
 /* Set core body defaults */
 body {
     min-height: 100vh;
-    background-color: var(--color-bg-primary);
+    background: radial-gradient(circle at 88% 5%, rgba(202, 235, 216, 0.9), transparent 30%),
+        linear-gradient(145deg, var(--color-bg-primary), #f9f7f0 60%);
     color: var(--color-text-main);
     line-height: 1.5;
     font-family: var(--font-sans);
@@ -64,6 +74,7 @@ select {
     html {
         scroll-behavior: auto;
     }
+
     * {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
