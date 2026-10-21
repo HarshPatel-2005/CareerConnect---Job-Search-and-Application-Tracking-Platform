@@ -1,0 +1,6 @@
+footer {
+    padding-top: 44px;
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    text-align: center;
+}

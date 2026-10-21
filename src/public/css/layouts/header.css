@@ -1,0 +1,46 @@
+.page-header {
+  background: var(--color-bg-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.page-header__inner {
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.brand,
+.page-header .brand {
+    font-weight: 850;
+    font-size: 1.25rem;
+    color: var(--color-accent);
+    text-decoration: none;
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--color-text-muted);
+    font-size: 0.84rem;
+}
+
+.nav a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.nav a:hover { 
+  text-decoration: underline; 
+}
+
+.nav__sep { 
+  margin: 0 6px; 
+}
+
+.nav__current { 
+  color: var(--color-text-main); 
+  font-weight: 500; 
+}
