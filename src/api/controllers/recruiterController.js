@@ -2,7 +2,7 @@ const db = require('../../config/db');
 
 const getRecruiterJobs = async (req, res) => {
     try {
-        // FOR TESTING ONLY: Default to company_id = 1 if no user is logged in
+
         const companyId = req.user?.company_id;
 
         const [rows] = await db.query(

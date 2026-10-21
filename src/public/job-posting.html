@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Career Connect – Job post</title>
+<!-- The dashboard stylesheet gives us the top bar, fonts, colors and buttons.
+     job-posting.css only adds what this page needs on top. -->
+<link rel="stylesheet" href="css/recruiter-dashboard.css">
+<link rel="stylesheet" href="css/job-posting.css">
+</head>
+<body>
+
+<!-- ================= TOP BAR ================= -->
+<header class="topbar">
+    <div class="topbar-inner">
+        <a class="brand" href="recruiter-dashboard.html">Career Connect<small>for recruiters</small></a>
+        <nav class="topnav" aria-label="Main">
+            <a class="active" href="recruiter-dashboard.html">Dashboard</a>
+        </nav>
+    </div>
+</header>
+
+<!-- ================= FORM ================= -->
+<main class="post-wrap">
+    <h1 id="page-title">Create a job post</h1>
+
+    <form id="job-form" novalidate>
+        <h2>Job details</h2>
+
+        <div class="form-row">
+            <label for="title">Job title</label>
+            <div class="control">
+                <input type="text" id="title" maxlength="255" autocomplete="off">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label for="openings">Number of openings</label>
+            <div class="control">
+                <input type="number" id="openings" min="1" max="999" value="1">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label for="country">Country and language</label>
+            <div class="control control-pair">
+                <select id="country" aria-label="Country">
+                    <option>Canada</option>
+                    <option>United States</option>
+                    <option>United Kingdom</option>
+                </select>
+                <select id="language" aria-label="Language">
+                    <option>English</option>
+                    <option>French</option>
+                    <option>English and French</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label for="location">Location</label>
+            <div class="control">
+                <input type="text" id="location" maxlength="255" placeholder="City, province or state" autocomplete="off">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label for="job_type">Job type</label>
+            <div class="control">
+                <select id="job_type">
+                    <option value="full_time">Full-time</option>
+                    <option value="part_time">Part-time</option>
+                    <option value="contract">Contract</option>
+                    <option value="temporary">Temporary</option>
+                    <option value="internship">Internship</option>
+                    <option value="co_op">Co-op</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label for="description">Job description</label>
+            <div class="control">
+                <textarea id="description" placeholder="Describe the role, responsibilities and requirements."></textarea>
+            </div>
+        </div>
+
+        <p class="form-error" id="form-error" role="alert" hidden></p>
+    </form>
+</main>
+
+<!-- ================= BOTTOM BAR ================= -->
+<div class="action-bar">
+    <div class="action-inner">
+        <a class="btn-outline" href="recruiter-dashboard.html">Cancel</a>
+        <button class="btn" type="submit" form="job-form" id="save-btn">Save changes</button>
+    </div>
+</div>
+
+<script src="js/job-posting.js"></script>
+</body>
+</html>

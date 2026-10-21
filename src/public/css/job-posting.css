@@ -1,0 +1,151 @@
+/* =====================================================================
+   CAREER CONNECT – JOB POSTING PAGE
+   Loaded AFTER recruiter-dashboard.css, so it reuses its colors
+   (--green, --line, ...), fonts, top bar and .btn.
+   ===================================================================== */
+
+/* Centered column */
+.post-wrap {
+    width: min(720px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 56px 0 140px;   /* bottom space so the fixed bar never covers the last field */
+}
+
+.post-wrap h1 {
+    margin-bottom: 40px;
+    font-size: 2.3rem;
+}
+
+.post-wrap h2 {
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+    font-size: 1.25rem;
+}
+
+/* One row = label on the left, field on the right */
+.form-row {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 16px;
+    align-items: start;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.form-row > label {
+    padding-top: 12px;
+    color: var(--muted);
+    font-size: .92rem;
+    font-weight: 700;
+}
+
+/* Country + language side by side */
+.control-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.control input,
+.control select,
+.control textarea {
+    width: 100%;
+}
+
+/* Number box and text area match the dashboard's text inputs */
+input[type="number"],
+textarea {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--white);
+    font-size: .92rem;
+}
+
+input[type="number"] {
+    height: 42px;
+    padding: 0 14px;
+}
+
+textarea {
+    min-height: 220px;
+    padding: 12px 14px;
+    line-height: 1.5;
+    resize: vertical;
+}
+
+input[type="number"]:hover,
+textarea:hover {
+    border-color: rgba(16, 35, 29, .3);
+}
+
+textarea::placeholder {
+    color: var(--muted);
+}
+
+/* Error message under the form */
+.form-error {
+    margin: 20px 0 0;
+    color: var(--red);
+    font-weight: 700;
+}
+
+.form-error[hidden] {
+    display: none;
+}
+
+/* Bar pinned to the bottom: Cancel on the left, Save on the right */
+.action-bar {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border-top: 1px solid var(--line);
+    background: var(--white);
+    box-shadow: 0 -8px 24px rgba(26, 54, 44, .06);
+}
+
+.action-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: min(720px, calc(100% - 32px));
+    height: 76px;
+    margin: 0 auto;
+}
+
+.btn-outline {
+    display: inline-flex;
+    align-items: center;
+    height: 42px;
+    padding: 0 22px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--white);
+    color: var(--green);
+    font-weight: 800;
+}
+
+.btn-outline:hover {
+    border-color: rgba(16, 35, 29, .35);
+}
+
+.btn:disabled {
+    opacity: .6;
+    cursor: default;
+}
+
+/* Phones: label above the field */
+@media (max-width: 640px) {
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .form-row > label {
+        padding-top: 0;
+    }
+
+    .control-pair {
+        grid-template-columns: 1fr;
+    }
+}

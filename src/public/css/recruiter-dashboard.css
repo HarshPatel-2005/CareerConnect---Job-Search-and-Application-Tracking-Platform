@@ -251,6 +251,12 @@ select:hover {
     background: var(--green-dark);
 }
 
+/* A link styled as a button (the "Post a job" link) */
+a.btn {
+    display: inline-flex;
+    align-items: center;
+}
+
 
 /* =====================================================================
    5. FILTER BOX
@@ -351,6 +357,17 @@ select:hover {
 
 .job-title {
     font-weight: 800;
+}
+
+/* The title is a link to the job posting page */
+a.job-title {
+    display: block;
+    color: var(--ink);
+}
+
+a.job-title:hover {
+    color: var(--green);
+    text-decoration: underline;
 }
 
 .job-meta {

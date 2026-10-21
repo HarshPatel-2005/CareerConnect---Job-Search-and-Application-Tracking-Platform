@@ -237,14 +237,29 @@ selectAllBox.addEventListener('change', function () {
     }
 });
 
-// Function to fetch jobs from the backend API and populate the dashboard
+
+/* =====================================================================
+   STEP 7: LOAD THE JOBS FROM THE DATABASE
+   ---------------------------------------------------------------------
+   Each job title is a link to job-posting.html?id=<job id>.
+   That page sees the id and fills the form with the saved job.
+   ===================================================================== */
+
 async function loadRecruiterJobs() {
     try {
-        const response = await fetch('/api/recruiter/jobs');
+        const token = localStorage.getItem('token');   // must match the key your login page saves
+        const response = await fetch('/api/recruiter/jobs', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        if (response.status === 401 || response.status === 403) {
+            window.location.href = 'login.html';       // use your real login page name
+            return;
+        }
         if (!response.ok) throw new Error('Failed to fetch jobs');
-        
+
         const jobs = await response.json();
-        
+
         // Clear the static list container
         jobList.innerHTML = '';
         allJobs.length = 0; // Clear the tracking array
@@ -271,7 +286,7 @@ async function loadRecruiterJobs() {
             rowDiv.innerHTML = `
                 <span><input type="checkbox" aria-label="Select job"></span>
                 <div>
-                    <div class="job-title">${escapeHTML(job.title)}</div>
+                    <a class="job-title" href="job-posting.html?id=${job.id}">${escapeHTML(job.title)}</a>
                     <div class="job-meta">${escapeHTML(job.location)}<br>Created: ${displayDate}</div>
                 </div>
                 <div class="cand">
@@ -311,15 +326,7 @@ function escapeHTML(str) {
     );
 }
 
-// Call loadRecruiterJobs when the page initializes instead of running sort/filter statically on empty/hardcoded rows
+// Load the jobs when the page starts
 document.addEventListener('DOMContentLoaded', () => {
     loadRecruiterJobs();
 });
-
-
-/* =====================================================================
-   STEP 7: RUN ONCE WHEN THE PAGE LOADS
-   ===================================================================== */
-
-sortJobs();
-filterJobs();
