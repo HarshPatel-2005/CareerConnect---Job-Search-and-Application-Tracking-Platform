@@ -2,3 +2,11 @@
 @import url('./base/variables.css');
 @import url('./base/reset.css');
 @import url('./base/typography.css');
+
+/* Layouts */
+@import url('./layouts/header.css');
+@import url('./layouts/footer.css');
+@import url('./layouts/grid.css');
+
+/* Components */
+@import url('./components/cards.css');
