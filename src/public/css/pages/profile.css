@@ -7,3 +7,54 @@
     font-weight: 500;
     color: var(--color-text-muted);
 }
+
+/* Company history styles */
+.company-history-group {
+    background-color: var(--color-bg-elevated);
+    border-radius: var(--radius-md);
+    width: 100%;
+    padding: var(--space-md);
+    display: flex;
+    flex-direction: column;
+}
+
+.company-history-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.company-history-position-list {
+    padding: 0 var(--space-md);
+    margin: 0;
+}
+
+.company-history-position {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto;
+    grid-column-gap: var(--space-md);
+}
+
+.company-history-position * {
+    grid-column: 2;
+}
+
+.company-history-position::after {
+    content: '';
+    grid-column: 1;
+    grid-row: 2 / -1;
+    position: relative;
+    width: 2px;
+    height: 100%;
+    background-color: var(--color-border);
+    justify-self: center;
+}
+
+.company-history-position-date {
+    grid-column: 1;
+    grid-row: 1;
+    color: var(--color-text-muted);
+}
+
