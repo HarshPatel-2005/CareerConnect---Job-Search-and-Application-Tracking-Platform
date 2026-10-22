@@ -1,3 +1,9 @@
 .profile-header {
     margin-left: -6px; /* Adjust for better visual alignment (due to circle profile image) */
 }
+
+.profile-company {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+}

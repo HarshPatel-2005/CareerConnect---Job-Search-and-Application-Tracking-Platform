@@ -13,7 +13,7 @@ async function getPublicProfile(req, res) {
         const { id } = req.params;
 
         const [rows] = await db.query(
-            'SELECT id, full_name FROM users WHERE id = ?',
+            'SELECT id, full_name, company_id FROM users WHERE id = ?',
             [id]
         );
 
@@ -21,7 +21,24 @@ async function getPublicProfile(req, res) {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        return res.status(200).json(rows[0]);
+        // Build the response object
+        const profileData = {
+            id: rows[0].id,
+            full_name: rows[0].full_name,
+        };
+
+        const companyId = rows[0].company_id;
+        if (companyId) {
+            const [companyRows] = await db.query(
+                'SELECT name FROM companies WHERE id = ?',
+                [companyId]
+            );
+            if (companyRows.length > 0) {
+                profileData.company = companyRows[0].name;
+            }
+        }
+
+        return res.status(200).json(profileData);
     } catch (error) {
         console.error('Error fetching profile:', error);
         return res.status(500).json({ error: 'Internal server error' });

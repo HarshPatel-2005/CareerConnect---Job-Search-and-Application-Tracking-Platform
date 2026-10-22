@@ -49,6 +49,11 @@ async function loadProfile() {
 
         // Populate the profile fields
         document.getElementById('profile-name').textContent = data.full_name;
+
+        if (data.company) {
+            document.getElementById('profile-company').textContent = data.company;
+        }
+
     } catch (error) {
         console.error('Error loading profile:', error);
     }
