@@ -21,25 +21,7 @@ describe('Profile Endpoints & JWT Security', () => {
     });
 
     describe('GET /api/profile/:id', () => {
-        it('should return 401 Unauthorized if no Bearer token is provided', async () => {
-            const res = await request(app).get('/api/profile/1');
-            expect(res.statusCode).toBe(401);
-            expect(res.body).toHaveProperty('error');
-        });
-
-        it('should return 403 Forbidden if user attempts to view another user profile', async () => {
-            const token = createToken(1); // User ID = 1
-
-            const res = await request(app)
-                .get('/api/profile/2') // Accessing User ID = 2
-                .set('Authorization', `Bearer ${token}`);
-
-            expect(res.statusCode).toBe(403);
-            expect(res.body.error).toMatch(/only access your own profile/i);
-        });
-
-        it('should return profile data for authenticated owner (200 OK)', async () => {
-            const token = createToken(1);
+        it('should return profile data publically without requiring a token (200 OK)', async () => {
             db.query.mockResolvedValueOnce([[{
                 id: 1,
                 full_name: 'John Doe',
@@ -48,9 +30,7 @@ describe('Profile Endpoints & JWT Security', () => {
                 company_id: null
             }]]);
 
-            const res = await request(app)
-                .get('/api/profile/1')
-                .set('Authorization', `Bearer ${token}`);
+            const res = await request(app).get('/api/profile/1');
 
             expect(res.statusCode).toBe(200);
             expect(res.body).toEqual({

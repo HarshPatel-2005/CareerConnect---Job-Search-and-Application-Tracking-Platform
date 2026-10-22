@@ -7,18 +7,13 @@ function isOwner(req) {
 }
 
 // GET /api/profile/:id
-// Returns the user's name and email. password_hash is never sent to the client.
-async function getProfile(req, res) {
+// Returns the user's public info. password_hash is never sent to the client.
+async function getPublicProfile(req, res) {
     try {
         const { id } = req.params;
 
-        // Enforce ownership check
-        if (!isOwner(req)) {
-            return res.status(403).json({ error: 'Forbidden: You can only access your own profile' });
-        }
-
         const [rows] = await db.query(
-            'SELECT id, full_name, email FROM users WHERE id = ?',
+            'SELECT id, full_name FROM users WHERE id = ?',
             [id]
         );
 
@@ -134,4 +129,4 @@ async function updatePassword(req, res) {
     }
 }
 
-module.exports = { getProfile, updateProfile, updatePassword };
+module.exports = { getProfile: getPublicProfile, updateProfile, updatePassword };

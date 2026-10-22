@@ -7,11 +7,15 @@ const {
 } = require("../controllers/profileController");
 const { authenticateToken } = require("../middleware/authMiddleware");
 
-// Protect all routes in this router with JWT authentication
-router.use(authenticateToken);
+// --- PUBLIC ROUTES ---
 
 // GET /api/profile/:id
 router.get("/:id", getProfile);
+
+// --- PROTECTED ROUTES ---
+
+// Protect with JWT authentication
+router.use(authenticateToken);
 
 // PUT /api/profile/:id  -> update full_name and/or email
 router.put("/:id", updateProfile);
