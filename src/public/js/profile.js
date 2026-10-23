@@ -26,58 +26,72 @@ function handleAuthError(response) {
 async function loadProfile() {
     // Disable the edit button if the user is viewing someone else's profile
     const editButton = document.getElementById('edit-btn');
+    const isOwner = String(profileId) === String(user.id);
 
-    if (profileId !== user.id) {
-        if (editButton) {
-            editButton.style.display = 'none';
-        }
+    if (!isOwner && editButton) {
+        editButton.style.display = 'none';
     }
 
     try {
-        const response = await fetch(`/api/profile/${profileId}`, {
+        const profileRes = await fetch(`/api/profile/${profileId}`, {
             method: 'GET'
         });
 
-        if (handleAuthError(response)) return;
+        if (handleAuthError(profileRes)) return;
 
-        const data = await response.json();
+        const profileData = await profileRes.json();
 
-        if (!response.ok) {
-            console.error('Error loading profile:', data.error || 'Unknown error');
+        if (!profileRes.ok) {
+            console.error('Error loading profile:', profileData.error || 'Unknown error');
             return;
         }
 
-        // Populate the profile fields
-        document.getElementById('profile-name').textContent = data.full_name;
+        // Populate the basic profile fields
+        document.getElementById('profile-name').textContent = profileData.full_name;
 
-        if (data.company) {
-            document.getElementById('profile-company').textContent = data.company;
+        if (profileData.company) {
+            document.getElementById('profile-company').textContent = profileData.company;
         }
-
-        if (data.summary) {
+        
+        if (profileData.summary) {
             document.getElementById('profile-summary').classList.remove('hidden');
-            document.getElementById('profile-summary-text').textContent = data.summary;
+            document.getElementById('profile-summary-text').textContent = profileData.summary;
         } else {
             document.getElementById('profile-summary').classList.add('hidden');
         }
 
-        if (data.resumes && data.resumes.length > 0) {
-            document.getElementById('profile-resumes').classList.remove('hidden');
-            populateResumes(data.resumes);
+        // Fetch resumes (only profile owner can see their uploaded resumes)
+        const resumeContainer = document.getElementById('profile-resumes');
+        if (isOwner) {
+            const resumeRes = await fetch(`/api/resumes`, {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+
+            if (handleAuthError(resumeRes)) return;
+            const resumeData = await resumeRes.json();
+
+            if (resumeRes.ok && resumeData.resumes && resumeData.resumes.length > 0) {
+                resumeContainer.classList.remove('hidden');
+                populateResumes(resumeData.resumes);
+            } else {
+                resumeContainer.classList.add('hidden');
+            }
         } else {
-            document.getElementById('profile-resumes').classList.add('hidden');
+            resumeContainer.classList.add('hidden');
         }
 
-        if (data.experience && data.experience.length > 0) {
+        // Populate experience and skills sections
+        if (profileData.experience && profileData.experience.length > 0) {
             document.getElementById('profile-experience').classList.remove('hidden');
-            populateExperience(data.experience);            
+            populateExperience(profileData.experience);            
         } else {
             document.getElementById('profile-experience').classList.add('hidden');
         }
 
-        if (data.skills && data.skills.length > 0) {
+        if (profileData.skills && profileData.skills.length > 0) {
             document.getElementById('profile-skills').classList.remove('hidden');
-            populateSkills(data.skills);
+            populateSkills(profileData.skills);
         } else {
             document.getElementById('profile-skills').classList.add('hidden');
         }
@@ -89,8 +103,8 @@ async function loadProfile() {
 
 function populateResumes(resumes) {
     const resumeList = document.getElementById('resume-list');
-
-    const canEdit = profileId === user.id;
+    const token = localStorage.getItem('token');
+    const canEdit = String(profileId) === String(user.id);
 
     const resumeRows = resumes.map(resume => {
         const row = document.createElement('div');
@@ -98,38 +112,105 @@ function populateResumes(resumes) {
 
         const fileName = document.createElement('div');
         fileName.className = 'resume-field';
-        fileName.textContent = resume.file_name;
+        fileName.textContent = resume.name;
 
         const dateUploaded = document.createElement('div');
         dateUploaded.className = 'resume-field';
-        dateUploaded.textContent = resume.date_uploaded;
+        dateUploaded.textContent = new Date(resume.createdAt).toLocaleDateString();
 
         const fileSize = document.createElement('div');
         fileSize.className = 'resume-field';
-        fileSize.textContent = `${(resume.file_size / 1024).toFixed(2)} KB`;
+        fileSize.textContent = `${(resume.size / 1024).toFixed(2)} KB`;
 
         const resumeActions = document.createElement('div');
         resumeActions.className = 'resume-actions';
 
+        // --- Download button ---
         const downloadButton = document.createElement('button');
         downloadButton.className = 'btn-secondary resume-action-btn';
-        downloadButton.ariaLabel = 'Download Resume';
+        downloadButton.setAttribute('aria-label', 'Download Resume');
         downloadButton.innerHTML = `<?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M6 20L18 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M12 4V16M12 16L15.5 12.5M12 16L8.5 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+        downloadButton.addEventListener('click', async () => {
+            try {
+                const res = await fetch(resume.downloadUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const blob = await res.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = resume.name;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(blobUrl);
+            } catch (error) {
+                console.error('Error downloading resume:', error);
+            }
+        });
 
         resumeActions.appendChild(downloadButton);
 
         if (canEdit) {
+            // --- Replace button ---
             const replaceButton = document.createElement('button');
             replaceButton.className = 'btn-secondary resume-action-btn';
             replaceButton.ariaLabel = 'Replace Resume';
             replaceButton.innerHTML = `<?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M3 21L12 21H21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M12.2218 5.82839L15.0503 2.99996L20 7.94971L17.1716 10.7781M12.2218 5.82839L6.61522 11.435C6.42769 11.6225 6.32233 11.8769 6.32233 12.1421L6.32233 16.6776L10.8579 16.6776C11.1231 16.6776 11.3774 16.5723 11.565 16.3847L17.1716 10.7781M12.2218 5.82839L17.1716 10.7781" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
 
+            replaceButton.addEventListener('click', () => {
+                const replaceInput = document.createElement('input');
+                replaceInput.type = 'file';
+                replaceInput.accept = '.pdf,.docx';
+                replaceInput.style.display = 'none';
+                
+                replaceInput.addEventListener('change', async () => {
+                    if (!replaceInput.files[0]) return;
+                    const formData = new FormData();
+                    formData.append('resume', replaceInput.files[0]);
+
+                    try {
+                        const res = await fetch(`/api/resumes/${resume.id}`, {
+                            method: 'PUT',
+                            headers: { 'Authorization': `Bearer ${token}` },
+                            body: formData
+                        });
+
+                        if (res.ok) loadProfile(); // Refresh list
+                        else alert('Failed to replace resume.');
+                    } catch (error) {
+                        console.error('Error replacing resume:', error);
+                    }
+                });
+            });
+
+            resumeActions.appendChild(replaceButton);
+
+            // --- Delete button ---
             const deleteButton = document.createElement('button');
             deleteButton.className = 'btn-secondary resume-action-btn';
             deleteButton.ariaLabel = 'Delete Resume';
             deleteButton.innerHTML = `<?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M20 9L18.005 20.3463C17.8369 21.3026 17.0062 22 16.0353 22H7.96474C6.99379 22 6.1631 21.3026 5.99496 20.3463L4 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M21 6L15.375 6M3 6L8.625 6M8.625 6V4C8.625 2.89543 9.52043 2 10.625 2H13.375C14.4796 2 15.375 2.89543 15.375 4V6M8.625 6L15.375 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+
+            deleteButton.addEventListener('click', async () => {
+                if (!confirm(`Are you sure you want to delete "${resume.name}"?`)) return;
+
+                try {
+                    const res = await fetch(`/api/resumes/${resume.id}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (res.status === 204) loadProfile(); // Refresh list
+                    else alert('Failed to delete resume.');
+                } catch (error) {
+                    console.error('Error deleting resume:', error);
+                }
+            })
             
-            resumeActions.appendChild(replaceButton);
             resumeActions.appendChild(deleteButton);
         }
 
