@@ -275,6 +275,48 @@ async function loadProfile() {
             resumeContainer.classList.add('hidden');
         }
 
+        // Setup resume upload functionality for profile owner
+        if (isOwner) {
+            const dropZone = document.getElementById('resume-upload');
+            const fileInput = document.getElementById('resume-file');
+
+            ['dragover', 'dragenter'].forEach(eventName => {
+                dropZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('dragover');
+                });
+            });
+
+            ['dragleave', 'dragend', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('dragover');
+                });
+            });
+
+            // Handle dropped files
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    fileInput.files = files;
+                    uploadResumeFile(files[0]);
+                }
+            });
+
+            // Handle click to trigger file input
+            dropZone.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            // Handle file selection via input
+            fileInput.addEventListener('change', (e) => {
+                if (fileInput.files.length > 0) {
+                    uploadResumeFile(fileInput.files[0]);
+                }
+            });
+        }
+
         // Populate experience and skills sections
         if (profileData.experience && profileData.experience.length > 0) {
             document.getElementById('profile-experience').classList.remove('hidden');
@@ -292,6 +334,38 @@ async function loadProfile() {
 
     } catch (error) {
         console.error('Error loading profile:', error);
+    }
+}
+
+async function uploadResumeFile(file) {
+    const formData = new FormData();
+    formData.append('resume', file);
+    const token = localStorage.getItem('token');
+
+    try {
+        const res = await fetch('/api/resumes', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData
+        });
+
+        if (handleAuthError(res)) return;
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            alert(data.error || 'Failed to upload resume.');
+            return;
+        }
+
+        const fileInput = document.getElementById('resume-file');
+        fileInput.value = ''; // Clear the file input
+        await loadProfile(); // Refresh the profile to show the new resume
+    } catch (error) {
+        console.error('Error uploading resume:', error);
+        alert('Could not reach the server. Please try again later.');
     }
 }
 

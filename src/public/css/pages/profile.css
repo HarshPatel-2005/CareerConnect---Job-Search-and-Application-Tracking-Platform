@@ -314,3 +314,26 @@
 .skill-level-pill span:hover {
     background-color: var(--color-bg-surface-hover);
 }
+
+.resume-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: var(--space-xl);
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg-elevated);
+    cursor: pointer;
+    transition: background-color var(--transition-fast), border-color var(--transition-fast);
+    text-align: center;
+    color: var(--color-text-muted);
+}
+
+.resume-upload:hover,
+.resume-upload.dragover {
+    background-color: var(--color-bg-surface-hover);
+    border-color: var(--color-primary);
+    color: var(--color-text-main);
+}
