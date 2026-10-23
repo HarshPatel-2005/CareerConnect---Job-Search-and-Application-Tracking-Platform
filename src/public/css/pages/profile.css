@@ -8,6 +8,11 @@
     color: var(--color-text-muted);
 }
 
+/* Hidden elements */
+.hidden {
+    display: none;
+}
+
 /* Company history styles */
 .company-history-group {
     background-color: var(--color-bg-elevated);
@@ -58,3 +63,145 @@
     color: var(--color-text-muted);
 }
 
+/* Skills styles */
+.skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.skill-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    background-color: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: 9999px; /* Pill shape */
+    padding: 4px 12px;
+    font-size: 0.9rem;
+}
+
+.skill-level-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1px solid var(--color-border);
+    position: relative;
+}
+
+.skill-item[data-skill-level="beginner"] .skill-level-indicator {
+    background-color: var(--color-danger);
+}
+
+.skill-item[data-skill-level="intermediate"] .skill-level-indicator {
+    background-color: var(--color-warning);
+}
+
+.skill-item[data-skill-level="advanced"] .skill-level-indicator {
+    background-color: var(--color-success);
+}
+
+.skill-level-indicator-tooltip {
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--color-bg-elevated);
+    color: var(--color-text-main);
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+
+    box-shadow: var(--card-shadow);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    z-index: 10;
+
+    transition: opacity var(--transition-fast), visibility var(--transition-fast);
+}
+
+.skill-level-indicator-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--color-bg-elevated) transparent transparent transparent;
+    box-shadow: var(--card-shadow);
+    stroke: 1px solid var(--color-border);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    z-index: 10;
+
+    transition: opacity var(--transition-fast), visibility var(--transition-fast);
+}
+
+.skill-level-indicator:hover .skill-level-indicator-tooltip,
+.skill-level-indicator-tooltip:hover,
+.skill-level-indicator:hover .skill-level-indicator-tooltip::after
+ {
+    opacity: 1;
+    visibility: visible;
+}   
+
+/* Resume styles */
+.resume-list {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.resume-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 140px;
+    align-items: center;
+    width: 100%;
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.resume-row:nth-child(odd):not(:nth-child(1)) {
+    background-color: var(--color-bg-elevated);
+}
+
+.resume-row:last-child {
+    border-bottom: none;
+}
+
+.resume-header {
+    background-color: var(--color-bg-elevated);
+    font-weight: 500;
+    color: var(--color-text-muted);
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.resume-field {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.resume-actions {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.resume-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-sm);
+}
