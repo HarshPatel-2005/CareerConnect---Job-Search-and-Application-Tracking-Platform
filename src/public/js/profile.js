@@ -23,6 +23,83 @@ function handleAuthError(response) {
     return false;
 }
 
+function toggleEditMode() {
+    const editButton = document.getElementById('edit-btn');
+    const isEditing = editButton.textContent === 'Save';
+
+    const summaryTextEl = document.getElementById('profile-summary-text');
+
+    if (!isEditing) {
+        // --- SWITCH TO EDIT MODE ---
+        editButton.textContent = 'Save';
+
+        // Turn summary into a textarea for editing
+        const currentSummary = summaryTextEl ? summaryTextEl.textContent.trim() : '';
+        const summaryCard = document.getElementById('profile-summary');
+
+        const summaryTextarea = document.createElement('textarea');
+        summaryTextarea.id = 'edit-summary-input';
+        summaryTextarea.rows = 4;
+        summaryTextarea.value = currentSummary;
+
+        summaryTextEl.parentElement.appendChild(summaryTextarea);
+        summaryCard.classList.remove('hidden');
+        summaryTextEl.classList.add('hidden');
+    } else {
+        // --- SAVE CHANGES ---
+        saveProfileChanges(editButton);
+    }
+}
+
+async function saveProfileChanges(editButton) {
+    const newSummary = document.getElementById('edit-summary-input').value.trim();
+
+    editButton.disabled = true; // Disable the button to prevent multiple clicks
+    editButton.textContent = 'Saving...';
+
+    try {
+        const res = await fetch(`/api/profile/${profileId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({ summary: newSummary })
+        });
+
+        if (handleAuthError(res)) return;
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            alert(data.error || 'Failed to save changes.');
+            editButton.disabled = false;
+            editButton.textContent = 'Save';
+            return;
+        }
+
+        // Reload profile to reflect changes
+        editButton.textContent = 'Edit Profile';
+        editButton.disabled = false;
+        loadProfile(); // Refresh the profile view
+    } catch (error) {
+        console.error('Error saving profile changes:', error);
+        alert('Could not reach the server. Please try again later.');
+        editButton.disabled = false;
+        editButton.textContent = 'Save';
+    } finally {
+        // Remove the textarea and restore the summary display
+        const summaryTextarea = document.getElementById('edit-summary-input');
+        if (summaryTextarea) {
+            summaryTextarea.remove();
+        }
+        const summaryTextEl = document.getElementById('profile-summary-text');
+        if (summaryTextEl) {
+            summaryTextEl.classList.remove('hidden');
+        }
+    }
+}
+
 async function loadProfile() {
     // Disable the edit button if the user is viewing someone else's profile
     const editButton = document.getElementById('edit-btn');
@@ -30,6 +107,8 @@ async function loadProfile() {
 
     if (!isOwner && editButton) {
         editButton.style.display = 'none';
+    } else if (isOwner && editButton) {
+        editButton.addEventListener('click', toggleEditMode);
     }
 
     try {
