@@ -31,9 +31,6 @@ CREATE TABLE IF NOT EXISTS users (
     FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE SET NULL
 );
 
--- Add summary to users table
-ALTER TABLE users ADD COLUMN summary TEXT DEFAULT NULL;
-
 -- Create experiences table
 CREATE TABLE IF NOT EXISTS experiences (
     id INT AUTO_INCREMENT PRIMARY KEY,
