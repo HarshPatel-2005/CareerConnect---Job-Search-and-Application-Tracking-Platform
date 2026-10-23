@@ -22,13 +22,17 @@ describe('Profile Endpoints & JWT Security', () => {
 
     describe('GET /api/profile/:id', () => {
         it('should return profile data publically without requiring a token (200 OK)', async () => {
-            db.query.mockResolvedValueOnce([[{
-                id: 1,
-                full_name: 'John Doe',
-                email: 'user@example.com',
-                role: 'job_seeker',
-                company_id: null
-            }]]);
+            db.query
+                .mockResolvedValueOnce([[{      // User Query
+                    id: 1,
+                    full_name: 'John Doe',
+                    email: 'user@example.com',
+                    role: 'job_seeker',
+                    summary: 'Software developer',
+                    company_id: null
+                }]])
+                .mockResolvedValueOnce([[]])    // Experiences Query
+                .mockResolvedValueOnce([[]]);   // Skills Query
 
             const res = await request(app).get('/api/profile/1');
 
@@ -36,9 +40,9 @@ describe('Profile Endpoints & JWT Security', () => {
             expect(res.body).toEqual({
                 id: 1,
                 full_name: 'John Doe',
-                email: 'user@example.com',
-                role: 'job_seeker',
-                company_id: null
+                summary: 'Software developer',
+                experience: [],
+                skills: []
             });
         });
     });
@@ -108,6 +112,122 @@ describe('Profile Endpoints & JWT Security', () => {
 
             expect(res.statusCode).toBe(401);
             expect(res.body.error).toMatch(/Current password is incorrect/i);
+        });
+    });
+
+    describe('POST /api/profile/:id/experience', () => {
+        it('should return 403 Forbidden if attempting to add experience to another user profile', async () => {
+            const token = createToken(1);
+
+            const res = await request(app)
+                .post('/api/profile/2/experience')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    company_name: 'Tech Corp',
+                    title: 'Software Engineer',
+                    start_date: '2023-01-01'
+                });
+
+            expect(res.statusCode).toBe(403);
+        });
+
+        it('should add experience successfully for owner (201 Created)', async () => {
+            const token = createToken(1);
+            db.query.mockResolvedValueOnce([{ insertId: 10 }]); // Insert query result
+
+            const res = await request(app)
+                .post('/api/profile/1/experience')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    company_name: 'Tech Corp',
+                    title: 'Software Engineer',
+                    start_date: '2023-01-01',
+                    end_date: '2024-01-01',
+                    details: 'Built awesome features.'
+                });
+
+            expect(res.statusCode).toBe(201);
+            expect(res.body).toHaveProperty('message', 'Experience added successfully');
+            expect(res.body).toHaveProperty('id', 10);
+        });
+    });
+
+    describe('DELETE /api/profile/:id/experience/:expId', () => {
+        it('should return 403 Forbidden if attempting to delete another user experience', async () => {
+            const token = createToken(1);
+
+            const res = await request(app)
+                .delete('/api/profile/2/experience/5')
+                .set('Authorization', `Bearer ${token}`);
+
+            expect(res.statusCode).toBe(403);
+        });
+
+        it('should delete experience successfully for owner (204 No Content)', async () => {
+            const token = createToken(1);
+            db.query.mockResolvedValueOnce([{ affectedRows: 1 }]); // Delete query result
+
+            const res = await request(app)
+                .delete('/api/profile/1/experience/5')
+                .set('Authorization', `Bearer ${token}`);
+
+            expect(res.statusCode).toBe(204);
+        });
+    });
+
+    describe('POST /api/profile/:id/skills', () => {
+        it('should return 403 Forbidden if attempting to add a skill to another user profile', async () => {
+            const token = createToken(1);
+
+            const res = await request(app)
+                .post('/api/profile/2/skills')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    name: 'JavaScript',
+                    level: 'Expert'
+                });
+
+            expect(res.statusCode).toBe(403);
+        });
+
+        it('should add a skill successfully for owner (201 Created)', async () => {
+            const token = createToken(1);
+            db.query.mockResolvedValueOnce([{ insertId: 3 }]); // Insert query result
+
+            const res = await request(app)
+                .post('/api/profile/1/skills')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    name: 'Node.js',
+                    level: 'advanced'
+                });
+
+            expect(res.statusCode).toBe(201);
+            expect(res.body).toHaveProperty('message', 'Skill added successfully');
+            expect(res.body).toHaveProperty('id', 3);
+        });
+    });
+
+    describe('DELETE /api/profile/:id/skills/:skillId', () => {
+        it('should return 403 Forbidden if attempting to delete another user skill', async () => {
+            const token = createToken(1);
+
+            const res = await request(app)
+                .delete('/api/profile/2/skills/4')
+                .set('Authorization', `Bearer ${token}`);
+
+            expect(res.statusCode).toBe(403);
+        });
+
+        it('should delete a skill successfully for owner (204 No Content)', async () => {
+            const token = createToken(1);
+            db.query.mockResolvedValueOnce([{ affectedRows: 1 }]); // Delete query result
+
+            const res = await request(app)
+                .delete('/api/profile/1/skills/4')
+                .set('Authorization', `Bearer ${token}`);
+
+            expect(res.statusCode).toBe(204);
         });
     });
 });
