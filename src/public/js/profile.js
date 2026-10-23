@@ -206,6 +206,12 @@ async function saveProfileChanges(editButton) {
         if (summaryTextEl) {
             summaryTextEl.classList.remove('hidden');
         }
+
+        // Hide the skill editor row
+        const skillEditorRow = document.getElementById('skill-editor-row');
+        if (skillEditorRow) {
+            skillEditorRow.classList.add('hidden');
+        }
     }
 }
 
