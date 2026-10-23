@@ -82,6 +82,7 @@
     border-radius: 9999px; /* Pill shape */
     padding: 4px 12px;
     font-size: 0.9rem;
+    position: relative;
 }
 
 .skill-level-indicator {
@@ -152,6 +153,57 @@
     visibility: visible;
 }   
 
+.skill-item.editable:hover .skill-actions {
+    opacity: 1;
+    visibility: visible;
+}
+
+.skill-actions {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: var(--space-xs);
+    border-radius: 9999px; /* Pill shape */
+    font-size: 0.9rem;
+
+    padding: 0 var(--space-sm);
+
+    background-color: var(--color-bg-surface-transparent);
+
+    overflow: hidden;
+
+    opacity: 0;
+    visibility: hidden;
+
+    transition: opacity var(--transition-fast), visibility var(--transition-fast);
+}
+
+.skill-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+
+    transition: color var(--transition-fast);
+}
+
+.skill-actions button:hover {
+    color: var(--color-primary);
+}
+
 /* Resume styles */
 .resume-list {
     display: flex;
@@ -209,4 +261,56 @@
 /* Editing Styles */
 #edit-summary-input {
     background-color: var(--color-bg-surface);
+}
+
+.skill-editor {
+    display: flex;
+    flex-direction: row;
+    gap: var(--space-sm);
+    width: 100%;
+    margin-bottom: var(--space-md);
+}
+
+.skill-editor input[type="text"] {
+    margin-bottom: 0;
+}
+
+.skill-level-selector {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs);
+    font-size: 0.9rem;
+}
+
+.skill-level-selector label {
+    margin: 0;
+}
+
+.skill-level-selector input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.skill-level-pill span {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 9999px; /* Pill shape */
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.skill-level-pill input[type="radio"]:checked + span {
+    background-color: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+
+.skill-level-pill span:hover {
+    background-color: var(--color-bg-surface-hover);
 }

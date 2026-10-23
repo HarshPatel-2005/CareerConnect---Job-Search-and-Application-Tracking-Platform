@@ -4,6 +4,7 @@
     --color-bg-surface: #f9f7f0;
     --color-bg-elevated: #fffefa;
     --color-bg-surface-hover: #ebe9e3;
+    --color-bg-surface-transparent: rgba(249, 247, 240, 0.8);
 
     --color-text-main: #10231d;
     --color-text-muted: #61706b;

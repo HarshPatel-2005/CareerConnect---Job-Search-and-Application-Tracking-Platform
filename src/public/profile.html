@@ -69,8 +69,32 @@
             <div class="card-row">
                 <h1 class="card-title">Skills</h1>
             </div>
+
+            <div class="card-row hidden" id="skill-editor-row">
+                <form class="skill-editor" id="skill-editor-form">
+                    <input type="text" id="skill-name-input" placeholder="Skill Name">
+                    <div class="skill-level-selector">
+                        <label class="skill-level-pill">
+                            <input type="radio" name="skill-level" value="beginner" required checked />
+                            <span>Beginner</span>
+                        </label>
+
+                        <label class="skill-level-pill">
+                            <input type="radio" name="skill-level" value="intermediate" required />
+                            <span>Intermediate</span>
+                        </label>
+
+                        <label class="skill-level-pill">
+                            <input type="radio" name="skill-level" value="advanced" required />
+                            <span>Advanced</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn-primary" id="skill-editor-submit-btn">Add Skill</button>
+                </form>
+            </div>
+
             <div class="card-row">
-                <ul class="skills-list"></ul>
+                <ul class="skills-list" id="skills-list"></ul>
             </div>
         </div>
     </main>

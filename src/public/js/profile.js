@@ -27,11 +27,13 @@ function toggleEditMode() {
     const editButton = document.getElementById('edit-btn');
     const isEditing = editButton.textContent === 'Save';
 
-    const summaryTextEl = document.getElementById('profile-summary-text');
-
+    
     if (!isEditing) {
         // --- SWITCH TO EDIT MODE ---
         editButton.textContent = 'Save';
+
+        // - SUMMARY EDITING -
+        const summaryTextEl = document.getElementById('profile-summary-text');
 
         // Turn summary into a textarea for editing
         const currentSummary = summaryTextEl ? summaryTextEl.textContent.trim() : '';
@@ -45,10 +47,117 @@ function toggleEditMode() {
         summaryTextEl.parentElement.appendChild(summaryTextarea);
         summaryCard.classList.remove('hidden');
         summaryTextEl.classList.add('hidden');
+
+        // - SKILL EDITING -
+        const skillsCard = document.getElementById('profile-skills');
+        const skillEditorRow = document.getElementById('skill-editor-row');
+        skillEditorRow.classList.remove('hidden');
+        skillsCard.classList.remove('hidden');
+
+        // Enable skill adding
+        const skillForm = document.getElementById('skill-editor-form');
+
+        skillForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const nameInput = document.getElementById('skill-name-input');
+            const selectedLevelInput = document.querySelector('input[name="skill-level"]:checked');
+
+            const name = nameInput.value.trim();
+            const level = selectedLevelInput ? selectedLevelInput.value : 'beginner';
+
+            if(!name) return;
+
+            const token = localStorage.getItem('token');
+            const submitButton = document.getElementById('skill-editor-submit-btn');
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'Adding...';
+
+            try {
+                const response = await fetch(`/api/profile/${profileId}/skills`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ name, level })
+                });
+
+                if (handleAuthError(response)) return;
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    alert(data.error || 'Failed to add skill.');
+                    return;
+                }
+
+                nameInput.value = '';
+                // Repopulate the skills list after adding a new skill
+                const skillObject = { id: data.id, name, level };
+                addSkillToList(skillObject, true);
+            } catch (error) {
+                console.error('Error adding skill:', error);
+                alert('Could not reach the server. Please try again later.');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Add Skill';
+            }
+        });
+        
+        // Make skills editable
+        const skillsList = document.getElementById('skills-list');
+        const skillItems = skillsList.querySelectorAll('.skill-item');
+        skillItems.forEach(skillItem => {
+            const skillId = skillItem.getAttribute('data-skill-id');
+
+            if (!skillId) {
+                skillItem.remove(); // Remove skills that don't have an ID
+                return;
+            }
+
+            skillItem.classList.add('editable');
+
+            // -- DELETE SKILL --
+
+            const deleteBtn = skillItem.querySelector('.skill-action-delete');
+            deleteBtn.addEventListener('click', skillDeleteHandler(skillItem, skillId));
+        });
+
     } else {
         // --- SAVE CHANGES ---
         saveProfileChanges(editButton);
     }
+}
+
+function skillDeleteHandler(skillItem, skillId) {
+    return async () => {
+        if (!confirm(`Are you sure you want to delete "${skillItem.querySelector('#skill-name').textContent}"?`)) return;
+
+        const token = localStorage.getItem('token');
+
+        try {
+            const res = await fetch(`/api/profile/${profileId}/skills/${skillId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (handleAuthError(res)) return;
+
+            if (res.status === 204) {
+                skillItem.remove(); // Remove the skill from the list
+            } else {
+                const data = await res.json();
+                alert(data.error || 'Failed to delete skill.');
+            }
+        } catch (error) {
+            console.error('Error deleting skill:', error);
+            alert('Could not reach the server. Please try again later.');
+        }
+    };
 }
 
 async function saveProfileChanges(editButton) {
@@ -357,18 +466,36 @@ function populateSkills(skills) {
     skillsList.innerHTML = ''; // Clear existing skills entries
 
     skills.forEach(skill => {
-        const skillItem = document.createElement('li');
-        skillItem.className = 'skill-item';
-        skillItem.dataset.skillLevel = skill.level; // Store skill level for filtering
-
-        skillItem.innerHTML = `
-        <div class="skill-level-indicator">
-            <div class="skill-level-indicator-tooltip">
-                <span>${skill.level}</span>
-            </div>
-        </div>
-        <span id="skill-name">${skill.name}</span>
-        `;
-        skillsList.appendChild(skillItem);
+        addSkillToList(skill, false);
     });
+}
+
+function addSkillToList(skill, editable = false) {
+    const skillsList = document.getElementById('skills-list');
+    const skillItem = document.createElement('li');
+    skillItem.classList.add('skill-item');
+    skillItem.setAttribute('data-skill-id', skill.id);
+    skillItem.setAttribute('data-skill-level', skill.level);
+    
+    skillItem.innerHTML = `
+    <div class="skill-level-indicator">
+    <div class="skill-level-indicator-tooltip">
+    <span>${skill.level}</span>
+    </div>
+    </div>
+    <span id="skill-name">${skill.name}</span>
+    <div class="skill-actions">
+    <button class="skill-action-delete">
+    <?xml version="1.0" encoding="UTF-8"?><svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M20 9L18.005 20.3463C17.8369 21.3026 17.0062 22 16.0353 22H7.96474C6.99379 22 6.1631 21.3026 5.99496 20.3463L4 9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M21 6L15.375 6M3 6L8.625 6M8.625 6V4C8.625 2.89543 9.52043 2 10.625 2H13.375C14.4796 2 15.375 2.89543 15.375 4V6M8.625 6L15.375 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+    </button>
+    </div>
+    `;
+    skillsList.appendChild(skillItem);
+
+    if (editable) {
+        skillItem.classList.add('editable');
+
+        const deleteBtn = skillItem.querySelector('.skill-action-delete');
+        deleteBtn.addEventListener('click', skillDeleteHandler(skillItem, skill.id));
+    }
 }
