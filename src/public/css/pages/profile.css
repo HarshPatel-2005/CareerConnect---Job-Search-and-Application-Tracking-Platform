@@ -63,6 +63,20 @@
     color: var(--color-text-muted);
 }
 
+.company-history-position-title {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+}
+
+.experience-delete-btn {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xs) var(--space-sm);
+}
+
 /* Skills styles */
 .skills-list {
     display: flex;
@@ -336,4 +350,45 @@
     background-color: var(--color-bg-surface-hover);
     border-color: var(--color-primary);
     color: var(--color-text-main);
+}
+
+.experience-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.experience-modal.hidden {
+    display: none;
+    pointer-events: none;
+}
+
+.experience-modal .card {
+    padding: var(--space-lg);
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    background-color: var(--color-bg-primary);
+}
+
+.experience-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+}
+
+.experience-form label:not(:first-child) {
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: var(--color-text-main);
+    margin-top: var(--space-md);
 }

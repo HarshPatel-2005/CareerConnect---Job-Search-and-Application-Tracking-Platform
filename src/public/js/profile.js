@@ -10,6 +10,60 @@ if (!profileId && !user.id) {
 // Init the profile info on load
 document.addEventListener('DOMContentLoaded', async () => {
     await loadProfile();
+
+    // Setup the experience form and modal
+    setupExperienceForm();
+    
+    // Disable the edit button if the user is viewing someone else's profile
+    const editButton = document.getElementById('edit-btn');
+    const isOwner = String(profileId) === String(user.id);
+    if (!isOwner && editButton) {
+        editButton.style.display = 'none';
+    } else if (isOwner && editButton) {
+        editButton.addEventListener('click', toggleEditMode);
+    }    
+
+    // Setup resume upload functionality for profile owner
+    if (isOwner) {
+        const dropZone = document.getElementById('resume-upload');
+        const fileInput = document.getElementById('resume-file');
+
+        ['dragover', 'dragenter'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+        });
+
+        ['dragleave', 'dragend', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+            });
+        });
+
+        // Handle dropped files
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                uploadResumeFile(files[0]);
+            }
+        });
+
+        // Handle click to trigger file input
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // Handle file selection via input
+        fileInput.addEventListener('change', (e) => {
+            if (fileInput.files.length > 0) {
+                uploadResumeFile(fileInput.files[0]);
+            }
+        });
+    }
 });
 
 function handleAuthError(response) {
@@ -27,7 +81,6 @@ function toggleEditMode() {
     const editButton = document.getElementById('edit-btn');
     const isEditing = editButton.textContent === 'Save';
 
-    
     if (!isEditing) {
         // --- SWITCH TO EDIT MODE ---
         editButton.textContent = 'Save';
@@ -120,9 +173,20 @@ function toggleEditMode() {
             skillItem.classList.add('editable');
 
             // -- DELETE SKILL --
-
             const deleteBtn = skillItem.querySelector('.skill-action-delete');
             deleteBtn.addEventListener('click', skillDeleteHandler(skillItem, skillId));
+        });
+
+        // - EXPERIENCE EDITING -
+        const experienceCard = document.getElementById('profile-experience');
+        const experienceSettings = document.getElementById('experience-settings');
+        experienceSettings.classList.remove('hidden');
+        experienceCard.classList.remove('hidden');
+
+        // Display the delete buttons for each experience entry
+        const experienceDeleteButtons = document.querySelectorAll('.experience-delete-btn');
+        experienceDeleteButtons.forEach(btn => {
+            btn.classList.remove('hidden');
         });
 
     } else {
@@ -212,18 +276,26 @@ async function saveProfileChanges(editButton) {
         if (skillEditorRow) {
             skillEditorRow.classList.add('hidden');
         }
+
+        // Hide the experience settings
+        const experienceSettings = document.getElementById('experience-settings');
+        if (experienceSettings) {
+            experienceSettings.classList.add('hidden');
+        }
+        // Hide the delete buttons for each experience entry
+        const experienceDeleteButtons = document.querySelectorAll('.experience-delete-btn');
+        experienceDeleteButtons.forEach(btn => {
+            btn.classList.add('hidden');
+        });
     }
 }
 
 async function loadProfile() {
-    // Disable the edit button if the user is viewing someone else's profile
     const editButton = document.getElementById('edit-btn');
     const isOwner = String(profileId) === String(user.id);
 
     if (!isOwner && editButton) {
         editButton.style.display = 'none';
-    } else if (isOwner && editButton) {
-        editButton.addEventListener('click', toggleEditMode);
     }
 
     try {
@@ -273,48 +345,6 @@ async function loadProfile() {
             }
         } else {
             resumeContainer.classList.add('hidden');
-        }
-
-        // Setup resume upload functionality for profile owner
-        if (isOwner) {
-            const dropZone = document.getElementById('resume-upload');
-            const fileInput = document.getElementById('resume-file');
-
-            ['dragover', 'dragenter'].forEach(eventName => {
-                dropZone.addEventListener(eventName, (e) => {
-                    e.preventDefault();
-                    dropZone.classList.add('dragover');
-                });
-            });
-
-            ['dragleave', 'dragend', 'drop'].forEach(eventName => {
-                dropZone.addEventListener(eventName, (e) => {
-                    e.preventDefault();
-                    dropZone.classList.remove('dragover');
-                });
-            });
-
-            // Handle dropped files
-            dropZone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                    fileInput.files = files;
-                    uploadResumeFile(files[0]);
-                }
-            });
-
-            // Handle click to trigger file input
-            dropZone.addEventListener('click', () => {
-                fileInput.click();
-            });
-
-            // Handle file selection via input
-            fileInput.addEventListener('change', (e) => {
-                if (fileInput.files.length > 0) {
-                    uploadResumeFile(fileInput.files[0]);
-                }
-            });
         }
 
         // Populate experience and skills sections
@@ -497,43 +527,76 @@ function populateResumes(resumes) {
     resumeRows.forEach(row => resumeList.appendChild(row));
 }
 
-function populateExperience(experience) {
+function populateExperience(experiences) {
     const experienceList = document.getElementById('experience-list');
     experienceList.innerHTML = ''; // Clear existing experience entries
+    const canEdit = String(profileId) === String(user.id);
 
-    experience.forEach(exp => {
+    const grouped = experiences.reduce((acc, exp) => {
+        if (!acc[exp.company_name]) acc[exp.company_name] = [];
+        acc[exp.company_name].push(exp);
+        return acc;
+    }, {});
+
+    Object.keys(grouped).forEach(companyName => {
         const historyGroup = document.createElement('div');
         historyGroup.className = 'company-history-group';
 
-        const historyTitle = `
-        <div class="company-history-title">
-            <h2 class="card-field-title">${exp.company}</h2>
-            <p class="company-history-dates">${exp.startDate} - ${exp.endDate}</p>
-        </div>
+        const historyTitle = document.createElement('div');
+        historyTitle.className = 'company-history-title';
+        historyTitle.innerHTML = `
+            <h2 class="card-field-title">${companyName}</h2>
         `;
-
-        historyGroup.innerHTML = historyTitle;
+        historyGroup.appendChild(historyTitle);
 
         const positionList = document.createElement('ul');
         positionList.className = 'company-history-position-list';
 
-        exp.positions.forEach(pos => {
+        grouped[companyName].forEach(exp => {
             const positionItem = document.createElement('li');
             positionItem.className = 'company-history-position';
             positionItem.innerHTML = `
             <div class="company-history-position-date">
-                <span>${pos.date}</span>
+                <span>${new Date(exp.start_date).getFullYear()}</span>
             </div>
 
             <div class="company-history-position-title">
-                <span>${pos.title}</span>
+                <span>${exp.title}</span>
             </div>
             <div class="company-history-position-details">
                 <p id="position-info">
-                    ${pos.details}
+                    ${exp.details || ''}
                 </p>
             </div>
             `;
+
+            // Add delete button if the user can edit
+            if (canEdit) {
+                const companyHistoryPositionTitle = positionItem.querySelector('.company-history-position-title');
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn-secondary experience-delete-btn hidden';
+                deleteBtn.innerHTML = `
+                <?xml version="1.0" encoding="UTF-8"?><svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M20 9L18.005 20.3463C17.8369 21.3026 17.0062 22 16.0353 22H7.96474C6.99379 22 6.1631 21.3026 5.99496 20.3463L4 9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M21 6L15.375 6M3 6L8.625 6M8.625 6V4C8.625 2.89543 9.52043 2 10.625 2H13.375C14.4796 2 15.375 2.89543 15.375 4V6M8.625 6L15.375 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                `;
+                deleteBtn.addEventListener('click', async () => {
+                    if (!confirm('Are you sure you want to delete this experience entry?')) return;
+                    
+                    const token = localStorage.getItem('token');
+                    const res = await fetch(`/api/profile/${profileId}/experience/${exp.id}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+
+                    if (res.status === 204) {
+                        loadProfile();
+                    } else {
+                        alert('Failed to delete experience.');
+                    }
+                });
+                companyHistoryPositionTitle.appendChild(deleteBtn);
+            }
+
             positionList.appendChild(positionItem);
         });
         historyGroup.appendChild(positionList);
@@ -577,5 +640,69 @@ function addSkillToList(skill, editable = false) {
 
         const deleteBtn = skillItem.querySelector('.skill-action-delete');
         deleteBtn.addEventListener('click', skillDeleteHandler(skillItem, skill.id));
+    }
+}
+
+function setupExperienceForm() {
+    const addExperienceBtn = document.getElementById('add-experience-btn');
+    addExperienceBtn.addEventListener('click', () => {
+        toggleExperienceModal(true);
+    });
+
+    const experienceForm = document.getElementById('experience-form');
+
+    experienceForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const title = document.getElementById('experience-title').value.trim();
+        const company_name = document.getElementById('experience-company').value.trim();
+        const start_date = document.getElementById('experience-start-date').value;
+        const end_date = document.getElementById('experience-end-date').value;
+        const details = document.getElementById('experience-details').value.trim();
+
+        const token = localStorage.getItem('token');
+
+        try {
+            const response = await fetch(`/api/profile/${profileId}/experience`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ 
+                    company_name, 
+                    title, 
+                    start_date, 
+                    end_date: end_date || null, 
+                    details: details || null
+                })
+            });
+
+            if (handleAuthError(response)) return;
+
+            const data = await response.json();
+            
+            if (!response.ok) {
+                alert(data.error || 'Failed to add experience.');
+                return;
+            }
+
+            toggleExperienceModal(false);
+            await loadProfile(); // Refresh the profile to show the new experience
+        } catch (error) {
+            console.error('Error adding experience:', error);
+            alert('Could not reach the server. Please try again later.');
+        }
+    });
+}
+
+function toggleExperienceModal(show = true) {
+    const experienceModal = document.getElementById('experience-modal');
+    const experienceForm = document.getElementById('experience-form');
+    if (show) {
+        experienceModal.classList.remove('hidden');
+    } else {
+        experienceModal.classList.add('hidden');
+        experienceForm.reset(); // Reset the form fields when closing the modal
     }
 }

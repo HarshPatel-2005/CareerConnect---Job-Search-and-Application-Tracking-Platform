@@ -68,6 +68,9 @@
             <div class="card-row">
                 <h1 class="card-title">Experience</h1>
             </div>
+            <div class="card-row hidden" id="experience-settings">
+                <button class="btn-primary" id="add-experience-btn">Add Experience</button>
+            </div>
             <div class="card-row-vertical" id="experience-list"></div>
         </div>
 
@@ -104,6 +107,35 @@
             </div>
         </div>
     </main>
+
+    <div class="experience-modal hidden" id="experience-modal">
+        <div class="card">
+            <div class="card-row">
+                <h1 class="card-title" id="experience-modal-title">Add Experience</h1>
+            </div>
+
+            <div class="card-row">
+                <form class="experience-form" id="experience-form">
+                    <label for="experience-title">Title</label>
+                    <input type="text" id="experience-title" name="title" required>
+
+                    <label for="experience-company">Company</label>
+                    <input type="text" id="experience-company" name="company" required>
+
+                    <label for="experience-start-date">Start Date</label>
+                    <input type="date" id="experience-start-date" name="startDate" required>
+
+                    <label for="experience-end-date">End Date</label>
+                    <input type="date" id="experience-end-date" name="endDate">
+
+                    <label for="experience-details">Description</label>
+                    <textarea id="experience-details" name="details"></textarea>
+
+                    <button type="submit" class="btn-primary">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <script src="js/profile.js"></script>
 </body>
