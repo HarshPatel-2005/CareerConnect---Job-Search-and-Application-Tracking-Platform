@@ -1,7 +1,8 @@
 /* Base Button Styles */
 .btn,
 button[type="submit"],
-button[type="button"] {
+button[type="button"],
+button {
     font: inherit;
     font-family: var(--font-sans);
     cursor: pointer;
@@ -50,7 +51,7 @@ button[type="submit"] {
 }
 
 .btn-secondary:hover:not(:disabled) {
-    background: var(--color-bg-surface);
+    background: var(--color-bg-surface-hover);
 }
 
 /* Text / Link Button */
