@@ -25,6 +25,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Setup resume upload functionality for profile owner
     if (isOwner) {
+        const resumeCard = document.getElementById('profile-resumes');
+        resumeCard.classList.remove('hidden');
+
         const dropZone = document.getElementById('resume-upload');
         const fileInput = document.getElementById('resume-file');
 
