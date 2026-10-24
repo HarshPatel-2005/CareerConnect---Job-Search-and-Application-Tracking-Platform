@@ -13,6 +13,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Setup the experience form and modal
     setupExperienceForm();
+
+    // Setup the skill form
+    setupSkillForm();
     
     // Disable the edit button if the user is viewing someone else's profile
     const editButton = document.getElementById('edit-btn');
@@ -109,58 +112,6 @@ function toggleEditMode() {
         const skillEditorRow = document.getElementById('skill-editor-row');
         skillEditorRow.classList.remove('hidden');
         skillsCard.classList.remove('hidden');
-
-        // Enable skill adding
-        const skillForm = document.getElementById('skill-editor-form');
-
-        skillForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const nameInput = document.getElementById('skill-name-input');
-            const selectedLevelInput = document.querySelector('input[name="skill-level"]:checked');
-
-            const name = nameInput.value.trim();
-            const level = selectedLevelInput ? selectedLevelInput.value : 'beginner';
-
-            if(!name) return;
-
-            const token = localStorage.getItem('token');
-            const submitButton = document.getElementById('skill-editor-submit-btn');
-
-            submitButton.disabled = true;
-            submitButton.textContent = 'Adding...';
-
-            try {
-                const response = await fetch(`/api/profile/${profileId}/skills`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ name, level })
-                });
-
-                if (handleAuthError(response)) return;
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    alert(data.error || 'Failed to add skill.');
-                    return;
-                }
-
-                nameInput.value = '';
-                // Repopulate the skills list after adding a new skill
-                const skillObject = { id: data.id, name, level };
-                addSkillToList(skillObject, true);
-            } catch (error) {
-                console.error('Error adding skill:', error);
-                alert('Could not reach the server. Please try again later.');
-            } finally {
-                submitButton.disabled = false;
-                submitButton.textContent = 'Add Skill';
-            }
-        });
         
         // Make skills editable
         const skillsList = document.getElementById('skills-list');
@@ -613,6 +564,59 @@ function populateSkills(skills) {
 
     skills.forEach(skill => {
         addSkillToList(skill, false);
+    });
+}
+
+function setupSkillForm() {
+    const skillForm = document.getElementById('skill-editor-form');
+    if (!skillForm) return;
+
+    skillForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const nameInput = document.getElementById('skill-name-input');
+        const selectedLevelInput = document.querySelector('input[name="skill-level"]:checked');
+
+        const name = nameInput.value.trim();
+        const level = selectedLevelInput ? selectedLevelInput.value : 'beginner';
+
+        if (!name) return;
+
+        const token = localStorage.getItem('token');
+        const submitButton = document.getElementById('skill-editor-submit-btn');
+
+        submitButton.disabled = true;
+        submitButton.textContent = 'Adding...';
+
+        try {
+            const response = await fetch(`/api/profile/${profileId}/skills`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ name, level })
+            });
+
+            if (handleAuthError(response)) return;
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                alert(data.error || 'Failed to add skill.');
+                return;
+            }
+
+            nameInput.value = '';
+            const skillObject = { id: data.id, name, level };
+            addSkillToList(skillObject, true);
+        } catch (error) {
+            console.error('Error adding skill:', error);
+            alert('Could not reach the server. Please try again later.');
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Add Skill';
+        }
     });
 }
 
