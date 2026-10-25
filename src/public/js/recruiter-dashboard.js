@@ -291,7 +291,7 @@ async function loadRecruiterJobs() {
                 </div>
                 <div class="cand">
                     ${job.candidates_count > 0 ? `
-                        <a class="total" href="#">${job.candidates_count} Active<br>Candidates</a>
+                        <a class="total" href="candidates-dashboard.html">${job.candidates_count} Active<br>Candidates</a>
                         <div class="stats">
                             <div><b>${job.awaiting_count}</b>Awaiting</div>
                             <div class="link"><b>${job.reviewed_count}</b>Reviewed</div>
