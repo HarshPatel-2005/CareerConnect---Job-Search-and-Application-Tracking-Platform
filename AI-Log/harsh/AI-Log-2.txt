@@ -1,4 +1,4 @@
-AI Log #2:
+AI Log #2 (Sprint #1):
 
 Task: Generate the route, controller and the JS for the profile page
 Purpose of AI: Code generation

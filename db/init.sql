@@ -31,6 +31,21 @@ CREATE TABLE IF NOT EXISTS users (
     FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE SET NULL
 );
 
+-- Create jobs table
+CREATE TABLE IF NOT EXISTS jobs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    company_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    status ENUM('open', 'paused', 'closed') DEFAULT 'open',
+    candidates_count INT DEFAULT 0,
+    awaiting_count INT DEFAULT 0,
+    reviewed_count INT DEFAULT 0,
+    contacting_count INT DEFAULT 0,
+    hired_count INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+);
 -- Create experiences table
 CREATE TABLE IF NOT EXISTS experiences (
     id INT AUTO_INCREMENT PRIMARY KEY,
