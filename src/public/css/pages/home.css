@@ -1,0 +1,12 @@
+.hero {
+    max-width: 870px;
+    padding: clamp(70px, 12vw, 130px) 0 58px;
+}
+
+.intro {
+    max-width: 650px;
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 1.08rem;
+    line-height: 1.7;
+}

@@ -1,0 +1,69 @@
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--color-text-main);
+}
+
+h1 {
+    font-size: clamp(2.8rem, 7vw, 5.8rem);
+    letter-spacing: -0.05em;
+    line-height: 0.96;
+    margin: 12px 0 24px;
+}
+
+h2 {
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    margin: 0 0 12px;
+}
+
+h3 {
+    font-size: clamp(1.4rem, 3vw, 2.2rem);
+}
+
+h4 {
+    font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+}
+
+h5 {
+    font-size: clamp(1rem, 2vw, 1.4rem);
+}
+
+h6 {
+    font-size: clamp(0.8rem, 1.5vw, 1.2rem);
+}
+
+/* Paragraphs & Text Elements */
+p {
+    margin-bottom: var(--space-sm);
+    color: var(--color-text-muted);
+}
+
+p:last-child {
+    margin-bottom: 0;
+}
+
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+a:hover {
+    color: var(--color-primary-hover);
+    text-decoration: underline;
+}
+
+code, pre {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    background-color: var(--color-bg-surface);
+    padding: 0.2em 0.4em;
+    border-radius: var(--radius-sm);
+}
+
+pre {
+    padding: var(--space-md);
+    overflow-x: auto;
+}

@@ -1,0 +1,104 @@
+/* For Layout & Fieldsets */
+fieldset {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-lg);
+    padding: var(--space-md);
+    background: var(--color-bg-surface);
+}
+
+legend {
+    font-weight: 600;
+    padding: 0 0.5rem;
+    font-size: 0.9rem;
+    color: var(--color-text-main);
+}
+
+/* Labels & Inputs */
+label {
+    display: block;
+    margin-bottom: var(--space-xs);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-text-main);
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    font-weight: 400;
+    margin-bottom: var(--space-sm);
+    color: var(--color-text-muted);
+    cursor: pointer;
+}
+
+.radio-label input {
+    margin-right: 0.5rem;
+    accent-color: var(--color-primary);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 0.65rem 0.875rem;
+    margin-bottom: var(--space-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg-elevated);
+    color: var(--color-text-main);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-sm);
+}
+
+textarea {
+    width: 100%;
+    padding: var(--space-sm); 
+    background-color: var(--color-bg-elevated);
+    color: var(--color-text-main);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    resize: none;
+}
+
+/* Dynamic Addons & Alerts */
+.dynamic-inputs {
+    margin-top: var(--space-md);
+    padding-top: var(--space-md);
+    border-top: 1px dashed var(--color-border);
+}
+
+.alert {
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-md);
+    font-size: 0.9rem;
+    display: none;
+}
+
+.alert.error {
+    background-color: #fde8e8;
+    color: var(--color-danger);
+    border: 1px solid rgba(176, 0, 32, 0.2);
+    display: block;
+}
+
+.alert.success {
+    background-color: #e6f4ea;
+    color: var(--color-success);
+    border: 1px solid rgba(23, 107, 82, 0.2);
+    display: block;
+}
+
+.hidden {
+    display: none !important;
+}
