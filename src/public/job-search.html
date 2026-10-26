@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Jobs | CareerConnect</title>
+    <link rel="stylesheet" href="/css/job-search.css">
+    <script src="/js/job-search.js" defer></script>
+</head>
+<body>
+    <header class="site-header">
+        <a href="/" class="logo">CareerConnect</a>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/job-search.html" aria-current="page">Find Jobs</a>
+            <a href="/profile.html">My Profile</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h1>Find your next opportunity</h1>
+            <p>Explore open positions and discover a job that fits you.</p>
+        </section>
+
+        <section class="search-panel" aria-label="Job search filters">
+            <form id="job-search-form">
+
+                <div class="field">
+                    <label for="keyword">Job title or keyword</label>
+                    <input
+                        type="search"
+                        id="keyword"
+                        name="search"
+                        placeholder="e.g. Software Developer"
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="location">Location</label>
+                    <input
+                        type="text"
+                        id="location"
+                        name="location"
+                        placeholder="e.g. Montreal"
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="job-type">Job type</label>
+                    <select id="job-type" name="job_type">
+                        <option value="">All job types</option>
+                        <option value="full_time">Full-time</option>
+                        <option value="part_time">Part-time</option>
+                        <option value="contract">Contract</option>
+                        <option value="temporary">Temporary</option>
+                        <option value="internship">Internship</option>
+                        <option value="co_op">Co-op</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="search-button">
+                    Search Jobs
+                </button>
+
+            </form>
+        </section>
+
+        <section class="results-section" aria-labelledby="results-title">
+            <div class="results-heading">
+                <h2 id="results-title">Available Jobs</h2>
+                <p id="results-count"></p>
+            </div>
+
+            <p id="search-status" role="status" aria-live="polite">
+                Loading jobs...
+            </p>
+
+            <div id="job-results" class="job-grid"></div>
+        </section>
+    </main>
+</body>
+</html>

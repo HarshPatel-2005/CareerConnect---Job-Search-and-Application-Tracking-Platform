@@ -5,6 +5,7 @@ const authRoutes = require('./routes/authRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const recruiterRoutes = require('./routes/recruiterRoutes');
 const jobPostingRoutes = require('./routes/jobPostingRoutes');   // NEW
+const jobSearchRoutes = require('./routes/jobSearchRoutes');
 
 function createApp(options = {}) {
     const app = express();
@@ -18,6 +19,7 @@ function createApp(options = {}) {
 
     app.use('/api/recruiter', recruiterRoutes);
     app.use('/api/recruiter', jobPostingRoutes);                 // NEW
+    app.use('/api/jobs', jobSearchRoutes);
 
     // Health check endpoint
     app.get('/health', (req, res) => {
