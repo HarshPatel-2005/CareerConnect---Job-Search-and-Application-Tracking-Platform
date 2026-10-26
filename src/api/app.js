@@ -6,6 +6,7 @@ const profileRoutes = require('./routes/profileRoutes');
 const recruiterRoutes = require('./routes/recruiterRoutes');
 const jobPostingRoutes = require('./routes/jobPostingRoutes');   // NEW
 const { createJobsRouter } = require('./routes/jobsRoutes');
+const jobSearchRoutes = require('./routes/jobSearchRoutes');
 
 function createApp(options = {}) {
     const app = express();
@@ -17,6 +18,8 @@ function createApp(options = {}) {
     app.use('/api/profile', profileRoutes);
     const resumes = createResumeRouter(options.resume || {});
     app.use('/api/resumes', resumes);
+    // Public search must run before the authenticated details/apply router.
+    app.use('/api/jobs', jobSearchRoutes);
     app.use('/api/jobs', createJobsRouter({
         store: resumes.resumeStore,
         uploadDir: resumes.uploadDir,

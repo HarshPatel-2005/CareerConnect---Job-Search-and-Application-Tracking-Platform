@@ -16,6 +16,7 @@ The primary objective of Sprint 2 was to advance the CareerConnect platform by e
 - **User Profile & Resume Lifecycle management**: Developed a complete profile management dashboard supporting profile summaries, interactive work experience timelines, pill-tag skill suites, and resume file upload, replacement, download, and deletion.
 - **Smart Route Protection & Navigation**: Refactored global site navigation, including dynamic profile links, direct post-authentication redirects, and client-side guards preventing authenticated users from accessing login pages.
 - **CI/CD Automation Pipeline**: Configured a GitHub Actions workflow that automatically executes Jest integration and unit test suites on every pull request to ensure high code quality and prevent regressions.
+- **Job Search and Filtering:** Implemented a job search interface and backend API allowing users to search available jobs by keyword and filter by location and job type. Added support for combined filters, matching job listings, and a helpful message when no jobs match. Created 8 automated tests to validate the search API.
 
 ## 3. Team Innovation & Original Features
 
@@ -33,6 +34,6 @@ The primary objective of Sprint 2 was to advance the CareerConnect platform by e
 ## 5. Team Contributions Summary
 
 - Lucas: Implemented end-to-end JWT auth middleware, security isolation, complete profile CRUD controllers, unified profile frontend dashboard, modular CSS redesign, and the GitHub Actions CI automated testing pipeline.
-- Joelle:
+- Joelle: Implemented the Job Search and Filtering feature, including the Express/MySQL search API, keyword and location/job type filters, and frontend job listings interface. Created 8 automated Jest/Supertest tests, verified all 97 project tests passed.
 - Harsh:
 - Maz:

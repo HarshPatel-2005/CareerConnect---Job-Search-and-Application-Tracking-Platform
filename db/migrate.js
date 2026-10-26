@@ -15,10 +15,10 @@ async function migrate() {
     const names = new Set(columns.map(column => column.Field));
     const additions = {
         openings: 'INT NOT NULL DEFAULT 1',
-        country: "VARCHAR(255) NOT NULL DEFAULT ''",
-        language: "VARCHAR(255) NOT NULL DEFAULT ''",
-        job_type: "VARCHAR(30) NOT NULL DEFAULT 'full_time'",
-        description: 'TEXT'
+        country: 'VARCHAR(100) DEFAULT NULL',
+        language: 'VARCHAR(100) DEFAULT NULL',
+        job_type: "ENUM('full_time', 'part_time', 'contract', 'temporary', 'internship', 'co_op') DEFAULT NULL",
+        description: 'TEXT DEFAULT NULL'
     };
     for (const [name, definition] of Object.entries(additions)) {
         if (!names.has(name)) await db.query(`ALTER TABLE jobs ADD COLUMN ${name} ${definition}`);

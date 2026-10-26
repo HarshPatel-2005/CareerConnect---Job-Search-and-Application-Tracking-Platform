@@ -29,16 +29,6 @@ function createJobsRouter({ store, uploadDir, db = defaultDb }) {
         next();
     });
 
-    router.get('/', async (_req, res, next) => {
-        try {
-            const [jobs] = await db.query(`
-                SELECT j.id, j.title, j.location, c.name AS company_name
-                FROM jobs j JOIN companies c ON c.id = j.company_id
-                WHERE j.status = 'open' ORDER BY j.created_at DESC, j.id DESC`);
-            res.json({ jobs });
-        } catch (error) { next(error); }
-    });
-
     router.get('/:id', async (req, res, next) => {
         try {
             const [jobs] = await db.query(`

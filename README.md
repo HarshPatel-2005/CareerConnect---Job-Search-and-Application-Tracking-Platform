@@ -13,8 +13,10 @@ The job details page shows the submission time and prevents another application.
 `POST /api/jobs/:id/apply` accepts `{ "resume_id": "<saved-resume-uuid>" }` with a
 Bearer token. It returns 201 with application metadata, 409 for a duplicate or
 unavailable job, 404 for a missing job/owned resume, and 400 for invalid input.
-`GET /api/jobs` lists open jobs; `GET /api/jobs/:id` includes the signed-in user's
-application, if any. These routes require a job seeker account.
+`GET /api/jobs` publicly searches open jobs by keyword, location, and job type;
+`GET /api/jobs/:id` includes the signed-in user's application, if any. Details
+and apply routes require a job seeker account. Search results link to the
+details page so applicants can select a saved resume.
 
 Applications live in MySQL with foreign keys to users/jobs and a unique
 `(user_id, job_id)` constraint. Resumes currently live in SQLite, so `resume_id`

@@ -125,15 +125,13 @@ test('job details return only the current applicant’s submission', async () =>
     expect(result.body.application).toEqual(application);
     expect(db.query.mock.calls[1][1]).toEqual(['5', 1]);
 });
-test('lists open jobs', async () => {
-    db.query.mockResolvedValueOnce([[{ id: 5, title: 'Developer' }]]);
-    const result = await request(app).get('/api/jobs').set('Authorization', `Bearer ${token()}`);
-    expect(result.status).toBe(200);
-    expect(result.body.jobs).toHaveLength(1);
-    expect(db.query.mock.calls[0][0]).toContain("j.status = 'open'");
+test('job details remain protected after mounting public search', async () => {
+    const result = await request(app).get('/api/jobs/5');
+    expect(result.status).toBe(401);
+    expect(db.query).not.toHaveBeenCalled();
 });
 test('restored login and new job pages are served', async () => {
-    for (const url of ['/login.html', '/jobs.html', '/job-details.html']) {
+    for (const url of ['/login.html', '/jobs.html', '/job-search.html', '/job-details.html']) {
         expect((await request(app).get(url)).status).toBe(200);
     }
 });

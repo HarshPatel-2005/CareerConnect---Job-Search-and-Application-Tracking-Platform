@@ -69,3 +69,17 @@ Decisions:
 - Everyone updated with their progress regardless of where we are
 - Looking over at what is there left to do for the future of our work
 - Progressing through the user stories
+
+Meeting Minutes #5
+
+Attendance: Joelle, Lucas, Harsh, Maz
+
+Discussions:
+
+- Getting up to date with completion
+- Looking over what was completed during the sprint and what are our next goals
+
+Decisions:
+
+- Everyone updated with their progress regardless of where we are
+- Looking over at what is there left to do for the future of our work
