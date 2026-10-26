@@ -12,7 +12,7 @@ function createJobsRouter({ store, uploadDir, db = defaultDb }) {
     const router = express.Router();
     router.use(authenticateToken);
     router.use((req, res, next) => {
-        if (req.user.role !== 'job_seeker') {
+        if (req.user.role !== 'job_seeker' && !(req.method === 'GET' && req.user.role === 'recruiter')) {
             return res.status(403).json({ error: 'A job seeker account is required.' });
         }
         const id = Number(req.user.id || req.user.userId);
@@ -37,7 +37,7 @@ function createJobsRouter({ store, uploadDir, db = defaultDb }) {
                 FROM jobs j JOIN companies c ON c.id = j.company_id WHERE j.id = ?`, [req.params.id]);
             if (!jobs.length) return res.status(404).json({ error: 'Job not found.' });
             const [applications] = await db.query(`
-                SELECT id, job_id, resume_id, resume_name, UNIX_TIMESTAMP(applied_at) * 1000 AS applied_at
+                SELECT id, job_id, resume_id, resume_name, status, UNIX_TIMESTAMP(applied_at) * 1000 AS applied_at
                 FROM applications WHERE job_id = ? AND user_id = ?`, [req.params.id, req.applicantId]);
             res.json({ job: jobs[0], application: applications[0] ? publicApplication(applications[0]) : null });
         } catch (error) { next(error); }
@@ -88,7 +88,7 @@ function createJobsRouter({ store, uploadDir, db = defaultDb }) {
             await connection.query(`UPDATE jobs SET candidates_count = candidates_count + 1,
                 awaiting_count = awaiting_count + 1 WHERE id = ?`, [req.params.id]);
             const [rows] = await connection.query(`
-                SELECT id, job_id, resume_id, resume_name, UNIX_TIMESTAMP(applied_at) * 1000 AS applied_at FROM applications WHERE id = ?`, [inserted.insertId]);
+                SELECT id, job_id, resume_id, resume_name, status, UNIX_TIMESTAMP(applied_at) * 1000 AS applied_at FROM applications WHERE id = ?`, [inserted.insertId]);
             await connection.commit();
             res.status(201).json({ application: publicApplication(rows[0]) });
         } catch (error) {

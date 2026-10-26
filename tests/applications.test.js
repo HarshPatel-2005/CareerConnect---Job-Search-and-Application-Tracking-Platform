@@ -132,6 +132,6 @@ test('job details remain protected after mounting public search', async () => {
 });
 test('restored login and new job pages are served', async () => {
     for (const url of ['/login.html', '/jobs.html', '/job-search.html', '/job-details.html']) {
-        expect((await request(app).get(url)).status).toBe(200);
+        expect((await request(app).get(url).redirects(1)).status).toBe(200);
     }
 });

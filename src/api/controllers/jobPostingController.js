@@ -105,4 +105,18 @@ const updateJob = async (req, res) => {
     }
 };
 
-module.exports = { getJob, createJob, updateJob };
+const updateJobStatus = async (req, res) => {
+    const companyId = getCompanyId(req, res);
+    if (!companyId) return;
+    if (!['open', 'paused', 'closed'].includes(req.body?.status)) return res.status(400).json({ error: 'Invalid job status' });
+    try {
+        const [result] = await db.query('UPDATE jobs SET status = ? WHERE id = ? AND company_id = ?', [req.body.status, req.params.id, companyId]);
+        if (!result.affectedRows) return res.status(404).json({ error: 'Job not found' });
+        res.json({ status: req.body.status });
+    } catch (error) {
+        console.error('Error updating job status:', error);
+        res.status(500).json({ error: 'Unable to update job status' });
+    }
+};
+
+module.exports = { getJob, createJob, updateJob, updateJobStatus };

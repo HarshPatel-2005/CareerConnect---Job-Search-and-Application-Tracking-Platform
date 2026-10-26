@@ -2,11 +2,13 @@
 <html lang="en">
 
 <head>
+    <script src="/js/site.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile — CareerConnect</title>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/pages/profile.css">
+    <link rel="stylesheet" href="/css/site.css">
 </head>
 
 <body>
@@ -26,6 +28,7 @@
     </header>
 
     <main class="page-shell">
+        <p id="profile-message" class="page-message" role="status" aria-live="polite"></p>
         <div class="card">
             <div class="card-row profile-header">
                 <div class="avatar-container avatar-container-lg" id="avatar">
@@ -39,7 +42,6 @@
             </div>
 
             <div class="card-row">
-                <button class="btn-primary" id="contact-btn">Contact</button>
                 <button class="btn-secondary" id="edit-btn">Edit Profile</button>
             </div>
 
@@ -90,7 +92,8 @@
 
             <div class="card-row hidden" id="skill-editor-row">
                 <form class="skill-editor" id="skill-editor-form">
-                    <input type="text" id="skill-name-input" placeholder="Skill Name">
+                    <label for="skill-name-input">Skill name</label>
+                    <input type="text" id="skill-name-input" placeholder="Skill Name" required>
                     <div class="skill-level-selector">
                         <label class="skill-level-pill">
                             <input type="radio" name="skill-level" value="beginner" required checked />
@@ -117,7 +120,7 @@
         </div>
     </main>
 
-    <div class="experience-modal hidden" id="experience-modal">
+    <div class="experience-modal hidden" id="experience-modal" role="dialog" aria-modal="true" aria-labelledby="experience-modal-title">
         <div class="card">
             <div class="card-row">
                 <h1 class="card-title" id="experience-modal-title">Add Experience</h1>
@@ -141,6 +144,7 @@
                     <textarea id="experience-details" name="details"></textarea>
 
                     <button type="submit" class="btn-primary">Save</button>
+                    <button type="button" class="btn-secondary" id="cancel-experience">Cancel</button>
                 </form>
             </div>
         </div>

@@ -29,6 +29,10 @@ async function migrate() {
         if (!names.has(name)) await db.query(`ALTER TABLE jobs ADD COLUMN ${name} ${definition}`);
     }
     await db.query(fs.readFileSync(path.join(__dirname, 'applications.sql'), 'utf8'));
+    const [applicationColumns] = await db.query('SHOW COLUMNS FROM applications');
+    if (!applicationColumns.some(column => column.Field === 'status')) {
+        await db.query("ALTER TABLE applications ADD COLUMN status ENUM('applied', 'under_review', 'interview', 'offered', 'rejected') NOT NULL DEFAULT 'applied'");
+    }
     console.log('Profile and applications schemas are ready. Existing records were preserved.');
 }
 

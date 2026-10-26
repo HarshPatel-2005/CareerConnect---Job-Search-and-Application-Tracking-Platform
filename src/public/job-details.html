@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="/js/site.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Job details | CareerConnect</title>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/pages/jobs.css">
     <script src="/js/job-details.js" defer></script>
+    <link rel="stylesheet" href="/css/site.css">
 </head>
 <body>
     <header class="page-header"><div class="page-header__inner">
@@ -31,7 +33,7 @@
                 <select id="resume" name="resume_id" required></select>
                 <button class="btn-primary" id="apply-button" type="submit">Submit application</button>
             </form>
-            <p><a href="/resumes.html" target="_blank" rel="noopener">Manage saved resumes (opens a new tab)</a></p>
+            <p><a id="manage-resumes" href="/resumes.html">Manage saved resumes</a></p>
             <button type="button" id="refresh-resumes">Refresh resume list</button>
         </section>
     </main>

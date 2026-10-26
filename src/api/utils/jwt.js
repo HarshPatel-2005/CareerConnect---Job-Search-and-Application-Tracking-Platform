@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+if (process.env.NODE_ENV !== 'test') require('dotenv').config({ quiet: true });
 
 const SECRET = process.env.JWT_SECRET || 'fallback_secret';
 const EXPIRATION = process.env.JWT_EXPIRATION || '24h';

@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="/js/site.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Career Connect – Recruiter</title>
 <link rel="stylesheet" href="css/recruiter-dashboard.css">
+    <link rel="stylesheet" href="/css/site.css">
 </head>
 <body>
 
@@ -24,7 +26,7 @@
     <div class="subnav">
         <nav class="tabs" aria-label="Sections">
             <a class="active" href="recruiter-dashboard.html">Jobs</a>
-            <a class="#" href="#">Candidates</a>
+            <a href="candidates-dashboard.html">Candidates</a>
         </nav>
         <div class="subnav-actions">
             <a class="btn" href="job-posting.html">Post a job</a>
@@ -33,10 +35,11 @@
 
     <!-- ================= FILTER BOX ================= -->
     <div class="section-head">
-        <h1>Open and paused jobs</h1>
-        <span class="count" id="count">(3)</span>
+        <h1>Your job postings</h1>
+        <span class="count" id="count">(0)</span>
     </div>
 
+    <p id="dashboard-message" class="page-message" role="status" aria-live="polite"></p>
     <section class="filters" aria-label="Filter jobs">
         <div class="filter-row">
             <div class="field">
@@ -88,27 +91,6 @@
         </div>
     </section>
 
-    <!-- ================= MESSAGES + INTERVIEWS ================= -->
-    <div class="panels">
-        <section class="panel">
-            <h2>Messages (0)</h2>
-            <div class="panel-body">
-                <div>
-                    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#176b52" stroke-width="1.5" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
-                    No messages to review.
-                </div>
-            </div>
-        </section>
-        <section class="panel">
-            <h2>Interviews (0)</h2>
-            <div class="panel-body">
-                <div>
-                    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#176b52" stroke-width="1.5" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
-                    No interviews scheduled.
-                </div>
-            </div>
-        </section>
-    </div>
 
     <footer>
         <span>© 2026 Career Connect</span>

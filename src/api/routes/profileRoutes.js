@@ -14,7 +14,7 @@ const { authenticateToken } = require("../middleware/authMiddleware");
 // --- PUBLIC ROUTES ---
 
 // GET /api/profile/:id
-router.get("/:id", getProfile);
+router.get('/:id', (req, res, next) => req.get('Authorization') ? authenticateToken(req, res, next) : next(), getProfile);
 
 // --- PROTECTED ROUTES ---
 

@@ -3,7 +3,7 @@ const { verifyToken } = require('../utils/jwt');
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     // Expected format: "Bearer <token>"
-    const token = authHeader && authHeader.split(' ')[1];
+    const token = typeof authHeader === 'string' && /^Bearer\s+\S+$/i.test(authHeader) ? authHeader.trim().split(/\s+/)[1] : null;
 
     if (!token) {
         return res.status(401).json({ error: 'Access denied. No token provided.' });

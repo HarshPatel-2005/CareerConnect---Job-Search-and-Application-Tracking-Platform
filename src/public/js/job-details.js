@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     const id = new URLSearchParams(window.location.search).get('id');
     const message = document.getElementById('message');
     const form = document.getElementById('apply-form');
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         message.className = type;
     }
     async function api(url, options = {}) {
-        const response = await fetch(url, {
+        const response = await CareerConnect.request(url, {
             ...options,
             headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
         });
@@ -50,8 +50,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             button.disabled = false;
         }
     }
-    if (!token) { window.location.href = '/login.html'; return; }
+    if (!token) { window.location.href = CareerConnect.loginUrl(); return; }
     if (!id || !/^[1-9]\d*$/.test(id)) { showMessage('Choose a job from Browse jobs first.', 'error'); return; }
+    document.getElementById('manage-resumes').href = `/resumes.html?job=${encodeURIComponent(id)}`;
 
     refresh.addEventListener('click', loadResumes);
     form.addEventListener('submit', async event => {
@@ -88,6 +89,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('job-meta').textContent = [job.job_type?.replaceAll('_', ' '), job.language, `${job.openings} opening(s)`].filter(Boolean).join(' · ');
         document.getElementById('description').textContent = job.description || 'No description provided.';
         document.getElementById('job').hidden = false;
+        if (CareerConnect.session()?.user.role === 'recruiter') {
+            showMessage('You are viewing this job as a recruiter. Job seeker accounts can submit applications.');
+            return;
+        }
         if (application) { showSubmitted(application); return; }
         if (job.status !== 'open') { showMessage('This job is no longer accepting applications.'); return; }
         panel.hidden = false;

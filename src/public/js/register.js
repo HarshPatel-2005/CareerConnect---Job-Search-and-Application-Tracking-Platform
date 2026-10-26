@@ -91,10 +91,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(data.error || 'Registration failed');
             }
 
-            // Save JWT and user details to localStorage
+            // Save JWT and user details to sessionStorage
             if (data.token && data.user) {
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('user', JSON.stringify(data.user));
+                CareerConnect.saveSession(data);
             }
 
             showMessage('Registration successful! Redirecting...', 'success');
@@ -105,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Redirect to profile page
             setTimeout(() => {
-                window.location.href = '/profile.html';
+                window.location.href = CareerConnect.destination();
             }, 1000); // 1 second delay for user to read the message
         } catch (error) {
             showMessage(error.message, 'error');

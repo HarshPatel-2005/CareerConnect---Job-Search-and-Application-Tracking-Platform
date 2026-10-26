@@ -1,5 +1,33 @@
 # CareerConnect
 
+### Connected workflows
+
+All pages share navigation and account controls. Recruiters land on their
+dashboard after sign-in; job seekers land on job search. The header shows the
+current account and role, with profile, settings, and logout controls. Sessions
+are kept in each tab's `sessionStorage`; old persistent login data is cleared.
+Opening an independent tab allows testing a second account without replacing
+the first tab's session. Signing in from a job details link returns to that job.
+
+Recruiters can create/edit postings, persist Open/Paused/Closed status, review
+applications under Candidates, download the submitted resume snapshot, and set
+Applied, Under Review, Interview, Offered, or Rejected. Job seekers see these
+changes under My applications. Profile, resume management, search, job details,
+and settings are reachable through the navigation. Resume management opened
+from a job includes a return link to that application.
+
+Run `npm run db:migrate` after updating an existing database, then `npm start`.
+The migration adds application status tracking without resetting existing data.
+
+Browser verification: `npm run test:e2e` runs desktop and mobile journeys using
+temporary accounts/postings which are removed afterward. Windows uses installed
+Microsoft Edge; on other platforms first run `npx playwright install chromium`.
+The tests start a separate server on port 3100 and need the configured local
+MySQL database. They cover profile editing, resume upload/replacement, search,
+submission, all five application statuses, submitted-file downloads, settings,
+account switching, and returning to a job after sign-in. Screenshots and failure
+traces are written to the ignored `test-results/` directory.
+
 ### Applying to jobs
 
 After updating an existing local database, run `npm run db:migrate` once, then

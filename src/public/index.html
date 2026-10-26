@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="/js/site.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CareerConnect | Home</title>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/pages/home.css">
+    <link rel="stylesheet" href="/css/site.css">
 </head>
 <body>
     <header class="page-header">
@@ -26,7 +28,7 @@
     <main class="home-shell">
         <section class="hero">
             <p class="eyebrow">Your next opportunity, organized</p>
-            <h1>Build your profile. Keep your best resume ready.</h1>
+            <h1>Your next opportunity starts here.</h1>
             <p class="intro">CareerConnect brings your job-search essentials together in one focused workspace. Choose a feature to get started.</p>
         </section>
 
@@ -40,7 +42,7 @@
                 </div>
                 <span class="action">Browse jobs</span>
             </a>
-            <a class="feature-card registration" href="/register.html">
+            <a class="feature-card registration" href="/register.html" data-audience="guest">
                 <span class="number">01</span>
                 <div>
                     <p class="card-label">Account</p>
@@ -50,7 +52,7 @@
                 <span class="action">Open registration <span aria-hidden="true">→</span></span>
             </a>
 
-            <a class="feature-card resumes" href="/resumes.html">
+            <a class="feature-card resumes" href="/resumes.html" data-audience="job_seeker">
                 <span class="number">02</span>
                 <div>
                     <p class="card-label">Documents</p>
@@ -58,6 +60,16 @@
                     <p>Upload, review, replace, download, and remove your PDF or DOCX resumes.</p>
                 </div>
                 <span class="action">Open resume manager <span aria-hidden="true">→</span></span>
+            </a>
+            <a class="feature-card" href="/recruiter-dashboard.html" data-audience="recruiter">
+                <span class="number">Hiring</span>
+                <div><p class="card-label">Recruiter workspace</p><h2>Manage your hiring</h2><p>Post roles, review submitted resumes, and update application statuses.</p></div>
+                <span class="action">Open recruiter dashboard</span>
+            </a>
+            <a class="feature-card" href="/applications.html" data-audience="job_seeker">
+                <span class="number">Track</span>
+                <div><p class="card-label">Applications</p><h2>Follow your progress</h2><p>See every application and its latest status in one place.</p></div>
+                <span class="action">View my applications</span>
             </a>
         </section>
 

@@ -99,10 +99,21 @@ function setupStatus(job) {
         item.innerHTML = '<span class="dot ' + choice.value + '"></span>' + choice.label;
 
         // When this choice is clicked: save it, update the button, close the menu
-        item.addEventListener('click', function () {
-            job.dataset.status = choice.value;
-            showStatus(job);
-            menu.hidden = true;
+        item.addEventListener('click', async function () {
+            button.disabled = true;
+            try {
+                const response = await CareerConnect.request(`/api/recruiter/jobs/${job.dataset.id}/status`, {
+                    method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: choice.value })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Unable to save job status.');
+                job.dataset.status = data.status;
+                showStatus(job);
+                menu.hidden = true;
+                document.getElementById('dashboard-message').textContent = 'Job status saved.';
+            } catch (error) {
+                document.getElementById('dashboard-message').textContent = error.message;
+            } finally { button.disabled = false; }
         });
 
         menu.appendChild(item);
@@ -247,7 +258,7 @@ selectAllBox.addEventListener('change', function () {
 
 async function loadRecruiterJobs() {
     try {
-        const token = localStorage.getItem('token');   // must match the key your login page saves
+        const token = sessionStorage.getItem('token');   // must match the key your login page saves
         const response = await fetch('/api/recruiter/jobs', {
             headers: { 'Authorization': 'Bearer ' + token }
         });
@@ -266,6 +277,7 @@ async function loadRecruiterJobs() {
 
         if (jobs.length === 0) {
             countLabel.textContent = '(0)';
+            emptyMessage.textContent = 'No job postings yet. Choose Post a job to create your first opening.';
             emptyMessage.hidden = false;
             return;
         }
@@ -277,6 +289,7 @@ async function loadRecruiterJobs() {
 
             const rowDiv = document.createElement('div');
             rowDiv.className = 'row job';
+            rowDiv.dataset.id = job.id;
             rowDiv.setAttribute('data-title', job.title);
             rowDiv.setAttribute('data-loc', job.location);
             rowDiv.setAttribute('data-date', formattedDate);
@@ -291,7 +304,7 @@ async function loadRecruiterJobs() {
                 </div>
                 <div class="cand">
                     ${job.candidates_count > 0 ? `
-                        <a class="total" href="candidates-dashboard.html">${job.candidates_count} Active<br>Candidates</a>
+                        <a class="total" href="candidates-dashboard.html?id=${job.id}">${job.candidates_count} Total<br>Candidates</a>
                         <div class="stats">
                             <div><b>${job.awaiting_count}</b>Awaiting</div>
                             <div class="link"><b>${job.reviewed_count}</b>Reviewed</div>
