@@ -10,6 +10,11 @@ async function migrate() {
     for (const statement of schema.split(';').filter(sql => sql.trim())) {
         await db.query(statement);
     }
+    // CREATE TABLE IF NOT EXISTS does not upgrade existing user tables.
+    const [userColumns] = await db.query('SHOW COLUMNS FROM users');
+    if (!userColumns.some(column => column.Field === 'summary')) {
+        await db.query('ALTER TABLE users ADD COLUMN summary TEXT DEFAULT NULL');
+    }
     // Add fields used by the existing job-posting endpoint to older databases.
     const [columns] = await db.query('SHOW COLUMNS FROM jobs');
     const names = new Set(columns.map(column => column.Field));
@@ -24,7 +29,7 @@ async function migrate() {
         if (!names.has(name)) await db.query(`ALTER TABLE jobs ADD COLUMN ${name} ${definition}`);
     }
     await db.query(fs.readFileSync(path.join(__dirname, 'applications.sql'), 'utf8'));
-    console.log('Applications schema is ready. Existing records were preserved.');
+    console.log('Profile and applications schemas are ready. Existing records were preserved.');
 }
 
 migrate().catch(error => {
