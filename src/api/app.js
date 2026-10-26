@@ -5,6 +5,7 @@ const authRoutes = require('./routes/authRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const recruiterRoutes = require('./routes/recruiterRoutes');
 const jobPostingRoutes = require('./routes/jobPostingRoutes');   // NEW
+const { createJobsRouter } = require('./routes/jobsRoutes');
 
 function createApp(options = {}) {
     const app = express();
@@ -14,7 +15,13 @@ function createApp(options = {}) {
 
     app.use('/api/auth', authRoutes);
     app.use('/api/profile', profileRoutes);
-    app.use('/api/resumes', createResumeRouter(options.resume || {}));
+    const resumes = createResumeRouter(options.resume || {});
+    app.use('/api/resumes', resumes);
+    app.use('/api/jobs', createJobsRouter({
+        store: resumes.resumeStore,
+        uploadDir: resumes.uploadDir,
+        ...options.applications
+    }));
 
     app.use('/api/recruiter', recruiterRoutes);
     app.use('/api/recruiter', jobPostingRoutes);                 // NEW

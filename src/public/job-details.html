@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job details | CareerConnect</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/pages/jobs.css">
+    <script src="/js/job-details.js" defer></script>
+</head>
+<body>
+    <header class="page-header"><div class="page-header__inner">
+        <a href="/" class="brand">CareerConnect</a>
+        <a href="/jobs.html">Browse jobs</a>
+    </div></header>
+    <main class="jobs-shell">
+        <p id="message" role="status" aria-live="polite">Loading job…</p>
+        <article id="job" hidden>
+            <p id="company"></p>
+            <h1 id="title"></h1>
+            <p id="location"></p>
+            <p id="job-meta"></p>
+            <h2>About the role</h2>
+            <p id="description" class="job-description"></p>
+        </article>
+        <section id="apply-panel" class="job-card" hidden aria-labelledby="apply-heading">
+            <h2 id="apply-heading">Apply with a saved resume</h2>
+            <p>Your profile and selected resume will be included. No need to enter your information again.</p>
+            <form id="apply-form" hidden>
+                <label for="resume">Choose your resume</label>
+                <select id="resume" name="resume_id" required></select>
+                <button class="btn-primary" id="apply-button" type="submit">Submit application</button>
+            </form>
+            <p><a href="/resumes.html" target="_blank" rel="noopener">Manage saved resumes (opens a new tab)</a></p>
+            <button type="button" id="refresh-resumes">Refresh resume list</button>
+        </section>
+    </main>
+</body>
+</html>

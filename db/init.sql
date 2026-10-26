@@ -37,6 +37,11 @@ CREATE TABLE IF NOT EXISTS jobs (
     company_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
     location VARCHAR(255) NOT NULL,
+    openings INT NOT NULL DEFAULT 1,
+    country VARCHAR(255) NOT NULL DEFAULT '',
+    language VARCHAR(255) NOT NULL DEFAULT '',
+    job_type VARCHAR(30) NOT NULL DEFAULT 'full_time',
+    description TEXT,
     status ENUM('open', 'paused', 'closed') DEFAULT 'open',
     candidates_count INT DEFAULT 0,
     awaiting_count INT DEFAULT 0,
@@ -68,4 +73,20 @@ CREATE TABLE IF NOT EXISTS skills (
     level ENUM('beginner', 'intermediate', 'advanced') DEFAULT 'beginner',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-)
+);
+
+-- SQLite resume ownership is validated by the apply endpoint. Store a snapshot
+-- so deleting or replacing a saved resume does not change an application.
+CREATE TABLE IF NOT EXISTS applications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    job_id INT NOT NULL,
+    resume_id VARCHAR(36) NOT NULL,
+    resume_name VARCHAR(255) NOT NULL,
+    resume_mime_type VARCHAR(100) NOT NULL,
+    resume_content MEDIUMBLOB NOT NULL,
+    applied_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    CONSTRAINT uq_applications_user_job UNIQUE (user_id, job_id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (job_id) REFERENCES jobs(id)
+);
