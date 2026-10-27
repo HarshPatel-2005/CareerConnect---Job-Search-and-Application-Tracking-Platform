@@ -13,7 +13,7 @@ async function getPublicProfile(req, res) {
         const { id } = req.params;
 
         const [rows] = await db.query(
-            'SELECT id, full_name, company_id, summary FROM users WHERE id = ?',
+            'SELECT id, full_name, email, company_id, summary FROM users WHERE id = ?',
             [id]
         );
 
@@ -29,6 +29,7 @@ async function getPublicProfile(req, res) {
         };
 
         const companyId = rows[0].company_id;
+        if (req.user && isOwner(req)) profileData.email = rows[0].email;
         if (companyId) {
             const [companyRows] = await db.query(
                 'SELECT name FROM companies WHERE id = ?',

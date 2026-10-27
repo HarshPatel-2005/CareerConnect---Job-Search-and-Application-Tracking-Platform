@@ -1,10 +1,10 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // Check if the user is already logged in
-    const token = localStorage.getItem('token');
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    if (token && user.id) {
+    const token = sessionStorage.getItem('token');
+    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+    if (token && user.id && await CareerConnect.validateSession()) {
         // Redirect to profile page if logged in
-        window.location.href = '/profile.html';
+        window.location.href = CareerConnect.destination();
         return;
     }
 
@@ -39,15 +39,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(data.error || 'Login failed');
             }
 
-            // Store JWT and user details in localStorage
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
+            // Store JWT and user details in sessionStorage
+            CareerConnect.saveSession(data);
 
             showMessage('Login successful! Redirecting...', 'success');
 
             // Redirect to profile page after a short delay
             setTimeout(() => {
-                window.location.href = '/profile.html';
+                window.location.href = CareerConnect.destination();
             }, 1000);
         } catch (error) {
             showMessage(error.message, 'error');

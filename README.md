@@ -1,5 +1,36 @@
 # CareerConnect
 
+### Applying to jobs
+
+After updating an existing local database, run `npm run db:migrate` once, then
+restart the server with `npm start`. The migration preserves existing data and
+can be rerun. Fresh Docker databases receive the same schema from `db/init.sql`.
+
+Sign in as a job seeker, upload a resume under **Manage resumes**, then open
+**Find a job** on the homepage. Select a role, choose a saved resume, and submit.
+The job details page shows the submission time and prevents another application.
+
+`POST /api/jobs/:id/apply` accepts `{ "resume_id": "<saved-resume-uuid>" }` with a
+Bearer token. It returns 201 with application metadata, 409 for a duplicate or
+unavailable job, 404 for a missing job/owned resume, and 400 for invalid input.
+`GET /api/jobs` publicly searches open jobs by keyword, location, and job type;
+`GET /api/jobs/:id` includes the signed-in user's application, if any. Details
+and apply routes require a job seeker account. Search results link to the
+details page so applicants can select a saved resume.
+
+Applications live in MySQL with foreign keys to users/jobs and a unique
+`(user_id, job_id)` constraint. Resumes currently live in SQLite, so `resume_id`
+is an application-validated reference rather than a cross-database foreign key.
+Each application stores the selected resume's name, MIME type, and file content
+as a snapshot so subsequent resume replacement/deletion cannot change the
+submission. The database generates `applied_at`; applicant identity comes from
+the verified token. Job candidate counters update in the same transaction.
+
+Run `npm test` for automated endpoint coverage. With local MySQL running and
+migrated, `npm run test:applications:db` verifies concurrent submissions, the
+database unique constraint, timestamps, counters, and retained resume snapshots.
+It creates temporary fixtures and removes only those fixtures afterward.
+
 **A job search and application tracking platform for job seekers and recruiters.**
 
 SOEN 341 Software Process, Fall 2026 | Concordia University

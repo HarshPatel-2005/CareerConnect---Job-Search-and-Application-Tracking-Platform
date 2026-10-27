@@ -1,0 +1,15 @@
+.jobs-shell { width: min(880px, calc(100% - 32px)); margin: 40px auto; }
+.jobs-shell h1, .jobs-shell h2 { margin: 16px 0; }
+.jobs-shell p { margin: 12px 0; }
+.jobs-list { display: grid; gap: 16px; margin-top: 24px; }
+.job-card { padding: 24px; border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-bg-elevated); }
+.job-card h2 { margin-top: 0; }
+.job-description { white-space: pre-wrap; overflow-wrap: anywhere; }
+#apply-panel { margin-top: 32px; }
+#apply-form { margin-top: 20px; }
+#resume { display: block; width: 100%; margin: 8px 0 20px; padding: 12px; }
+#message { padding: 12px 0; }
+#message.error { color: var(--color-danger); }
+#message.success { color: var(--color-success); }
+button:disabled { opacity: .6; cursor: wait; }
+[hidden] { display: none !important; }

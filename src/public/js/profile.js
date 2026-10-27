@@ -1,4 +1,4 @@
-const user = JSON.parse(localStorage.getItem('user') || '{}');
+const user = JSON.parse(sessionStorage.getItem('user') || '{}');
 const urlParams = new URLSearchParams(window.location.search);
 const profileId = urlParams.get('id') || user.id;
 
@@ -74,8 +74,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 function handleAuthError(response) {
     if (response.status === 401 || response.status === 403) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
         window.location.href = '/login.html';
         return true;
     }
@@ -151,9 +151,9 @@ function toggleEditMode() {
 
 function skillDeleteHandler(skillItem, skillId) {
     return async () => {
-        if (!confirm(`Are you sure you want to delete "${skillItem.querySelector('#skill-name').textContent}"?`)) return;
+        if (!confirm(`Are you sure you want to delete "${skillItem.querySelector('.skill-name').textContent}"?`)) return;
 
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
 
         try {
             const res = await fetch(`/api/profile/${profileId}/skills/${skillId}`, {
@@ -189,7 +189,7 @@ async function saveProfileChanges(editButton) {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                'Authorization': `Bearer ${sessionStorage.getItem('token')}`
             },
             body: JSON.stringify({ summary: newSummary })
         });
@@ -263,8 +263,10 @@ async function loadProfile() {
 
         if (!profileRes.ok) {
             console.error('Error loading profile:', profileData.error || 'Unknown error');
+            document.getElementById('profile-message').textContent = profileData.error || 'Unable to load this profile.';
             return;
         }
+        document.getElementById('profile-message').textContent = '';
 
         // Populate the basic profile fields
         document.getElementById('profile-name').textContent = profileData.full_name;
@@ -282,10 +284,10 @@ async function loadProfile() {
 
         // Fetch resumes (only profile owner can see their uploaded resumes)
         const resumeContainer = document.getElementById('profile-resumes');
-        if (isOwner) {
+        if (isOwner && user.role === 'job_seeker') {
             const resumeRes = await fetch(`/api/resumes`, {
                 method: 'GET',
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                headers: { 'Authorization': `Bearer ${sessionStorage.getItem('token')}` }
             });
 
             if (handleAuthError(resumeRes)) return;
@@ -295,21 +297,22 @@ async function loadProfile() {
                 resumeContainer.classList.remove('hidden');
                 populateResumes(resumeData.resumes);
             } else {
-                resumeContainer.classList.add('hidden');
+                resumeContainer.classList.remove('hidden');
+                populateResumes([]);
             }
         } else {
             resumeContainer.classList.add('hidden');
         }
 
         // Populate experience and skills sections
-        if (profileData.experience && profileData.experience.length > 0) {
+        if (isOwner || (profileData.experience && profileData.experience.length > 0)) {
             document.getElementById('profile-experience').classList.remove('hidden');
             populateExperience(profileData.experience);            
         } else {
             document.getElementById('profile-experience').classList.add('hidden');
         }
 
-        if (profileData.skills && profileData.skills.length > 0) {
+        if (isOwner || (profileData.skills && profileData.skills.length > 0)) {
             document.getElementById('profile-skills').classList.remove('hidden');
             populateSkills(profileData.skills);
         } else {
@@ -318,13 +321,14 @@ async function loadProfile() {
 
     } catch (error) {
         console.error('Error loading profile:', error);
+        document.getElementById('profile-message').textContent = 'Unable to load the profile. Please refresh to try again.';
     }
 }
 
 async function uploadResumeFile(file) {
     const formData = new FormData();
     formData.append('resume', file);
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
 
     try {
         const res = await fetch('/api/resumes', {
@@ -355,7 +359,7 @@ async function uploadResumeFile(file) {
 
 function populateResumes(resumes) {
     const resumeList = document.getElementById('resume-list');
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     const canEdit = String(profileId) === String(user.id);
 
     const resumeRows = resumes.map(resume => {
@@ -391,6 +395,8 @@ function populateResumes(resumes) {
                     }
                 });
 
+                if (handleAuthError(res)) return;
+                if (!res.ok) throw new Error('Unable to download this resume.');
                 const blob = await res.blob();
                 const blobUrl = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -419,6 +425,7 @@ function populateResumes(resumes) {
                 replaceInput.type = 'file';
                 replaceInput.accept = '.pdf,.docx';
                 replaceInput.style.display = 'none';
+                document.body.appendChild(replaceInput);
                 
                 replaceInput.addEventListener('change', async () => {
                     if (!replaceInput.files[0]) return;
@@ -438,6 +445,8 @@ function populateResumes(resumes) {
                         console.error('Error replacing resume:', error);
                     }
                 });
+                replaceInput.addEventListener('cancel', () => replaceInput.remove(), { once: true });
+                replaceInput.click();
             });
 
             resumeActions.appendChild(replaceButton);
@@ -481,6 +490,12 @@ function populateResumes(resumes) {
     resumeRows.forEach(row => resumeList.appendChild(row));
 }
 
+function escapeProfile(value) {
+    const span = document.createElement('span');
+    span.textContent = String(value || '');
+    return span.innerHTML;
+}
+
 function populateExperience(experiences) {
     const experienceList = document.getElementById('experience-list');
     experienceList.innerHTML = ''; // Clear existing experience entries
@@ -490,7 +505,7 @@ function populateExperience(experiences) {
         if (!acc[exp.company_name]) acc[exp.company_name] = [];
         acc[exp.company_name].push(exp);
         return acc;
-    }, {});
+    }, Object.create(null));
 
     Object.keys(grouped).forEach(companyName => {
         const historyGroup = document.createElement('div');
@@ -499,7 +514,7 @@ function populateExperience(experiences) {
         const historyTitle = document.createElement('div');
         historyTitle.className = 'company-history-title';
         historyTitle.innerHTML = `
-            <h2 class="card-field-title">${companyName}</h2>
+            <h2 class="card-field-title">${escapeProfile(companyName)}</h2>
         `;
         historyGroup.appendChild(historyTitle);
 
@@ -515,11 +530,11 @@ function populateExperience(experiences) {
             </div>
 
             <div class="company-history-position-title">
-                <span>${exp.title}</span>
+                <span>${escapeProfile(exp.title)}</span>
             </div>
             <div class="company-history-position-details">
                 <p id="position-info">
-                    ${exp.details || ''}
+                    ${escapeProfile(exp.details)}
                 </p>
             </div>
             `;
@@ -536,7 +551,7 @@ function populateExperience(experiences) {
                 deleteBtn.addEventListener('click', async () => {
                     if (!confirm('Are you sure you want to delete this experience entry?')) return;
                     
-                    const token = localStorage.getItem('token');
+                    const token = sessionStorage.getItem('token');
                     const res = await fetch(`/api/profile/${profileId}/experience/${exp.id}`, {
                         method: 'DELETE',
                         headers: { 'Authorization': `Bearer ${token}` }
@@ -582,7 +597,7 @@ function setupSkillForm() {
 
         if (!name) return;
 
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         const submitButton = document.getElementById('skill-editor-submit-btn');
 
         submitButton.disabled = true;
@@ -630,10 +645,10 @@ function addSkillToList(skill, editable = false) {
     skillItem.innerHTML = `
     <div class="skill-level-indicator">
     <div class="skill-level-indicator-tooltip">
-    <span>${skill.level}</span>
+    <span>${escapeProfile(skill.level)}</span>
     </div>
     </div>
-    <span id="skill-name">${skill.name}</span>
+    <span class="skill-name">${escapeProfile(skill.name)}</span>
     <div class="skill-actions">
     <button class="skill-action-delete">
     <?xml version="1.0" encoding="UTF-8"?><svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M20 9L18.005 20.3463C17.8369 21.3026 17.0062 22 16.0353 22H7.96474C6.99379 22 6.1631 21.3026 5.99496 20.3463L4 9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M21 6L15.375 6M3 6L8.625 6M8.625 6V4C8.625 2.89543 9.52043 2 10.625 2H13.375C14.4796 2 15.375 2.89543 15.375 4V6M8.625 6L15.375 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
@@ -651,6 +666,10 @@ function addSkillToList(skill, editable = false) {
 }
 
 function setupExperienceForm() {
+    document.getElementById('cancel-experience').addEventListener('click', () => toggleExperienceModal(false));
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') toggleExperienceModal(false);
+    });
     const addExperienceBtn = document.getElementById('add-experience-btn');
     addExperienceBtn.addEventListener('click', () => {
         toggleExperienceModal(true);
@@ -666,8 +685,9 @@ function setupExperienceForm() {
         const start_date = document.getElementById('experience-start-date').value;
         const end_date = document.getElementById('experience-end-date').value;
         const details = document.getElementById('experience-details').value.trim();
+        if (end_date && end_date < start_date) { alert('End date must be on or after start date.'); return; }
 
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
 
         try {
             const response = await fetch(`/api/profile/${profileId}/experience`, {
@@ -708,8 +728,10 @@ function toggleExperienceModal(show = true) {
     const experienceForm = document.getElementById('experience-form');
     if (show) {
         experienceModal.classList.remove('hidden');
+        document.getElementById('experience-title').focus();
     } else {
         experienceModal.classList.add('hidden');
         experienceForm.reset(); // Reset the form fields when closing the modal
+        document.getElementById('add-experience-btn').focus();
     }
 }

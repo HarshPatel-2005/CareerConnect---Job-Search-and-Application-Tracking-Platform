@@ -1,6 +1,6 @@
 // Auth helper variables
-const token = localStorage.getItem('token');
-const user = JSON.parse(localStorage.getItem('user') || '{}');
+const token = sessionStorage.getItem('token');
+const user = JSON.parse(sessionStorage.getItem('user') || '{}');
 
 // Redirect to login if not authenticated
 if (!token || !user.id) {
@@ -16,8 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function handleAuthError(response) {
     if (response.status === 401 || response.status === 403) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
         window.location.href = '/login.html';
         return true;
     }
@@ -134,7 +134,8 @@ async function submitRow(row, field, form) {
             body: JSON.stringify(payload),
         });
 
-        if (handleAuthError(response)) return;
+        // A wrong current password is a field error, not an expired session.
+        if (response.status === 403 && handleAuthError(response)) return;
 
         const data = await response.json();
 
@@ -150,7 +151,8 @@ async function submitRow(row, field, form) {
             setValue(field, payload[field]);
             // Update stored user object if email/name changed
             user[field] = payload[field];
-            localStorage.setItem('user', JSON.stringify(user));
+            sessionStorage.setItem('user', JSON.stringify(user));
+            window.dispatchEvent(new Event('account-updated'));
         }
 
         form.hidden = true;

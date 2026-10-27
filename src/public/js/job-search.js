@@ -46,7 +46,10 @@ const jobType = document.getElementById('job-type').value;
                 card.className = 'job-card';
 
                 const title = document.createElement('h3');
-                title.textContent = job.title;
+                const detailsLink = document.createElement('a');
+                detailsLink.href = `/job-details.html?id=${encodeURIComponent(job.id)}`;
+                detailsLink.textContent = job.title;
+                title.appendChild(detailsLink);
 
                 const company = document.createElement('p');
                 company.className = 'company-name';
@@ -64,7 +67,10 @@ const jobType = document.getElementById('job-type').value;
                 description.className = 'job-description';
                 description.textContent = job.description || 'No description provided.';
 
-                card.append(title, company, meta, description);
+                const applyLink = document.createElement('a');
+                applyLink.href = detailsLink.href;
+                applyLink.textContent = 'View details and apply';
+                card.append(title, company, meta, description, applyLink);
                 results.appendChild(card);
             });
         } catch (error) {

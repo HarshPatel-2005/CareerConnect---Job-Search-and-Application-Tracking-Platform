@@ -1,5 +1,5 @@
 // Check auth on load
-const token = localStorage.getItem('token');
+const token = sessionStorage.getItem('token');
 if (!token) {
     window.location.href = '/login.html';
 }
@@ -12,6 +12,12 @@ const list = document.querySelector('#resume-list');
 const count = document.querySelector('#resume-count');
 const message = document.querySelector('#message');
 let replacementId = null;
+const returnJob = new URLSearchParams(location.search).get('job');
+if (returnJob && /^[1-9]\d*$/.test(returnJob)) {
+    const back = document.getElementById('return-to-job');
+    back.hidden = false;
+    back.querySelector('a').href = `/job-details.html?id=${returnJob}`;
+}
 
 function showMessage(text, type = '') {
     message.textContent = text;
@@ -61,8 +67,8 @@ async function request(url, options = {}) {
     const response = await fetch(url, options);
 
     if (response.status === 401 || response.status === 403) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
         window.location.href = '/login.html';
         return null;
     }

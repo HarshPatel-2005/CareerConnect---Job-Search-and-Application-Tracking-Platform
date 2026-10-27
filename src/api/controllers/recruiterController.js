@@ -4,6 +4,7 @@ const getRecruiterJobs = async (req, res) => {
     try {
 
         const companyId = req.user?.company_id;
+        if (req.user?.role !== 'recruiter' || !companyId) return res.status(403).json({ error: 'Recruiter account required' });
 
         const [rows] = await db.query(
             `SELECT id, title, location, status, created_at, 

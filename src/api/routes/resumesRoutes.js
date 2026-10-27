@@ -169,6 +169,8 @@ function createResumeRouter(options = {}) {
         res.status(500).json({ error: 'Unable to manage resumes right now.' });
     });
 
+    router.resumeStore = store;
+    router.uploadDir = uploadDir;
     return router;
 }
 

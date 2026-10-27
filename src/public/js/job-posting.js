@@ -20,7 +20,7 @@ function request(method, url, body) {
         method: method,
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + localStorage.getItem('token')
+            'Authorization': 'Bearer ' + sessionStorage.getItem('token')
         },
         body: body ? JSON.stringify(body) : undefined
     });
@@ -72,4 +72,4 @@ form.addEventListener('submit', async function (event) {
     }
 });
 
-if (jobId) loadJob();
+if (jobId) loadJob().catch(() => { showError('Unable to load this job. Please refresh to try again.'); saveButton.disabled = true; });

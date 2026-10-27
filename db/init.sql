@@ -38,10 +38,10 @@ CREATE TABLE IF NOT EXISTS jobs (
     title VARCHAR(255) NOT NULL,
     location VARCHAR(255) NOT NULL,
     openings INT NOT NULL DEFAULT 1,
-country VARCHAR(100) DEFAULT NULL,
-language VARCHAR(100) DEFAULT NULL,
-job_type ENUM('full_time', 'part_time', 'contract', 'temporary', 'internship', 'co_op') DEFAULT NULL,
-description TEXT DEFAULT NULL,
+    country VARCHAR(100) DEFAULT NULL,
+    language VARCHAR(100) DEFAULT NULL,
+    job_type ENUM('full_time', 'part_time', 'contract', 'temporary', 'internship', 'co_op') DEFAULT NULL,
+    description TEXT DEFAULT NULL,
     status ENUM('open', 'paused', 'closed') DEFAULT 'open',
     candidates_count INT DEFAULT 0,
     awaiting_count INT DEFAULT 0,
@@ -73,4 +73,21 @@ CREATE TABLE IF NOT EXISTS skills (
     level ENUM('beginner', 'intermediate', 'advanced') DEFAULT 'beginner',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-)
+);
+
+-- SQLite resume ownership is validated by the apply endpoint. Store a snapshot
+-- so deleting or replacing a saved resume does not change an application.
+CREATE TABLE IF NOT EXISTS applications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    job_id INT NOT NULL,
+    resume_id VARCHAR(36) NOT NULL,
+    resume_name VARCHAR(255) NOT NULL,
+    resume_mime_type VARCHAR(100) NOT NULL,
+    resume_content MEDIUMBLOB NOT NULL,
+    status ENUM('applied', 'under_review', 'interview', 'offered', 'rejected') NOT NULL DEFAULT 'applied',
+    applied_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    CONSTRAINT uq_applications_user_job UNIQUE (user_id, job_id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (job_id) REFERENCES jobs(id)
+);

@@ -4,6 +4,8 @@ node_modules/
 # Runtime data and uploaded resumes
 data/
 uploads/
+test-results/
+playwright-report/
 
 # Microsoft Word documents
 *.doc
