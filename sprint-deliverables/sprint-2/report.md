@@ -35,5 +35,5 @@ The primary objective of Sprint 2 was to advance the CareerConnect platform by e
 
 - Lucas: Implemented end-to-end JWT auth middleware, security isolation, complete profile CRUD controllers, unified profile frontend dashboard, modular CSS redesign, and the GitHub Actions CI automated testing pipeline.
 - Joelle: Implemented the Job Search and Filtering feature, including the Express/MySQL search API, keyword and location/job type filters, and frontend job listings interface. Created 8 automated Jest/Supertest tests, verified all 97 project tests passed.
-- Harsh:
-- Maz:
+- Harsh: Designed and implemented the Recruiter Dashboard, Implemented Job Posting Management, Implemented posting closure,
+- Maz: Designed and implemented end-to-end routes for all the CRUD operations needed to post and retrieve a job posting as well as applying and changing the status of said job posting. Created the different application table linking users, jobs and resumes (US-07)
