@@ -20,12 +20,19 @@
         "bcrypt": "^6.0.0",
         "bcryptjs": "^3.0.3",
         "dotenv": "^18.0.6",
-        "express": "^5.2.1",
+        "express": "^5.3.0",
         "jsonwebtoken": "^9.0.3",
-        "multer": "^2.4.0",
-        "mysql2": "^3.24.4"
+        "mammoth": "^1.13.0",
+        "multer": "^2.5.0",
+        "mysql2": "^3.24.6",
+        "ollama": "^0.6.4",
+        "pdf-parse": "^2.4.5"
     },
-    "jest": { "testMatch": ["**/tests/*.test.js"] },
+    "jest": {
+        "testMatch": [
+            "**/tests/*.test.js"
+        ]
+    },
     "devDependencies": {
         "@playwright/test": "^1.64.1",
         "jest": "^30.5.2",
