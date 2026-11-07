@@ -1,8 +1,8 @@
-const db = require('../../config/db');
+const defaultDb = require('../../config/db');
 
 class ResumeStore {
-    constructor(db = db) {
-        this.db = db;
+    constructor(database = defaultDb) {
+        this.db = database;
     }
 
     async list(userId) {

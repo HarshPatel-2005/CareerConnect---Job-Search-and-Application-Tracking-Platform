@@ -19,16 +19,16 @@ beforeEach(() => {
     directory = fs.mkdtempSync(path.join(os.tmpdir(), 'careerconnect-applications-'));
 
     store = {
-        get: jest.fn().mockImplementation((id, userId) => ({
+        get: jest.fn().mockImplementation(async (id, userId) => String(userId) === '1' ? {
             id: resumeId,
-            user_id: String(userId),
+            user_id: '1',
             original_name: 'CV.pdf',
             stored_name: 'stored.pdf',
             mime_type: 'application/pdf',
             size_bytes: pdf.length,
             created_at: '2026-10-26',
             updated_at: '2026-10-26'
-        })),
+        } : null),
         create: jest.fn().mockResolvedValue(),
         list: jest.fn().mockResolvedValue([]),
         replace: jest.fn().mockResolvedValue(),
@@ -37,11 +37,6 @@ beforeEach(() => {
     };
 
     fs.writeFileSync(path.join(directory, 'stored.pdf'), pdf);
-
-    connection = {
-        beginTransaction: jest.fn().mockResolvedValue(), commit: jest.fn().mockResolvedValue(),
-        rollback: jest.fn().mockResolvedValue(), release: jest.fn(), query: jest.fn()
-    };
 
     connection = {
         beginTransaction: jest.fn().mockResolvedValue(), commit: jest.fn().mockResolvedValue(),

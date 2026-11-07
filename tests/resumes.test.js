@@ -5,30 +5,45 @@ const request = require('supertest');
 const jwt = require('jsonwebtoken');
 const db = require('../src/config/db');
 
-// Mock ollama to prevent live network calls during tests
-jest.mock('ollama', () => ({
-    default: {
-        chat: jest.fn().mockResolvedValue({
-            message: {
-                content: JSON.stringify({
-                    skills: [
-                        { name: "JavaScript", proficiency: "Advanced" },
-                        { name: "Docker", proficiency: "Intermediate" }
-                    ],
-                    job_history: [
-                        {
-                            company_name: "Tech Corp",
-                            position_title: "Software Engineer",
-                            start_date: "2024-01",
-                            end_date: null,
-                            is_current: true,
-                            details: "Developed microservices."
-                        }
-                    ]
-                })
-            }
-        })
+jest.mock('../src/api/db/resumeStore', () => class MockResumeStore {
+    constructor() { this.rows = new Map(); }
+    async list(userId) {
+        return [...this.rows.values()].filter(r => r.user_id === String(userId));
     }
+    async get(id, userId) {
+        const r = this.rows.get(id);
+        return r && r.user_id === String(userId) ? r : null;
+    }
+    async create(resume) {
+        const row = { ...resume, user_id: String(resume.user_id) };
+        this.rows.set(row.id, row);
+        return row;
+    }
+    async replace(id, userId, resume) {
+        const existing = await this.get(id, userId);
+        if (!existing) return null;
+        const row = { ...existing, ...resume };
+        this.rows.set(id, row);
+        return row;
+    }
+    async delete(id, userId) {
+        return (await this.get(id, userId)) ? this.rows.delete(id) : false;
+    }
+    close() {}
+});
+
+jest.mock('../src/api/services/aiResumeService', () => ({
+    parseResumeWithAI: jest.fn().mockResolvedValue({
+        skills: [
+            { name: 'JavaScript', proficiency: 'Advanced' },
+            { name: 'Docker', proficiency: 'Intermediate' }
+        ],
+        job_history: [{
+            company_name: 'Tech Corp', title: 'Software Engineer',
+            start_date: '2024-01', end_date: null, is_current: true,
+            details: 'Developed microservices.'
+        }]
+    })
 }));
 
 const { createApp } = require('../src/api/app');
@@ -56,7 +71,7 @@ beforeEach(() => {
         resume: {
             uploadDir: path.join(tempDir, 'uploads'),
             store,
-            maxSize: 100 * 1024 * 1024
+            maxSize: PDF.length + 50
         }
     });
 

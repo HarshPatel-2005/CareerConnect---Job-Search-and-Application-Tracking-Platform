@@ -50,12 +50,12 @@ function createJobsRouter({ store, uploadDir, db = defaultDb }) {
         }
         let connection;
         try {
-            // SQLite TEXT IDs can be stored as "1" or "1.0" depending on
-            // whether older upload requests bound the JWT ID as text or number.
+            if (!store || typeof store.get !== 'function') {
+                return res.status(500).json({ error: 'Resume store is not configured.' });
+            }
+
             const resume = await store.get(resumeId, String(req.applicantId)) || await store.get(resumeId, req.applicantId);
             if (!resume) return res.status(404).json({ error: 'Saved resume not found.' });
-            // Read synchronously with metadata lookup so a resume replacement cannot
-            // interleave and change the file being submitted in this process.
             let content;
             try {
                 content = fs.readFileSync(path.join(uploadDir, path.basename(resume.stored_name)));
@@ -66,11 +66,14 @@ function createJobsRouter({ store, uploadDir, db = defaultDb }) {
             connection = await db.getConnection();
             await connection.beginTransaction();
             // Serialize applications with job status changes and counter updates.
-            const [jobs] = await connection.query('SELECT id, status FROM jobs WHERE id = ? FOR UPDATE', [req.params.id]);
+            const result = await connection.query('SELECT id, status FROM jobs WHERE id = ? FOR UPDATE', [req.params.id]);
+            const rows = Array.isArray(result) ? result[0] : result;
+            const jobs = Array.isArray(rows) ? rows : [rows];
             if (!jobs.length) {
                 await connection.rollback();
                 return res.status(404).json({ error: 'Job not found.' });
             }
+
             const [existing] = await connection.query(
                 'SELECT id FROM applications WHERE user_id = ? AND job_id = ?', [req.applicantId, req.params.id]);
             if (existing.length) {
@@ -81,16 +84,19 @@ function createJobsRouter({ store, uploadDir, db = defaultDb }) {
                 await connection.rollback();
                 return res.status(409).json({ error: 'This job is no longer accepting applications.' });
             }
+
             const [inserted] = await connection.query(`
                 INSERT INTO applications (user_id, job_id, resume_id, resume_name, resume_mime_type, resume_content)
                 VALUES (?, ?, ?, ?, ?, ?)`,
             [req.applicantId, req.params.id, resume.id, resume.original_name, resume.mime_type, content]);
+
             await connection.query(`UPDATE jobs SET candidates_count = candidates_count + 1,
                 awaiting_count = awaiting_count + 1 WHERE id = ?`, [req.params.id]);
-            const [rows] = await connection.query(`
+            const [application] = await connection.query(`
                 SELECT id, job_id, resume_id, resume_name, status, UNIX_TIMESTAMP(applied_at) * 1000 AS applied_at FROM applications WHERE id = ?`, [inserted.insertId]);
+
             await connection.commit();
-            res.status(201).json({ application: publicApplication(rows[0]) });
+            res.status(201).json({ application: publicApplication(application[0]) });
         } catch (error) {
             if (connection) await connection.rollback();
             if (error.code === 'ER_DUP_ENTRY') {
