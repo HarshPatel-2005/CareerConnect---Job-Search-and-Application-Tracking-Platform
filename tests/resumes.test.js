@@ -3,6 +3,34 @@ const os = require('os');
 const path = require('path');
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
+const db = require('../src/config/db');
+
+// Mock ollama to prevent live network calls during tests
+jest.mock('ollama', () => ({
+    default: {
+        chat: jest.fn().mockResolvedValue({
+            message: {
+                content: JSON.stringify({
+                    skills: [
+                        { name: "JavaScript", proficiency: "Advanced" },
+                        { name: "Docker", proficiency: "Intermediate" }
+                    ],
+                    job_history: [
+                        {
+                            company_name: "Tech Corp",
+                            position_title: "Software Engineer",
+                            start_date: "2024-01",
+                            end_date: null,
+                            is_current: true,
+                            details: "Developed microservices."
+                        }
+                    ]
+                })
+            }
+        })
+    }
+}));
+
 const { createApp } = require('../src/api/app');
 const ResumeStore = require('../src/api/db/resumeStore');
 
@@ -23,12 +51,12 @@ function createToken(userId, email = 'user@example.com', role = 'job_seeker') {
 
 beforeEach(() => {
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'careerconnect-resumes-'));
-    store = new ResumeStore(path.join(tempDir, 'resumes.sqlite'));
+    store = new ResumeStore(db);
     app = createApp({
         resume: {
             uploadDir: path.join(tempDir, 'uploads'),
             store,
-            maxSize: 100
+            maxSize: 100 * 1024 * 1024
         }
     });
 
@@ -51,7 +79,7 @@ async function uploadPdf(name = 'resume.pdf', token = userAToken) {
         });
 }
 
-describe('resume management (JWT Protected)', () => {
+describe('resume management & AI extraction (JWT Protected)', () => {
     it('rejects requests without a valid JWT', async () => {
         const res = await request(app).get('/api/resumes');
         expect(res.status).toBe(401);
@@ -69,6 +97,26 @@ describe('resume management (JWT Protected)', () => {
         expect(listed.status).toBe(200);
         expect(listed.body.resumes).toHaveLength(1);
         expect(listed.body.resumes[0].id).toBe(uploaded.body.resume.id);
+    });
+
+    it('extracts structured profile JSON via POST /api/resumes/resume-extract (Task 27.2)', async () => {
+        const response = await request(app)
+            .post('/api/resumes/resume-extract')
+            .set('Authorization', `Bearer ${userAToken}`)
+            .attach('resume', PDF, {
+                filename: 'resume.pdf',
+                contentType: 'application/pdf'
+            });
+
+        expect(response.status).toBe(201);
+        expect(response.body).toHaveProperty('extractedProfile');
+        expect(response.body.extractedProfile.skills).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({ name: "JavaScript", proficiency: "Advanced" })
+            ])
+        );
+        expect(response.body.extractedProfile.job_history).toHaveLength(1);
+        expect(response.body.extractedProfile.job_history[0].company_name).toBe("Tech Corp");
     });
 
     it('accepts a DOCX resume with a valid ZIP signature', async () => {

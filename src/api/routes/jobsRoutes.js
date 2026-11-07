@@ -52,7 +52,7 @@ function createJobsRouter({ store, uploadDir, db = defaultDb }) {
         try {
             // SQLite TEXT IDs can be stored as "1" or "1.0" depending on
             // whether older upload requests bound the JWT ID as text or number.
-            const resume = store.get(resumeId, String(req.applicantId)) || store.get(resumeId, req.applicantId);
+            const resume = await store.get(resumeId, String(req.applicantId)) || await store.get(resumeId, req.applicantId);
             if (!resume) return res.status(404).json({ error: 'Saved resume not found.' });
             // Read synchronously with metadata lookup so a resume replacement cannot
             // interleave and change the file being submitted in this process.

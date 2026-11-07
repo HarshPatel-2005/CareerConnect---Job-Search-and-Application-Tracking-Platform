@@ -6,6 +6,7 @@ const request = require('supertest');
 const jwt = require('jsonwebtoken');
 const { createApp } = require('../src/api/app');
 const ResumeStore = require('../src/api/db/resumeStore');
+const defaultDb = require('../src/config/db');
 
 const resumeId = 'ee7470ab-89ad-4076-887d-31a658632f81';
 const pdf = Buffer.from('%PDF-1.7\nSaved resume');
@@ -18,7 +19,7 @@ const apply = (body = { resume_id: resumeId }, bearer = token(), id = '5') => re
 
 beforeEach(() => {
     directory = fs.mkdtempSync(path.join(os.tmpdir(), 'careerconnect-applications-'));
-    store = new ResumeStore(path.join(directory, 'resumes.sqlite'));
+    store = new ResumeStore(defaultDb);
     fs.writeFileSync(path.join(directory, 'stored.pdf'), pdf);
     store.create({ id: resumeId, user_id: '1', original_name: 'CV.pdf', stored_name: 'stored.pdf',
         mime_type: 'application/pdf', size_bytes: pdf.length, created_at: '2026-10-26', updated_at: '2026-10-26' });
