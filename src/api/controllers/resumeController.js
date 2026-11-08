@@ -46,7 +46,6 @@ class ResumeController {
         }
 
         const userId = req.user?.userId || req.user?.id;
-        const now = new Date().toISOString();
 
         try {
             // Save metadata record to DB
@@ -57,8 +56,6 @@ class ResumeController {
                 stored_name: req.file.filename,
                 mime_type: req.file.mimetype,
                 size_bytes: req.file.size,
-                created_at: now,
-                updated_at: now
             });
 
             // Parse the file with AI to extract structured data
@@ -111,7 +108,6 @@ class ResumeController {
                 stored_name: req.file.filename,
                 mime_type: req.file.mimetype,
                 size_bytes: req.file.size,
-                updated_at: new Date().toISOString()
             });
             fs.rmSync(path.join(this.uploadDir, path.basename(existing.stored_name)), { force: true });
             res.json({ resume: this._publicResume(updated) });
