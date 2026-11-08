@@ -31,8 +31,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         const resumeCard = document.getElementById('profile-resumes');
         resumeCard.classList.remove('hidden');
 
+        const uploadButton = document.getElementById('resume-upload-btn');
+
         const dropZone = document.getElementById('resume-upload');
         const fileInput = document.getElementById('resume-file');
+
+        // Open file modal on button click
+        uploadButton.addEventListener('click', () => {
+            const resumeModal = document.getElementById('resume-modal');
+            resumeModal.classList.remove('hidden');
+        });
+
+        // Close modal on cancel button click
+        const cancelButton = document.getElementById('resume-upload-cancel');
+        cancelButton.addEventListener('click', () => {
+            const resumeModal = document.getElementById('resume-modal');
+            resumeModal.classList.add('hidden');
+            fileInput.value = ''; // Clear the file input
+        });
 
         ['dragover', 'dragenter'].forEach(eventName => {
             dropZone.addEventListener(eventName, (e) => {
@@ -54,7 +70,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const files = e.dataTransfer.files;
             if (files.length > 0) {
                 fileInput.files = files;
-                uploadResumeFile(files[0]);
+                handleResume(files[0]);
             }
         });
 
@@ -66,7 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Handle file selection via input
         fileInput.addEventListener('change', (e) => {
             if (fileInput.files.length > 0) {
-                uploadResumeFile(fileInput.files[0]);
+                handleResume(fileInput.files[0]);
             }
         });
     }
@@ -305,14 +321,14 @@ async function loadProfile() {
         }
 
         // Populate experience and skills sections
-        if (isOwner || (profileData.experience && profileData.experience.length > 0)) {
+        if (profileData.experience && profileData.experience.length > 0) {
             document.getElementById('profile-experience').classList.remove('hidden');
             populateExperience(profileData.experience);            
         } else {
             document.getElementById('profile-experience').classList.add('hidden');
         }
 
-        if (isOwner || (profileData.skills && profileData.skills.length > 0)) {
+        if (profileData.skills && profileData.skills.length > 0) {
             document.getElementById('profile-skills').classList.remove('hidden');
             populateSkills(profileData.skills);
         } else {
@@ -325,7 +341,8 @@ async function loadProfile() {
     }
 }
 
-async function uploadResumeFile(file) {
+// Regular Resume Upload (no AI)
+async function uploadFile(file) {
     const formData = new FormData();
     formData.append('resume', file);
     const token = sessionStorage.getItem('token');
@@ -354,6 +371,243 @@ async function uploadResumeFile(file) {
     } catch (error) {
         console.error('Error uploading resume:', error);
         alert('Could not reach the server. Please try again later.');
+    } finally {
+        // Hide the upload modal after processing
+        const resumeModal = document.getElementById('resume-modal');
+        resumeModal.classList.add('hidden');
+    }
+}
+
+// AI Resume Upload and Parsing
+async function uploadAndParseFile(file) {
+    const formData = new FormData();
+    formData.append('resume', file);
+    const token = sessionStorage.getItem('token');
+
+    // Show a loading state since AI parsing might take longer
+    const uploadModal = document.getElementById('resume-modal-upload');
+    const processingModal = document.getElementById('resume-modal-processing');
+    const reviewModal = document.getElementById('resume-modal-review');
+
+    uploadModal.classList.add('hidden');
+    processingModal.classList.remove('hidden');
+
+    try {
+        console.log('Uploading and parsing resume with AI...');
+
+        const res = await fetch('/api/resumes/resume-extract', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` },
+            body: formData
+        });
+
+        if (handleAuthError(res)) return;
+        const data = await res.json();
+
+        if (!res.ok) {
+            alert(data.error || 'Failed to upload and parse resume.');
+            processingModal.classList.add('hidden');
+            uploadModal.classList.remove('hidden');
+            return;
+        }
+
+        // Save the staged file reference for when the user confirms the extracted data
+        sessionStorage.setItem('stagedResume', JSON.stringify(data.tempFile));
+
+        // Switch to review step
+        processingModal.classList.add('hidden');
+        reviewModal.classList.remove('hidden');
+
+        renderReviewForm(data.extractedProfile);
+    } catch (error) {
+        console.error('Error extracting the resume with AI:', error);
+        alert('Could not reach the server. Please try again later.');
+        processingModal.classList.add('hidden');
+        uploadModal.classList.remove('hidden');
+    }
+}
+
+function renderReviewForm(profile) {
+    const reviewModal = document.getElementById('resume-modal-review');
+
+    const skills = profile.skills || [];
+    const experiences = profile.job_history || [];
+
+    reviewModal.innerHTML = `
+        <div class="card-row">
+            <h1 class="card-title">Review Extracted Details</h1>
+        </div>
+        <form id="resume-review-form" class="card-row-vertical" style="gap: 20px; max-height: 70vh; overflow-y: auto; padding-right: 5px;">
+            <!-- Skills Review -->
+            <div>
+                <h3 class="card-field-title" style="margin-bottom: 8px;">Extracted Skills</h3>
+                <div id="review-skills-list" style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    ${skills.map((skill, index) => {
+                        const skillName = typeof skill === 'string' ? skill : skill.name;
+                        const skillLevel = typeof skill === 'object' && skill.level ? skill.level : 'beginner';
+                        return `
+                            <div class="skill-review-item" data-index="${index}" style="display: flex; align-items: center; gap: 6px; background: var(--color-surface, #f5f5f5); padding: 4px 10px; border-radius: 16px; border: 1px solid var(--color-border, #ddd);">
+                                <input type="text" value="${escapeProfile(skillName)}" class="review-skill-name-input" style="border: none; background: transparent; font-weight: 500; outline: none; width: 100px;" />
+                                <select class="review-skill-level-select" style="border: none; background: transparent; font-size: 0.85rem; color: var(--color-text-muted, #666); cursor: pointer;">
+                                    <option value="beginner" ${skillLevel === 'beginner' ? 'selected' : ''}>Beginner</option>
+                                    <option value="intermediate" ${skillLevel === 'intermediate' ? 'selected' : ''}>Intermediate</option>
+                                    <option value="advanced" ${skillLevel === 'advanced' ? 'selected' : ''}>Advanced</option>
+                                </select>
+                                <button type="button" onclick="this.closest('.skill-review-item').remove()" style="border: none; background: none; cursor: pointer; font-size: 1rem; color: #ff4d4f;">&times;</button>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+
+            <!-- Experience Review -->
+            <div>
+                <h3 class="card-field-title" style="margin-bottom: 8px;">Extracted Experience</h3>
+                <div id="review-experience-list" style="display: flex; flex-direction: column; gap: 12px;">
+                    ${experiences.map((exp, index) => `
+                        <div class="experience-review-item card-surface" data-index="${index}" style="padding: 12px; border: 1px solid var(--color-border, #ddd); border-radius: 6px;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                                <input type="text" placeholder="Job Title" value="${escapeProfile(exp.title || '')}" class="review-exp-title" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;" required />
+                                <input type="text" placeholder="Company Name" value="${escapeProfile(exp.company_name || '')}" class="review-exp-company" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;" required />
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                                <input type="date" value="${exp.start_date || ''}" class="review-exp-start" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;" />
+                                <input type="date" value="${exp.end_date || ''}" class="review-exp-end" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;" />
+                            </div>
+                            <textarea placeholder="Description / Details" class="review-exp-details" rows="2" style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">${escapeProfile(exp.details || '')}</textarea>
+                            <button type="button" onclick="this.closest('.experience-review-item').remove()" class="btn-secondary" style="margin-top: 8px; font-size: 0.8rem; padding: 2px 8px; color: #ff4d4f;">Remove Position</button>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="card-row" style="gap: 10px; margin-top: 10px; justify-content: flex-end;">
+                <button type="submit" class="btn-primary">Confirm & Commit to Profile</button>
+                <button type="button" class="btn-secondary" id="cancel-review">Cancel</button>
+            </div>
+        </form>
+    `;
+
+    // Handle form submission to commit to database
+    document.getElementById('resume-review-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await commitExtractedProfile();
+    });
+
+    document.getElementById('cancel-review').addEventListener('click', () => {
+        document.getElementById('resume-modal').classList.add('hidden');
+        document.getElementById('resume-modal-review').innerHTML = ''; // Clear the review modal
+        document.getElementById('resume-modal-upload').classList.remove('hidden');
+        sessionStorage.removeItem('stagedResume'); // Clear the staged resume on cancel
+        loadProfile();
+    });
+}
+
+async function commitExtractedProfile() {
+    const token = sessionStorage.getItem('token');
+
+    try {
+        const stageResumeStr = sessionStorage.getItem('stagedResume');
+        // If the user validated and we have a staged resume, confirm and save it to the database
+        if (sessionStorage.getItem('stagedResume')) {
+            const stagedResume = JSON.parse(stageResumeStr);
+            const resumeRes = await fetch('/api/resumes/confirm', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(stagedResume)
+            });
+
+            if (handleAuthError(resumeRes)) return;
+
+            if (!resumeRes.ok) {
+                sessionStorage.removeItem('stagedResume'); // Clear the staged resume on failure
+                throw new Error('Failed to save resume document.');
+            }
+
+            sessionStorage.removeItem('stagedResume'); // Clear the staged resume on success
+        }
+
+        // Gather edited skills
+        const skillItems = document.querySelectorAll('.skill-review-item');
+        const compiledSkills = Array.from(skillItems).map(item => {
+            return {
+                name: item.querySelector('.review-skill-name-input').value.trim(),
+                level: item.querySelector('.review-skill-level-select').value
+            }
+        }).filter(skill => skill.name); // Filter out empty skill names
+    
+        // Gather edited experiences
+        const expItems = document.querySelectorAll('.experience-review-item');
+        const compiledExperiences = Array.from(expItems).map(item => {
+            return {title: item.querySelector('.review-exp-title').value.trim(),
+                company_name: item.querySelector('.review-exp-company').value.trim(),
+                start_date: item.querySelector('.review-exp-start').value || null,
+                end_date: item.querySelector('.review-exp-end').value || null,
+                details: item.querySelector('.review-exp-details').value.trim()
+            }
+        }).filter(exp => exp.title && exp.company_name); // Filter out incomplete experiences
+
+        // Update the profile skills
+        for (const skill of compiledSkills) {
+            const res = await fetch(`/api/profile/${profileId}/skills`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(skill)
+            });
+            if (handleAuthError(res)) return;
+            if (!res.ok) {
+                const data = await res.json();
+                alert(data.error || 'Failed to save skill: ' + skill.name);
+                return;
+            }
+        }
+
+        // Update the profile experiences
+        for (const exp of compiledExperiences) {
+            const res = await fetch(`/api/profile/${profileId}/experience`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(exp)
+            });
+            if (handleAuthError(res)) return;
+            if (!res.ok) {
+                const data = await res.json();
+                alert(data.error || 'Failed to save experience: ' + exp.title);
+                return;
+            }
+        }
+
+        // Close the modal, clean up UI, and reload the profile
+        document.getElementById('resume-modal').classList.add('hidden');
+        document.getElementById('resume-modal-review').innerHTML = ''; // Clear the review modal
+        document.getElementById('resume-modal-upload').classList.remove('hidden');
+        await loadProfile(); // Refresh the profile to show the new data
+    } catch (error) {
+        console.error('Error saving extracted profile:', error);
+        alert('Could not reach the server. Please try again later.');
+    }
+}
+
+async function handleResume(file) {
+    if (!file) return;
+
+    const parseWithAI = document.getElementById('resume-parse').checked;
+
+    if (parseWithAI) {
+        await uploadAndParseFile(file);
+
+    } else {
+        await uploadFile(file);
     }
 }
 

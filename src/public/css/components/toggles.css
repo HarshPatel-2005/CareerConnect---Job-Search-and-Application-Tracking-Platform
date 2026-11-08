@@ -1,0 +1,63 @@
+/* Container for the toggle */
+.toggle {
+    position: relative;
+    display: inline-flex;
+    width: calc(var(--space-lg) * 2);
+    height: var(--space-lg);
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Hide the default checkbox */
+.toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Outer pill track */
+.slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--space-lg); /* Fully rounded */
+    transition: all var(--transition-fast);
+}
+
+/* Inner moving circle */
+.slider::before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: var(--color-primary);
+    border-radius: 50%;
+    transition: all var(--transition-fast);
+}
+
+/* Track bg when toggled on */
+.toggle input:checked + .slider {
+    background-color: var(--color-primary);
+}
+
+/* Inner circle when toggled on */
+.toggle input:checked + .slider::before {
+    background-color: var(--color-bg-elevated);
+}
+
+/* Move the circle to the right when toggled on */
+.toggle input:checked + .slider::before {
+    transform: translateX(var(--space-lg));
+}
+
+/* Focus style */
+.toggle input:focus + .slider {
+    box-shadow: 0 0 1px var(--color-bg-primary);
+}

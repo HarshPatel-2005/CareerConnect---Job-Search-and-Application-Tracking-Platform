@@ -25,13 +25,13 @@ function createApp(options = {}) {
     // Public search must run before the authenticated details/apply router.
     app.use('/api/jobs', jobSearchRoutes);
     app.use('/api/jobs', createJobsRouter({
-        store: resumes.resumeStore,
+        store: resumes.store,
         uploadDir: resumes.uploadDir,
         ...options.applications
     }));
 
     app.use('/api/recruiter', recruiterRoutes);
-    app.use('/api/recruiter', jobPostingRoutes);                 // NEW
+    app.use('/api/recruiter', jobPostingRoutes);
 
     // Health check endpoint
     app.get('/health', (req, res) => {

@@ -133,6 +133,7 @@ describe('Profile Endpoints & JWT Security', () => {
 
         it('should add experience successfully for owner (201 Created)', async () => {
             const token = createToken(1);
+            db.query.mockResolvedValueOnce([[]]); // Existing experience check
             db.query.mockResolvedValueOnce([{ insertId: 10 }]); // Insert query result
 
             const res = await request(app)
@@ -149,6 +150,21 @@ describe('Profile Endpoints & JWT Security', () => {
             expect(res.statusCode).toBe(201);
             expect(res.body).toHaveProperty('message', 'Experience added successfully');
             expect(res.body).toHaveProperty('id', 10);
+        });
+
+        it('updates an existing experience instead of duplicating it (200 OK)', async () => {
+            const token = createToken(1);
+            db.query.mockResolvedValueOnce([[{ id: 7 }]]);         // Existing experience found
+            db.query.mockResolvedValueOnce([{ affectedRows: 1 }]); // Update query
+
+            const res = await request(app)
+                .post('/api/profile/1/experience')
+                .set('Authorization', `Bearer ${token}`)
+                .send({ company_name: 'Tech Corp', title: 'Software Engineer', start_date: '2023-01-01' });
+
+            expect(res.statusCode).toBe(200);
+            expect(res.body).toHaveProperty('message', 'Experience updated successfully');
+            expect(res.body).toHaveProperty('id', 7);
         });
     });
 
@@ -192,6 +208,7 @@ describe('Profile Endpoints & JWT Security', () => {
 
         it('should add a skill successfully for owner (201 Created)', async () => {
             const token = createToken(1);
+            db.query.mockResolvedValueOnce([[]]); // Existing skill check
             db.query.mockResolvedValueOnce([{ insertId: 3 }]); // Insert query result
 
             const res = await request(app)
@@ -205,6 +222,21 @@ describe('Profile Endpoints & JWT Security', () => {
             expect(res.statusCode).toBe(201);
             expect(res.body).toHaveProperty('message', 'Skill added successfully');
             expect(res.body).toHaveProperty('id', 3);
+        });
+
+        it('updates the level of an existing skill instead of duplicating it (200 OK)', async () => {
+            const token = createToken(1);
+            db.query.mockResolvedValueOnce([[{ id: 5 }]]);         // Existing skill found
+            db.query.mockResolvedValueOnce([{ affectedRows: 1 }]); // Update query
+
+            const res = await request(app)
+                .post('/api/profile/1/skills')
+                .set('Authorization', `Bearer ${token}`)
+                .send({ name: 'Node.js', level: 'advanced' });
+
+            expect(res.statusCode).toBe(200);
+            expect(res.body).toHaveProperty('message', 'Skill updated successfully');
+            expect(res.body).toHaveProperty('id', 5);
         });
     });
 

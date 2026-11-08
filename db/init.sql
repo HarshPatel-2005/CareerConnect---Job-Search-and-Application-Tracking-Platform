@@ -91,3 +91,17 @@ CREATE TABLE IF NOT EXISTS applications (
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (job_id) REFERENCES jobs(id)
 );
+
+-- Create resumes table
+CREATE TABLE IF NOT EXISTS resumes (
+    id VARCHAR(36) PRIMARY KEY,
+    user_id INT NOT NULL,
+    original_name VARCHAR(255) NOT NULL,
+    stored_name VARCHAR(255) NOT NULL UNIQUE,
+    mime_type VARCHAR(100) NOT NULL,
+    size_bytes INT NOT NULL,
+    created_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    updated_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    INDEX idx_resumes_user_id (user_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+)

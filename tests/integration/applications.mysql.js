@@ -13,7 +13,7 @@ const ResumeStore = require('../../src/api/db/resumeStore');
 
 async function run() {
     const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'careerconnect-mysql-check-'));
-    const store = new ResumeStore(path.join(directory, 'resumes.sqlite'));
+    const store = new ResumeStore(db);
     const app = createApp({ resume: { store, uploadDir: directory } });
     let userId, companyId, jobId;
     try {

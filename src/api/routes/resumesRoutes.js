@@ -4,6 +4,7 @@ const path = require('path');
 const express = require('express');
 const multer = require('multer');
 const ResumeStore = require('../db/resumeStore');
+const ResumeController = require('../controllers/resumeController');
 const { authenticateToken } = require('../middleware/authMiddleware');
 
 const DEFAULT_MAX_SIZE = 5 * 1024 * 1024;
@@ -11,18 +12,6 @@ const ALLOWED_FILES = {
     '.pdf': 'application/pdf',
     '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
 };
-
-function publicResume(resume) {
-    return {
-        id: resume.id,
-        name: resume.original_name,
-        mimeType: resume.mime_type,
-        size: resume.size_bytes,
-        createdAt: resume.created_at,
-        updatedAt: resume.updated_at,
-        downloadUrl: `/api/resumes/${resume.id}/download`
-    };
-}
 
 function hasValidSignature(filePath, extension) {
     const descriptor = fs.openSync(filePath, 'r');
@@ -42,11 +31,12 @@ function createResumeRouter(options = {}) {
     const router = express.Router();
     const root = path.resolve(__dirname, '../../..');
     const uploadDir = path.resolve(options.uploadDir || path.join(root, 'uploads/resumes'));
-    const dbPath = path.resolve(options.dbPath || path.join(root, 'data/careerconnect.sqlite'));
     const maxSize = options.maxSize || Number(process.env.RESUME_MAX_SIZE_BYTES) || DEFAULT_MAX_SIZE;
-    const store = options.store || new ResumeStore(dbPath);
+    const store = options.store || new ResumeStore();
 
     fs.mkdirSync(uploadDir, { recursive: true });
+
+    const controller = new ResumeController(store, uploadDir, maxSize);
 
     // Enforce JWT authentication for all routes in this router
     router.use(authenticateToken);
@@ -70,94 +60,28 @@ function createResumeRouter(options = {}) {
         }
     });
 
-    const userId = (req) => req.user?.userId || req.user?.id;
-
-    const removeUploadedFile = (file) => {
-        if (file?.path && fs.existsSync(file.path)) fs.unlinkSync(file.path);
-    };
-
-    function validateUploadedFile(req, res) {
+    function validateUploadedFile(req, res, next) {
         if (!req.file) {
-            res.status(400).json({ error: 'Choose a PDF or DOCX resume to upload.' });
-            return false;
+            return res.status(400).json({ error: 'Choose a PDF or DOCX resume to upload.' });
         }
         const extension = path.extname(req.file.originalname).toLowerCase();
         if (!hasValidSignature(req.file.path, extension)) {
-            removeUploadedFile(req.file);
-            res.status(400).json({ error: 'The file content does not match a valid PDF or DOCX file.' });
-            return false;
+            if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+            return res.status(400).json({ error: 'The file content does not match a valid PDF or DOCX file.' });
         }
-        return true;
+        next();
     }
 
-    router.get('/', (req, res) => {
-        res.json({ resumes: store.list(userId(req)).map(publicResume), maxSize });
-    });
+    // Route Endpoints
+    router.get('/', controller.list);
+    router.post('/', upload.single('resume'), validateUploadedFile, controller.upload);
+    router.post('/resume-extract', upload.single('resume'), validateUploadedFile, controller.uploadAndExtract);
+    router.get('/:id/download', controller.download);
+    router.delete('/:id', controller.remove);
+    router.put('/:id', upload.single('resume'), validateUploadedFile, controller.replace);
+    router.post("/confirm", controller.confirmAndSaveResume);
 
-    router.post('/', upload.single('resume'), (req, res, next) => {
-        if (!validateUploadedFile(req, res)) return;
-        const now = new Date().toISOString();
-        try {
-            const record = store.create({
-                id: crypto.randomUUID(),
-                user_id: userId(req),
-                original_name: path.basename(req.file.originalname),
-                stored_name: req.file.filename,
-                mime_type: req.file.mimetype,
-                size_bytes: req.file.size,
-                created_at: now,
-                updated_at: now
-            });
-            res.status(201).json({ resume: publicResume(record) });
-        } catch (error) {
-            removeUploadedFile(req.file);
-            next(error);
-        }
-    });
-
-    router.put('/:id', upload.single('resume'), (req, res, next) => {
-        if (!validateUploadedFile(req, res)) return;
-        const existing = store.get(req.params.id, userId(req));
-        if (!existing) {
-            removeUploadedFile(req.file);
-            return res.status(404).json({ error: 'Resume not found.' });
-        }
-
-        try {
-            const record = store.replace(req.params.id, userId(req), {
-                original_name: path.basename(req.file.originalname),
-                stored_name: req.file.filename,
-                mime_type: req.file.mimetype,
-                size_bytes: req.file.size,
-                updated_at: new Date().toISOString()
-            });
-            fs.rmSync(path.join(uploadDir, existing.stored_name), { force: true });
-            res.json({ resume: publicResume(record) });
-        } catch (error) {
-            removeUploadedFile(req.file);
-            next(error);
-        }
-    });
-
-    router.get('/:id/download', (req, res) => {
-        const resume = store.get(req.params.id, userId(req));
-        if (!resume) return res.status(404).json({ error: 'Resume not found.' });
-        res.download(path.join(uploadDir, resume.stored_name), resume.original_name);
-    });
-
-    router.delete('/:id', (req, res, next) => {
-        const resume = store.get(req.params.id, userId(req));
-        if (!resume) return res.status(404).json({ error: 'Resume not found.' });
-
-        try {
-            fs.rmSync(path.join(uploadDir, resume.stored_name), { force: true });
-            store.delete(req.params.id, userId(req));
-            res.status(204).send();
-        } catch (error) {
-            next(error);
-        }
-    });
-
+    // Multer / General error handling middleware
     router.use((error, _req, res, _next) => {
         if (error instanceof multer.MulterError) {
             if (error.code === 'LIMIT_FILE_SIZE') {
@@ -169,7 +93,7 @@ function createResumeRouter(options = {}) {
         res.status(500).json({ error: 'Unable to manage resumes right now.' });
     });
 
-    router.resumeStore = store;
+    router.store = store;
     router.uploadDir = uploadDir;
     return router;
 }

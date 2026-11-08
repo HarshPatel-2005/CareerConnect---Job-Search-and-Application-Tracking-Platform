@@ -3,6 +3,49 @@ const os = require('os');
 const path = require('path');
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
+const db = require('../src/config/db');
+
+jest.mock('../src/api/db/resumeStore', () => class MockResumeStore {
+    constructor() { this.rows = new Map(); }
+    async list(userId) {
+        return [...this.rows.values()].filter(r => r.user_id === String(userId));
+    }
+    async get(id, userId) {
+        const r = this.rows.get(id);
+        return r && r.user_id === String(userId) ? r : null;
+    }
+    async create(resume) {
+        const row = { ...resume, user_id: String(resume.user_id) };
+        this.rows.set(row.id, row);
+        return row;
+    }
+    async replace(id, userId, resume) {
+        const existing = await this.get(id, userId);
+        if (!existing) return null;
+        const row = { ...existing, ...resume };
+        this.rows.set(id, row);
+        return row;
+    }
+    async delete(id, userId) {
+        return (await this.get(id, userId)) ? this.rows.delete(id) : false;
+    }
+    close() {}
+});
+
+jest.mock('../src/api/services/aiResumeService', () => ({
+    parseResumeWithAI: jest.fn().mockResolvedValue({
+        skills: [
+            { name: 'JavaScript', proficiency: 'Advanced' },
+            { name: 'Docker', proficiency: 'Intermediate' }
+        ],
+        job_history: [{
+            company_name: 'Tech Corp', title: 'Software Engineer',
+            start_date: '2024-01', end_date: null, is_current: true,
+            details: 'Developed microservices.'
+        }]
+    })
+}));
+
 const { createApp } = require('../src/api/app');
 const ResumeStore = require('../src/api/db/resumeStore');
 
@@ -23,12 +66,12 @@ function createToken(userId, email = 'user@example.com', role = 'job_seeker') {
 
 beforeEach(() => {
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'careerconnect-resumes-'));
-    store = new ResumeStore(path.join(tempDir, 'resumes.sqlite'));
+    store = new ResumeStore(db);
     app = createApp({
         resume: {
             uploadDir: path.join(tempDir, 'uploads'),
             store,
-            maxSize: 100
+            maxSize: PDF.length + 50
         }
     });
 
@@ -51,7 +94,7 @@ async function uploadPdf(name = 'resume.pdf', token = userAToken) {
         });
 }
 
-describe('resume management (JWT Protected)', () => {
+describe('resume management & AI extraction (JWT Protected)', () => {
     it('rejects requests without a valid JWT', async () => {
         const res = await request(app).get('/api/resumes');
         expect(res.status).toBe(401);
@@ -69,6 +112,26 @@ describe('resume management (JWT Protected)', () => {
         expect(listed.status).toBe(200);
         expect(listed.body.resumes).toHaveLength(1);
         expect(listed.body.resumes[0].id).toBe(uploaded.body.resume.id);
+    });
+
+    it('extracts structured profile JSON via POST /api/resumes/resume-extract (Task 27.2)', async () => {
+        const response = await request(app)
+            .post('/api/resumes/resume-extract')
+            .set('Authorization', `Bearer ${userAToken}`)
+            .attach('resume', PDF, {
+                filename: 'resume.pdf',
+                contentType: 'application/pdf'
+            });
+
+        expect(response.status).toBe(201);
+        expect(response.body).toHaveProperty('extractedProfile');
+        expect(response.body.extractedProfile.skills).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({ name: "JavaScript", proficiency: "Advanced" })
+            ])
+        );
+        expect(response.body.extractedProfile.job_history).toHaveLength(1);
+        expect(response.body.extractedProfile.job_history[0].company_name).toBe("Tech Corp");
     });
 
     it('accepts a DOCX resume with a valid ZIP signature', async () => {
