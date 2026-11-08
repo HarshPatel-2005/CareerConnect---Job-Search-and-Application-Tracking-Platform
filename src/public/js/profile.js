@@ -305,14 +305,14 @@ async function loadProfile() {
         }
 
         // Populate experience and skills sections
-        if (isOwner || (profileData.experience && profileData.experience.length > 0)) {
+        if (profileData.experience && profileData.experience.length > 0) {
             document.getElementById('profile-experience').classList.remove('hidden');
             populateExperience(profileData.experience);            
         } else {
             document.getElementById('profile-experience').classList.add('hidden');
         }
 
-        if (isOwner || (profileData.skills && profileData.skills.length > 0)) {
+        if (profileData.skills && profileData.skills.length > 0) {
             document.getElementById('profile-skills').classList.remove('hidden');
             populateSkills(profileData.skills);
         } else {
