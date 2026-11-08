@@ -60,7 +60,8 @@ async function parseResumeWithAI(filePath, fileType) {
     Guardrails:
     - Do NOT hallucinate, infer, extrapolate, or make assumptions on any skills, companies, job titles, dates, or details not explicitly written in the text.
     - If data is ambiguous, missing, or unclear omit it. False negatives are heavily preferred over false positives.
-    - Skill proficiencies must be strictly mapped to "beginner", "intermediate", or "advanced" based on context clues (e.g., years of experience or explicit mentions). Default to "beginner" if no clear indication is present.`
+    - Skill proficiencies must be strictly mapped to "beginner", "intermediate", or "advanced" based on context clues (e.g., years of experience or explicit mentions). Default to "beginner" if no clear indication is present.
+    - Dates must be in "yyyy-MM-dd" format. If only a year is present, use "yyyy-01-01". If a month and year are present, use "yyyy-MM-01". If no year is present, omit the date. If a job is currently held, set "is_current" to true and "end_date" to null, do NOT set "end_date" to a specific date or "present".`
 
     const response = await ollama.chat({
         model: 'qwen2.5:3b-instruct',
