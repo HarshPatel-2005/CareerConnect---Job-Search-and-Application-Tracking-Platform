@@ -19,6 +19,27 @@ services:
       - 11434:11434
     volumes:
       - ollama_data:/root/.ollama
+    entrypoint: ["/bin/sh", "-c"]
+    command: 
+      - |
+        # Start the Ollama server in the background
+        ollama serve &
+
+        # Wait for the server to be ready
+        until ollama list > /dev/null 2>&1; do
+          sleep 1
+        done
+
+        # Check if the model is already downloaded
+        if !ollama list | grep -q "qwen2.5:3b-instruct"; then
+          echo "Model qwen2.5:3b-instruct not found. Downloading..."
+          ollama pull qwen2.5:3b-instruct
+        else
+          echo "Model qwen2.5:3b-instruct already downloaded."
+        fi
+
+        # Keep the container running
+        wait
     restart:
       unless-stopped
 
