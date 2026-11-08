@@ -1,4 +1,4 @@
-# AI LOG 1 (SPRINT 3)
+# AI LOG 2 (SPRINT 3)
 
 Task: Migrate sqlite to MySQL
 Purpose of the AI: Debugging and code generation for database migration and connection setup.
