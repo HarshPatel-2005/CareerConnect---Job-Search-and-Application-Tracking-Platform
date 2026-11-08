@@ -31,7 +31,6 @@ function createResumeRouter(options = {}) {
     const router = express.Router();
     const root = path.resolve(__dirname, '../../..');
     const uploadDir = path.resolve(options.uploadDir || path.join(root, 'uploads/resumes'));
-    const dbPath = path.resolve(options.dbPath || path.join(root, 'data/careerconnect.sqlite'));
     const maxSize = options.maxSize || Number(process.env.RESUME_MAX_SIZE_BYTES) || DEFAULT_MAX_SIZE;
     const store = options.store || new ResumeStore();
 
@@ -80,6 +79,7 @@ function createResumeRouter(options = {}) {
     router.get('/:id/download', controller.download);
     router.delete('/:id', controller.remove);
     router.put('/:id', upload.single('resume'), validateUploadedFile, controller.replace);
+    router.post("/confirm", controller.confirmAndSaveResume);
 
     // Multer / General error handling middleware
     router.use((error, _req, res, _next) => {

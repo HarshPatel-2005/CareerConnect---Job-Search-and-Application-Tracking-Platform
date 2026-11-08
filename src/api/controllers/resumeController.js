@@ -48,29 +48,48 @@ class ResumeController {
         const userId = req.user?.userId || req.user?.id;
 
         try {
-            // Save metadata record to DB
-            const record = await this.store.create({
-                id: req.file.filename.split('.')[0],
-                user_id: userId,
-                original_name: path.basename(req.file.originalname),
-                stored_name: req.file.filename,
-                mime_type: req.file.mimetype,
-                size_bytes: req.file.size,
-            });
-
             // Parse the file with AI to extract structured data
             const aiExtractedData = await parseResumeWithAI(req.file.path, req.file.mimetype);
 
             // Return both resume metadata & AI extracted data
             res.status(201).json({ 
-                resume: this._publicResume(record), 
-                extractedProfile: aiExtractedData 
+                extractedProfile: aiExtractedData ,
+                tempFile: {
+                    stored_name: req.file.filename,
+                    original_name: path.basename(req.file.originalname),
+                    mime_type: req.file.mimetype,
+                    size_bytes: req.file.size
+                }
             });
         } catch (error) {
             this._removeFile(req.file);
             next(error);
         }
     };
+
+    confirmAndSaveResume = async (req, res, next) => {
+        const userId = req.user?.userId || req.user?.id;
+        const { stored_name, original_name, mime_type, size_bytes } = req.body;
+
+        if (!stored_name) {
+            return res.status(400).json({ error: 'No staged resume file provided.' });
+        }
+
+        try {
+            const record = await this.store.create({
+                id: stored_name.split('.')[0],
+                user_id: userId,
+                original_name,
+                stored_name,
+                mime_type,
+                size_bytes,
+            });
+
+            res.status(201).json({ resume: this._publicResume(record) });
+        } catch (error) {
+            next(error);
+        }
+    }
 
     download = async (req, res) => {
         const userId = req.user?.userId || req.user?.id;
