@@ -26,17 +26,15 @@ class ResumeStore {
     async create(resume) {
         await this.db.query(`
             INSERT INTO resumes
-                (id, user_id, original_name, stored_name, mime_type, size_bytes, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                (id, user_id, original_name, stored_name, mime_type, size_bytes)
+            VALUES (?, ?, ?, ?, ?, ?)
         `, [
             resume.id,
             resume.user_id,
             resume.original_name,
             resume.stored_name,
             resume.mime_type,
-            resume.size_bytes,
-            resume.created_at,
-            resume.updated_at
+            resume.size_bytes
         ]);
         return await this.get(resume.id, resume.user_id);
     }
@@ -44,14 +42,13 @@ class ResumeStore {
     async replace(id, userId, resume) {
         const [result] = await this.db.query(`
             UPDATE resumes
-            SET original_name = ?, stored_name = ?, mime_type = ?, size_bytes = ?, updated_at = ?
+            SET original_name = ?, stored_name = ?, mime_type = ?, size_bytes = ?
             WHERE id = ? AND user_id = ?
         `, [
             resume.original_name,
             resume.stored_name,
             resume.mime_type,
             resume.size_bytes,
-            resume.updated_at,
             id,
             userId
         ]);

@@ -75,7 +75,7 @@ function createResumeRouter(options = {}) {
 
     // Route Endpoints
     router.get('/', controller.list);
-    router.post('/', upload.single('resume'), validateUploadedFile, controller.uploadAndExtract);
+    router.post('/', upload.single('resume'), validateUploadedFile, controller.upload);
     router.post('/resume-extract', upload.single('resume'), validateUploadedFile, controller.uploadAndExtract);
     router.get('/:id/download', controller.download);
     router.delete('/:id', controller.remove);

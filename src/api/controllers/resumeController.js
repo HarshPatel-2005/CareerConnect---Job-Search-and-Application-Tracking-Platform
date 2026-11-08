@@ -15,6 +15,31 @@ class ResumeController {
         res.json({ resumes: resumes.map(this._publicResume), maxSize: this.maxSize });
     }
 
+    upload = async (req, res, next) => {
+        if (!req.file) {
+            return res.status(400).json({ error: 'Choose a PDF or DOCX resume to upload.' });
+        }
+
+        const userId = req.user?.userId || req.user?.id;
+
+        try {
+            // Save metadata record to DB
+            const record = await this.store.create({
+                id: req.file.filename.split('.')[0],
+                user_id: userId,
+                original_name: path.basename(req.file.originalname),
+                stored_name: req.file.filename,
+                mime_type: req.file.mimetype,
+                size_bytes: req.file.size,
+            });
+
+            res.status(201).json({ resume: this._publicResume(record) });
+        } catch (error) {
+            this._removeFile(req.file);
+            next(error);
+        }
+    }
+
     uploadAndExtract = async (req, res, next) => {
         if (!req.file) {
             return res.status(400).json({ error: 'Choose a PDF or DOCX resume to upload.' });
