@@ -138,6 +138,19 @@ async function addExperience(req, res) {
             return res.status(400).json({ error: 'Missing required experience fields' });
         }
 
+        const [existingExp] = await db.query(
+            'SELECT id FROM experiences WHERE user_id = ? AND LOWER(company_name) = LOWER(?) AND LOWER(title) = LOWER(?)',
+            [id, company_name.trim(), title.trim()]
+        );
+
+        if (existingExp.length > 0) {
+            await db.query(
+                'UPDATE experiences SET start_date = ?, end_date = ?, details = ? WHERE id = ?',
+                [start_date, end_date || null, details || null, existingExp[0].id]
+            );
+            return res.status(200).json({ message: 'Experience updated successfully', id: existingExp[0].id });
+        }
+
         const [result] = await db.query(
             'INSERT INTO experiences (user_id, company_name, title, start_date, end_date, details) VALUES (?, ?, ?, ?, ?, ?)',
             [id, company_name, title, start_date, end_date || null, details || null]
@@ -179,6 +192,19 @@ async function addSkill(req, res) {
 
         if (!name) {
             return res.status(400).json({ error: 'Skill name is required' });
+        }
+
+        const [existingSkills] = await db.query(
+            'SELECT id FROM skills WHERE user_id = ? AND LOWER(name) = LOWER(?)',
+            [id, name.trim()]
+        );
+
+        if (existingSkills.length > 0) {
+            await db.query(
+                'UPDATE skills SET level = ? WHERE id = ?',
+                [level || 'beginner', existingSkills[0].id]
+            );
+            return res.status(200).json({ message: 'Skill updated successfully', id: existingSkills[0].id });
         }
 
         const [result] = await db.query(
