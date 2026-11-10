@@ -252,3 +252,25 @@ Validation: Peer review and manual review
 Decision: Accepted
 Reflection: Because I have never created a test file before, the AI helped me understand how it works exactly. It was taken and understood how exactly it works and what the expected output is supposed to be.
 Responsible Person: Harsh Patel (40341498)
+
+AI Log #7 (Sprint #2):
+
+Task: Help test the recruiter dashboard and job posting
+Purpose of AI: Code Generation for test file
+Link: https://claude.ai/share/a82da295-7f90-452e-b5b2-1ed1055634e7
+AI-Suggested Content: The AI model created a jwt test file and explained to me how it worked exactly
+Validation: Peer review and manual review
+Decision: Accepted
+Reflection: Because I have never created a test file before, the AI helped me understand how it works exactly. It was taken and understood how exactly it works and what the expected output is supposed to be.
+Responsible Person: Harsh Patel (40341498)
+
+AI Log #8 (Sprint #3):
+
+Task: Help create user stories
+Purpose of AI: User Story generation
+Link: https://claude.ai/share/b02cbba2-46cd-42a3-862a-42144ed3692f
+AI-Suggested Content: The AI model created 3 user stories which was modified slightly and read through the make sure it matches what we're looking for
+Validation: Peer review and manual review
+Decision: Accepted
+Reflection: Issues were accepted with slight modification and helped us create a roadmap for the feature
+Responsible Person: Harsh Patel (40341498)

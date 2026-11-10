@@ -12,6 +12,9 @@
      8. Messages and interviews boxes
      9. Footer
     10. Small screens
+
+   ARCHIVE FEATURE: every change is marked with "NEW" or "CHANGED".
+   Search this file for those words to see what was added.
    ===================================================================== */
 
 
@@ -164,7 +167,7 @@ h1 {
 
 
 /* =====================================================================
-   3. PAGE WIDTH AND SUB-NAV (Jobs / Candidates / Messages)
+   3. PAGE WIDTH AND SUB-NAV (Jobs / Archived / Candidates)
    ===================================================================== */
 
 .wrap {
@@ -257,6 +260,27 @@ a.btn {
     align-items: center;
 }
 
+/* NEW: small outlined button used for "Archive" and "Unarchive" */
+.btn-small {
+    height: 38px;
+    padding: 0 16px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--white);
+    font-size: .88rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-small:hover {
+    background: var(--mint);
+}
+
+.btn-small:disabled {
+    opacity: .6;
+    cursor: default;
+}
+
 
 /* =====================================================================
    5. FILTER BOX
@@ -273,6 +297,13 @@ a.btn {
 .count {
     color: var(--muted);
     font-size: .95rem;
+}
+
+/* NEW: short explanation line on the Archived page */
+.archived-note {
+    margin: 0 0 8px;
+    color: var(--muted);
+    font-size: .92rem;
 }
 
 /* The white box that holds the filters */
@@ -324,14 +355,24 @@ a.btn {
     overflow-x: auto;
 }
 
-/* One row = checkbox | job info | candidates | status */
+/* One row = checkbox | job info | candidates | status | archive button
+   CHANGED: added a 5th column (110px) for the Archive button,
+   and min-width went from 760px to 880px to make room for it. */
 .row {
     display: grid;
-    grid-template-columns: 36px minmax(220px, 1.4fr) minmax(300px, 2fr) 160px;
+    grid-template-columns: 36px minmax(220px, 1.4fr) minmax(300px, 2fr) 160px 110px;
     align-items: center;
     gap: 12px;
-    min-width: 760px;
+    min-width: 880px;
     padding: 18px 20px;
+}
+
+/* NEW: the Archived page has no checkbox column and a read-only status,
+   so it uses its own column layout. "row arch" is more specific than
+   ".row", so these values win on that page. */
+.row.arch {
+    grid-template-columns: minmax(220px, 1.4fr) minmax(300px, 2fr) 140px 120px;
+    min-width: 760px;
 }
 
 .row + .row {
@@ -471,6 +512,15 @@ a.job-title:hover {
     border-right: 2px solid var(--muted);
     border-bottom: 2px solid var(--muted);
     transform: rotate(45deg) translateY(-2px);
+}
+
+/* NEW: plain (non-clickable) status shown on the Archived page */
+.status-static {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .9rem;
+    font-weight: 700;
 }
 
 /* Colored dot: green = open, amber = paused, red = closed */

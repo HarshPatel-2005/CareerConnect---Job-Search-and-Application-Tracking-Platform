@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="/js/site.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Career Connect – Archived jobs</title>
+<link rel="stylesheet" href="css/recruiter-dashboard.css">
+    <link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+
+<!-- ================= TOP BAR ================= -->
+<header class="topbar">
+    <div class="topbar-inner">
+        <a class="brand" href="#">Career Connect<small>for recruiters</small></a>
+        <nav class="topnav" aria-label="Main">
+            <a class="active" href="recruiter-dashboard.html">Dashboard</a>
+        </nav>
+    </div>
+</header>
+
+<main class="wrap">
+
+    <!-- ================= SUB NAV ================= -->
+    <div class="subnav">
+        <nav class="tabs" aria-label="Sections">
+            <a href="recruiter-dashboard.html">Jobs</a>
+            <a class="active" href="archived-jobs.html" aria-current="page">Archived</a>
+            <a href="candidates-dashboard.html">Candidates</a>
+        </nav>
+        <div class="subnav-actions">
+            <a class="btn" href="job-posting.html">Post a job</a>
+        </div>
+    </div>
+
+    <!-- ================= FILTER BOX ================= -->
+    <div class="section-head">
+        <h1>Archived job postings</h1>
+        <span class="count" id="count">(0)</span>
+    </div>
+
+    <p class="archived-note">Archived jobs are hidden from job seekers. Unarchive a job to show it on your Jobs tab again.</p>
+    <p id="dashboard-message" class="page-message" role="status" aria-live="polite"></p>
+
+    <section class="filters" aria-label="Filter archived jobs">
+        <div class="filter-row">
+            <div class="field">
+                <label for="q">Job title</label>
+                <input type="text" id="q" placeholder="Search job titles…">
+            </div>
+            <div class="field">
+                <label for="loc">Location</label>
+                <input type="text" id="loc" placeholder="Search locations…">
+            </div>
+            <div class="field">
+                <label for="sort">Sort by</label>
+                <select id="sort">
+                    <option value="date">Posting date</option>
+                    <option value="title">Job title</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="order">Order</label>
+                <select id="order">
+                    <option value="desc">Descending</option>
+                    <option value="asc">Ascending</option>
+                </select>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= ARCHIVED JOBS ================= -->
+    <section class="jobs" aria-label="Archived jobs">
+        <div class="jobs-scroll">
+            <div class="row head arch">
+                <span>Job title</span>
+                <span>Candidates</span>
+                <span>Job status</span>
+                <span>Action</span>
+            </div>
+
+            <div id="list">
+                <!--Filled from the database-->
+            </div>
+
+            <div class="empty-state" id="empty" hidden>No archived jobs.</div>
+        </div>
+    </section>
+
+    <footer>
+        <span>© 2026 Career Connect</span>
+        <span>Privacy · Terms · Contact</span>
+    </footer>
+</main>
+
+<script src="js/archived-jobs.js"></script>
+</body>
+</html>

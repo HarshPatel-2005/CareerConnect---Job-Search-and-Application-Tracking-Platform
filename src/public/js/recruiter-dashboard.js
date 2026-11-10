@@ -1,11 +1,14 @@
 /* =====================================================================
    RECRUITER DASHBOARD – JAVASCRIPT
    ---------------------------------------------------------------------
-   This file does three small jobs:
+   This file does four small jobs:
      1. Gives every job a status button (Open / Paused / Closed)
      2. Hides job cards that don't match what you typed in the filters
      3. Puts the job cards in order (by date or title)
+     4. NEW: Lets the recruiter archive a job (it moves to archived-jobs.html)
 
+   ARCHIVE FEATURE: every change is marked with "NEW" or "CHANGED".
+   Search this file for those words to see what was added.
    ===================================================================== */
 
 
@@ -141,6 +144,43 @@ document.addEventListener('click', closeAllMenus);
 
 
 /* =====================================================================
+   STEP 3B (NEW): ARCHIVING
+   ---------------------------------------------------------------------
+   Each job row gets an "Archive" button (added in STEP 7 below).
+   Clicking it:
+     1. tells the server "this job is now archived"
+     2. if the server says OK, removes the row from the page
+   The server hides archived jobs from job seekers, and the job then
+   appears on archived-jobs.html where it can be unarchived.
+   ===================================================================== */
+
+async function archiveJob(job, button) {
+    const message = document.getElementById('dashboard-message');
+
+    button.disabled = true;   // stop double clicks while we wait for the server
+    try {
+        const response = await CareerConnect.request(`/api/recruiter/jobs/${job.dataset.id}/archive`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ archived: true })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Unable to archive job.');
+
+        // Server said OK: take the row out of our list, then off the page
+        allJobs.splice(allJobs.indexOf(job), 1);
+        job.remove();
+
+        filterJobs();   // recounts the jobs and shows the "no jobs" message if needed
+        message.textContent = 'Job archived. You can find it under the Archived tab.';
+    } catch (error) {
+        message.textContent = error.message;
+        button.disabled = false;   // let the recruiter try again
+    }
+}
+
+
+/* =====================================================================
    STEP 4: FILTERING
    ===================================================================== */
 
@@ -168,6 +208,12 @@ function filterJobs() {
     }
 
     countLabel.textContent = '(' + shownCount + ')';   // update the number in the heading
+
+    // NEW: if every job was archived, say so; otherwise it's the filters hiding them
+    emptyMessage.textContent = allJobs.length === 0
+        ? 'No active job postings. Choose Post a job to create one.'
+        : 'No jobs match these filters. Clear a filter to see more.';
+
     emptyMessage.hidden = shownCount > 0;              // show the message only when nothing matches
 }
 
@@ -254,6 +300,10 @@ selectAllBox.addEventListener('change', function () {
    ---------------------------------------------------------------------
    Each job title is a link to job-posting.html?id=<job id>.
    That page sees the id and fills the form with the saved job.
+
+   NOTE: the server must return only NON-archived jobs from this URL.
+   Archived jobs come from /api/recruiter/jobs?archived=true
+   (used by archived-jobs.js).
    ===================================================================== */
 
 async function loadRecruiterJobs() {
@@ -296,6 +346,7 @@ async function loadRecruiterJobs() {
             rowDiv.setAttribute('data-candidates', job.candidates_count);
             rowDiv.setAttribute('data-status', job.status);
 
+            /* CHANGED: added the last <div> (the Archive button cell) */
             rowDiv.innerHTML = `
                 <span><input type="checkbox" aria-label="Select job"></span>
                 <div>
@@ -317,11 +368,17 @@ async function loadRecruiterJobs() {
                     `}
                 </div>
                 <div class="status"></div>
+                <div><button type="button" class="btn-small btn-archive">Archive</button></div>
             `;
 
             jobList.appendChild(rowDiv);
             allJobs.push(rowDiv);
             setupStatus(rowDiv);
+
+            // NEW: when "Archive" is clicked, run archiveJob for this row
+            rowDiv.querySelector('.btn-archive').addEventListener('click', function () {
+                archiveJob(rowDiv, this);
+            });
         });
 
         sortJobs();
