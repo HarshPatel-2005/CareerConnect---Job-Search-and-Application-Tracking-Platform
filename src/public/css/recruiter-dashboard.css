@@ -540,13 +540,13 @@ a.job-title:hover {
     background: var(--red);
 }
 
-/* The dropdown that appears under the button */
+/* The dropdown that appears under the button.
+   CHANGED: position is now "fixed" (was "absolute") so the menu floats
+   over the page instead of being clipped by the table. The JS sets its
+   left / top / width each time it opens. */
 .menu {
-    position: absolute;
-    z-index: 5;
-    top: calc(100% + 6px);
-    left: 0;
-    right: 0;
+    position: fixed;
+    z-index: 1000;
     padding: 6px;
     border: 1px solid var(--line);
     border-radius: 12px;

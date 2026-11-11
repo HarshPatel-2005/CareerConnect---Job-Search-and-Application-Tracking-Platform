@@ -274,3 +274,14 @@ Validation: Peer review and manual review
 Decision: Accepted
 Reflection: Issues were accepted with slight modification and helped us create a roadmap for the feature
 Responsible Person: Harsh Patel (40341498)
+
+AI Log #9 (Sprint #3):
+
+Task: Code generation for job archive feature
+Purpose of AI: Code generation
+Link: https://claude.ai/share/3f06f0f9-4b9d-48fc-a824-3600d6d02715
+AI-Suggested Content: The AI model created the fullstack for the archived job feature using what already existed from the recruiter dashboard and the styling mechanism.
+Validation: Peer review and manual review
+Decision: Accepted with modifications to fix certain quality issues
+Reflection: Issues were accepted with slight modification
+Responsible Person: Harsh Patel (40341498)

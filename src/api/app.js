@@ -5,6 +5,7 @@ const authRoutes = require('./routes/authRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const recruiterRoutes = require('./routes/recruiterRoutes');
 const jobPostingRoutes = require('./routes/jobPostingRoutes');   // NEW
+const archiveRoutes = require('./routes/archiveRoutes');         // NEW: archive feature
 const { createJobsRouter } = require('./routes/jobsRoutes');
 const jobSearchRoutes = require('./routes/jobSearchRoutes');
 
@@ -32,6 +33,7 @@ function createApp(options = {}) {
 
     app.use('/api/recruiter', recruiterRoutes);
     app.use('/api/recruiter', jobPostingRoutes);
+    app.use('/api/recruiter', archiveRoutes);                    // NEW: archive feature
 
     // Health check endpoint
     app.get('/health', (req, res) => {

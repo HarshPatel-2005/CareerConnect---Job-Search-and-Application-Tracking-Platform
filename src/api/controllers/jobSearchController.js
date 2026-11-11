@@ -21,6 +21,7 @@ const searchJobs = async (req, res) => {
             FROM jobs
             JOIN companies ON jobs.company_id = companies.id
             WHERE jobs.status = 'open'
+              AND jobs.archived = FALSE
         `;
 
         const params = [];

@@ -123,12 +123,27 @@ function setupStatus(job) {
     }
 
     // When the status button is clicked: open its menu (and close any others)
+    /* CHANGED: the menu is now position: fixed (see the CSS), so we place it
+       ourselves under the button. That lets it float outside the table
+       instead of being clipped by it. */
     button.addEventListener('click', function (event) {
         event.stopPropagation();        // stops the "click anywhere to close" rule below
 
         const wasClosed = menu.hidden;
         closeAllMenus();
-        menu.hidden = !wasClosed;       // if it was closed, open it; if it was open, keep it closed
+
+        if (wasClosed) {
+            menu.hidden = false;
+
+            // Put the menu under the button, or above it if there is no room below
+            const rect = button.getBoundingClientRect();
+            const menuHeight = menu.offsetHeight;
+            const fitsBelow = rect.bottom + 6 + menuHeight < window.innerHeight;
+
+            menu.style.left  = rect.left + 'px';
+            menu.style.width = rect.width + 'px';
+            menu.style.top   = (fitsBelow ? rect.bottom + 6 : rect.top - 6 - menuHeight) + 'px';
+        }
     });
 
     showStatus(job);
@@ -141,6 +156,11 @@ for (let i = 0; i < allJobs.length; i++) {
 
 /* Clicking anywhere else on the page closes the menus. */
 document.addEventListener('click', closeAllMenus);
+
+/* CHANGED: a fixed menu would stay in place while the page moves,
+   so close it when the page scrolls or the window is resized. */
+window.addEventListener('scroll', closeAllMenus, true);
+window.addEventListener('resize', closeAllMenus);
 
 
 /* =====================================================================
