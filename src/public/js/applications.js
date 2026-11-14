@@ -52,9 +52,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 select.addEventListener('change', async () => {
                     select.disabled = true;
                     try {
-                        await json(`/api/applications/${record.id}/status`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: select.value }) });
+                        /* CHANGED: keep the server's answer so we know if the job just filled up */
+                        const result = await json(`/api/applications/${record.id}/status`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: select.value }) });
                         card.querySelector('.status-tag').textContent = statuses[select.value];
                         record.status = select.value; message.textContent = 'Application status saved.';
+
+                        /* NEW: the job is full. The server rejected the other waiting
+                           applications and closed the job, so reload the list to show it. */
+                        if (result.job_closed) {
+                            await loadJob(picker.value);
+                            message.className = '';
+                            message.textContent = 'All openings are filled. The job was closed and '
+                                + result.auto_rejected + ' other application(s) were marked Rejected.';
+                        }
                     } catch (error) { select.value = record.status; message.textContent = error.message; }
                     finally { select.disabled = false; }
                 });

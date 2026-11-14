@@ -12,7 +12,8 @@ router.get('/', async (req, res, next) => {
     try {
         const [rows] = await db.query(`SELECT ${metadata}, j.title, j.location, c.name AS company_name
             FROM applications a JOIN jobs j ON j.id = a.job_id JOIN companies c ON c.id = j.company_id
-            WHERE a.user_id = ? ORDER BY a.applied_at DESC, a.id DESC`, [req.user.id]);
+            WHERE a.user_id = ? AND j.archived = FALSE /* NEW: hide archived jobs */
+            ORDER BY a.applied_at DESC, a.id DESC`, [req.user.id]);
         res.json({ applications: rows.map(publicRecord) });
     } catch (error) { next(error); }
 });
@@ -50,8 +51,27 @@ router.patch('/:id/status', async (req, res, next) => {
             JOIN jobs j ON j.id = a.job_id WHERE a.id = ? AND j.company_id = ?`, [req.params.id, req.user.company_id]);
         if (!applications.length) { await connection.rollback(); return res.status(404).json({ error: 'Application not found.' }); }
         const jobId = applications[0].job_id;
-        await connection.query('SELECT id FROM jobs WHERE id = ? FOR UPDATE', [jobId]);
+        /* CHANGED: also read "openings" while locking the job row */
+        const [jobRows] = await connection.query('SELECT openings FROM jobs WHERE id = ? FOR UPDATE', [jobId]);
         await connection.query('UPDATE applications SET status = ? WHERE id = ?', [req.body.status, req.params.id]);
+
+        /* NEW: "offered" counts as hired. When the number of offered applications
+           reaches the job's openings, close the job and reject everyone else
+           who is still waiting. Offered and already-rejected rows are left alone. */
+        let jobClosed = false;
+        let autoRejected = 0;
+        if (req.body.status === 'offered') {
+            const [offeredRows] = await connection.query(
+                "SELECT COUNT(*) AS n FROM applications WHERE job_id = ? AND status = 'offered'", [jobId]);
+            if (Number(offeredRows[0].n) >= jobRows[0].openings) {
+                const [rejected] = await connection.query(
+                    "UPDATE applications SET status = 'rejected' WHERE job_id = ? AND status NOT IN ('offered', 'rejected')", [jobId]);
+                autoRejected = rejected.affectedRows;
+                await connection.query("UPDATE jobs SET status = 'closed' WHERE id = ?", [jobId]);
+                jobClosed = true;
+            }
+        }
+
         // Recompute from source records, preserving consistency when revisiting a status.
         const [counts] = await connection.query(`SELECT COUNT(*) AS total,
             SUM(status = 'applied') AS awaiting, SUM(status IN ('under_review', 'rejected')) AS reviewed,
@@ -61,7 +81,8 @@ router.patch('/:id/status', async (req, res, next) => {
         await connection.query(`UPDATE jobs SET candidates_count = ?, awaiting_count = ?, reviewed_count = ?,
             contacting_count = ?, hired_count = ? WHERE id = ?`, [c.total, c.awaiting || 0, c.reviewed || 0, c.contacting || 0, c.hired || 0, jobId]);
         await connection.commit();
-        res.json({ status: req.body.status });
+        /* CHANGED: tell the page if the job was closed so it can refresh the list */
+        res.json({ status: req.body.status, job_closed: jobClosed, auto_rejected: autoRejected });
     } catch (error) { if (connection) await connection.rollback(); next(error); }
     finally { if (connection) connection.release(); }
 });
