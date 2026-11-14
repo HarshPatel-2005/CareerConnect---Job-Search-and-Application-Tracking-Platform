@@ -115,3 +115,17 @@ Decisions:
 
 - Everyone gave their progress and made sure that the work completed has progress being made
 - Anyone that had issues were able to share their thoughts and solutions about it and had the assistance of everyone else to solve that issue.
+
+Meeting Minutes #8
+
+Attendance: Joelle, Lucas, Harsh, Maz
+
+Discussions:
+
+- Updating one another about the progress that is being made
+- Preparing to merge our works and cleaning up any bugs
+
+Decisions:
+
+- Everyone gave their progress and made sure that the work completed has progress being made
+- We started thinking about any issues we may have with our works and when we wish to merge everything together
