@@ -1,0 +1,80 @@
+
+/* Sprint 3: Application Analytics Dashboard */
+
+#application-analytics {
+    margin: 30px 0;
+}
+
+#application-analytics h2 {
+    margin: 25px 0 15px;
+}
+
+.analytics-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+.analytics-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.analytics-card h3 {
+    font-size: 14px;
+    color: #475569;
+    margin-bottom: 12px;
+}
+
+.analytics-card p {
+    font-size: 32px;
+    font-weight: bold;
+    color: #2563eb;
+    margin: 0;
+}
+
+#applications-chart {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.analytics-chart-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.analytics-chart-row span {
+    min-width: 85px;
+    font-size: 14px;
+    color: #475569;
+}
+
+.analytics-chart-bar {
+    background: #2563eb;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    min-width: 30px;
+    box-sizing: border-box;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .analytics-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .analytics-summary {
+        grid-template-columns: 1fr;
+    }
+}
