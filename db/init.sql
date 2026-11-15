@@ -48,6 +48,8 @@ CREATE TABLE IF NOT EXISTS jobs (
     reviewed_count INT DEFAULT 0,
     contacting_count INT DEFAULT 0,
     hired_count INT DEFAULT 0,
+    archived BOOLEAN NOT NULL DEFAULT FALSE,           -- NEW
+    archived_at TIMESTAMP NULL DEFAULT NULL,           -- NEW
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
 );
@@ -104,4 +106,4 @@ CREATE TABLE IF NOT EXISTS resumes (
     updated_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
     INDEX idx_resumes_user_id (user_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-)
+);
