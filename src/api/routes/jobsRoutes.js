@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const defaultDb = require('../../config/db');
 const { authenticateToken } = require('../middleware/authMiddleware');
+const jobFeedbackController = require('../controllers/jobFeedbackController');
 
 function publicApplication(row) {
     return { ...row, applied_at: new Date(Number(row.applied_at)).toISOString() };
@@ -106,6 +107,10 @@ function createJobsRouter({ store, uploadDir, db = defaultDb }) {
         } finally {
             if (connection) connection.release();
         }
+    });
+
+    router.post('/:id/feedback', async (req, res) => {
+        return jobFeedbackController.getJobFeedback(req, res, { store, uploadDir, db });
     });
 
     router.use((error, _req, res, _next) => {
