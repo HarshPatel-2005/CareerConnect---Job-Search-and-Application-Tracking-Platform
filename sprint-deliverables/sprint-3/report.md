@@ -32,4 +32,4 @@ The primary objective of Sprint 3 was to complete the remaining core functionali
 - Lucas: Implemented the generative AI features, including the resume parser and job matching feedback feature. Migrated random sqlite database to mysql. Created the 404 route handler.
 - Joelle: 
 - Harsh: 
-- Mahmoud:
+- Maz:

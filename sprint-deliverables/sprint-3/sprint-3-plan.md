@@ -54,5 +54,5 @@ Below is a table that outlines the features and the team members responsible for
 | - | - |
 | AI Feature | Lucas |
 | Application Analytics & History Dashboard | Joelle |
-| Notifications & Reminders | Mahmoud |
+| Notifications & Reminders | Maz |
 | Recruiter Dashboard and Posting Management | Harsh |
