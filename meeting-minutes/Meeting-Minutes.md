@@ -129,3 +129,30 @@ Decisions:
 
 - Everyone gave their progress and made sure that the work completed has progress being made
 - We started thinking about any issues we may have with our works and when we wish to merge everything together
+
+Meeting Minutes #9
+
+Attendance: Joelle, Lucas, Harsh, Maz
+
+Discussions:
+
+- Updating one another about the progress that is being made
+- Resolving any conflicts between our files
+
+Decisions:
+
+- Everyone gave their progress and made sure that the work completed has progress being made
+- Any conflicts were resolved
+
+Meeting Minutes #10
+
+Attendance: Joelle, Lucas, Harsh, Maz
+
+Discussions:
+
+- Preparing to merge
+
+Decisions:
+
+- Everyone was up to date with their features
+- We discussed merging the files, filling our contribution logs, etc.
