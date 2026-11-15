@@ -7,6 +7,7 @@ const recruiterRoutes = require('./routes/recruiterRoutes');
 const jobPostingRoutes = require('./routes/jobPostingRoutes');   // NEW
 const { createJobsRouter } = require('./routes/jobsRoutes');
 const jobSearchRoutes = require('./routes/jobSearchRoutes');
+const { create404Middleware } = require('./middleware/404Middleware');
 
 function createApp(options = {}) {
     const app = express();
@@ -44,6 +45,10 @@ function createApp(options = {}) {
         console.error('Request failed:', error);
         res.status(500).json({ error: 'Unable to complete the request right now.' });
     });
+
+    // 404 handler for all other routes (HTML, JSON, text)
+    app.use(create404Middleware());
+
     return app;
 }
 
