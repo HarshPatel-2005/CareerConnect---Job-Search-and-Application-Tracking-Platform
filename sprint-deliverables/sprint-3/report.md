@@ -31,5 +31,5 @@ The primary objective of Sprint 3 was to complete the remaining core functionali
 
 - Lucas: Implemented the generative AI features, including the resume parser and job matching feedback feature. Migrated random sqlite database to mysql. Created the 404 route handler.
 - Joelle: 
-- Harsh: 
+- Harsh: Implemented the archive and restore feature for job postings, including the Archived tab, the archive API, and hiding archived postings from the dashboard, job search, and job seekers' application lists. Built the candidate review rule that closes a job and rejects the remaining pending applications once its openings are filled. Fixed the job status dropdown on the recruiter dashboard. Wrote and updated the Jest tests for these features, along with the user stories, acceptance tests, and contribution log.
 - Maz:
