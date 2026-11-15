@@ -1,4 +1,4 @@
-# AI LOG 1 – Debugging VS Code and Local Development Issues
+# AI LOG 1 – Debugging VS Code and Local Development Issues (sprint 3)
 
 **Task:** Resolve errors encountered while running the CareerConnect application in VS Code during Sprint 3.
 
@@ -143,7 +143,116 @@ I verified the AI-suggested solutions by:
 - Confirming that the application statistics and monthly activity chart displayed the correct information.
 
 
+# AI LOG 2 (SPRINT 3)
+## Fixing a JavaScript Syntax Error in VS Code
 
-The step-by-step explanations were especially useful because I was unfamiliar with some of these development tools. I executed the commands myself, checked the terminal output, and tested the application to confirm that the suggested solutions worked.
+**Task:** Fix a JavaScript syntax error encountered while integrating the Application Analytics Dashboard into the existing CareerConnect application tracking page.
 
-This experience improved my understanding of debugging a full-stack application and helped me complete my Sprint 3 feature successfully.
+**Purpose of AI:** I used ChatGPT to help identify a problem with the closing braces in my JavaScript code, understand how conditional statements and `try/catch` blocks work, and correct the error without affecting the existing application tracking functionality.
+
+**AI Tool Used:** ChatGPT
+
+## Prompt
+
+While implementing my Application Analytics and History Dashboard, I modified the `applications.js` file to calculate application statistics.
+
+After adding my code, I noticed an issue with the JavaScript structure and closing brackets in VS Code.
+
+I was not sure where the closing braces should go because the file already contains several `if`, `else`, and `try/catch` blocks.
+
+
+## AI Response
+
+ChatGPT explained that JavaScript uses curly braces `{ }` to define blocks of code, including conditional statements, loops, functions, and error-handling statements.
+
+When adding a new feature inside an existing JavaScript file, an extra or missing closing brace can cause a syntax error or place code outside its intended block.
+
+### 1. see the Existing Code Structure
+
+The `applications.js` file already contained a `try/catch` block that handled different functionality depending on whether the logged-in user was a recruiter or a job seeker.
+
+The existing code used a conditional statement similar to:
+
+```javascript
+try {
+    if (recruiter && picker) {
+        // Load recruiter job postings
+        // Display applicants for a selected job
+    } else if (!recruiter) {
+        // Load the job seeker's applications
+    }
+} catch (error) {
+    message.textContent = error.message;
+    message.className = 'error';
+}
+```
+
+ChatGPT explained that each opening brace `{` must have a corresponding closing brace `}`.
+
+The `else if (!recruiter)` block is where the Application Analytics Dashboard calculations should be added because the dashboard is intended for job seekers.
+
+
+### 2. Correcting the JavaScript Structure
+
+ChatGPT suggested keeping the dashboard calculations inside the `else if (!recruiter)` block and removing the unnecessary closing brace.
+
+The corrected structure was:
+
+```javascript
+try {
+    if (recruiter && picker) {
+        // Existing recruiter functionality
+
+    } else if (!recruiter) {
+        const data = await json('/api/applications');
+        const applications = data.applications;
+
+        render(applications);
+
+        // Sprint 3: Application Analytics
+        document.getElementById(
+            'total-applications'
+        ).textContent = applications.length;
+
+        document.getElementById(
+            'under-review-count'
+        ).textContent = applications.filter(
+            app => app.status === 'under_review'
+        ).length;
+
+        document.getElementById(
+            'interview-count'
+        ).textContent = applications.filter(
+            app => app.status === 'interview'
+        ).length;
+
+        document.getElementById(
+            'offer-count'
+        ).textContent = applications.filter(
+            app => app.status === 'offered'
+        ).length;
+    }
+
+} catch (error) {
+    message.textContent = error.message;
+    message.className = 'error';
+}
+```
+
+This ensured that the recruiter functionality remained separate from the job seeker dashboard and that errors would still be handled by the existing `catch` block.
+
+
+### 5. I verifyed the correction
+
+After correcting the JavaScript structure, I saved `applications.js` and continued implementing the dashboard.
+
+I later tested the application locally and confirmed that the My Applications page loaded correctly.
+
+The dashboard displayed the expected statistics for my submitted test application:
+
+**Result: Passed.** The JavaScript structure was corrected, and the dashboard functioned as expected.
+
+## Reflection
+
+ChatGPT helped me understand how JavaScript uses curly braces to organize conditional statements and error-handling blocks.
+
