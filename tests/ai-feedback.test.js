@@ -1,49 +1,20 @@
 process.env.JWT_SECRET = 'ai-feedback-test-secret';
+
+// Mock the AI service to avoid real API calls during tests
+jest.mock('../src/api/services/aiResumeService', () => ({
+    parseResumeWithAI: jest.fn(),
+    generateJobFeedback: jest.fn()
+}));
+
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
 const { createApp } = require('../src/api/app');
+const aiService = require('../src/api/services/aiResumeService');
 
 const resumeId = 'ee7470ab-89ad-4076-887d-31a658632f81';
-const pdf = Buffer.from('%PDF-1.7\nSample resume for AI feedback');
-let directory, store, app, connection, db, aiServiceMock;
-
-const token = (overrides = {}) => jwt.sign({ id: 1, role: 'job_seeker', ...overrides }, process.env.JWT_SECRET);
-const getFeedback = (body = { resume_id: resumeId }, bearer = token(), id = '5') => request(app)
-    .post(`/api/jobs/${id}/feedback`)
-    .set('Authorization', `Bearer ${bearer}`).send(body);
-
-const mockParsedProfile = {
-    id: resumeId,
-    user_id: '1',
-    original_name: 'CV.pdf',
-    parsed_content: {
-        skills: [
-            { name: 'Node.js', proficiency: 'advanced' },
-            { name: 'React', proficiency: 'intermediate' }
-        ],
-        job_history: [
-            {
-                company_name: 'Tech Corp',
-                title: 'Software Engineer',
-                start_date: '2023-01',
-                end_date: null,
-                is_current: true,
-                details: 'Build REST APIs and optimized database queries.'
-            }
-        ]
-    }
-};
-
-const mockJobPosting = {
-    id: 5,
-    status: 'open',
-    title: 'Senior Full-Stack Engineer',
-    description: 'Looking for an engineer experienced in Node.js, React, and Docker',
-    required_skills: JSON.stringify(['Node.js', 'React', 'Docker'])
-};
 
 const mockAIResponse = {
     strengths: [
@@ -59,160 +30,179 @@ const mockAIResponse = {
     ]
 };
 
+let directory, app, db;
+
+const token = (overrides = {}) => jwt.sign({ id: 1, role: 'job_seeker', ...overrides }, process.env.JWT_SECRET);
+
+const NO_BODY = Symbol('no body');
+const postFeedback = ({ body = { resume_id: resumeId }, bearer = token(), id = '5' } = {}) => {
+    const req = request(app).post(`/api/jobs/${id}/feedback`);
+    if (bearer !== null) req.set('Authorization', `Bearer ${bearer}`);
+    return body === NO_BODY ? req : req.send(body);
+};
+
+
 beforeEach(() => {
     directory = fs.mkdtempSync(path.join(os.tmpdir(), 'careerconnect-ai-feedback-'));
 
-    store = {
-        get: jest.fn().mockImplementation(async (id, userId) => String(userId) === '1' ? {
-            id: resumeId,
-            user_id: '1',
-            original_name: 'CV.pdf',
-            stored_name: 'stored.pdf',
-            mime_type: 'application/pdf',
-            size_bytes: pdf.length,
-            created_at: '2026-10-26',
-            updated_at: '2026-10-26',
-        } : null),
-        create: jest.fn().mockResolvedValue(),
-        list: jest.fn().mockResolvedValue([]),
-        replace: jest.fn().mockResolvedValue(),
-        delete: jest.fn().mockResolvedValue(true),
-        close: jest.fn()
-    };
-
-    fs.writeFileSync(path.join(directory, 'stored.pdf'), pdf);
-
-    connection = {
-        beginTransaction: jest.fn().mockResolvedValue(),
-        commit: jest.fn().mockResolvedValue(),
-        rollback: jest.fn().mockResolvedValue(),
-        release: jest.fn(),
-        query: jest.fn()
-    };
-
     db = {
         query: jest.fn(),
-        getConnection: jest.fn().mockResolvedValue(connection)
+        getConnection: jest.fn()
     };
 
-    aiServiceMock = {
-        generateJobFeedback: jest.fn().mockResolvedValue(mockAIResponse)
-    };
+    aiService.generateJobFeedback.mockReset().mockResolvedValue(mockAIResponse);
 
     app = createApp({
-        resume: { store, uploadDir: directory },
+        resume: { 
+            uploadDir: directory,
+            store: { get: jest.fn(), list: jest.fn(), create: jest.fn(), replace: jest.fn(), delete: jest.fn(), close: jest.fn() } 
+        },
         applications: { db },
-        aiService: aiServiceMock,
-        profileService: {
-            getParsedProfile: jest.fn().mockResolvedValue(mockParsedProfile)
-        }
     });
 });
+
 
 afterEach(() => {
     fs.rmSync(directory, { recursive: true, force: true });
-    jest.clearAllMocks();
 });
 
-function successfulJobQuery() {
-    connection.query.mockResolvedValueOnce([[mockJobPosting]]);
-}
-
 describe('POST /api/jobs/:id/feedback', () => {
-    // Auth & Role Guards
+    // Auth & role guards
     test('requires authentication', async () => {
-        const unauth = await request(app).post('/api/jobs/5/feedback').send({});
-        expect (unauth.status).toBe(401);
+        const unauth = await postFeedback({ bearer: null });
+        expect(unauth.status).toBe(401);
 
-        const badToken = await getFeedback('5', 'invalid');
+        const badToken = await postFeedback({ bearer: 'invalid' });
         expect(badToken.status).toBe(403);
+
         expect(db.query).not.toHaveBeenCalled();
-        expect(aiServiceMock.generateJobFeedback).not.toHaveBeenCalled();
+        expect(aiService.generateJobFeedback).not.toHaveBeenCalled();
     });
 
     test('blocks recruiter accounts from generating applicant feedback', async () => {
-        const res = await getFeedback('5', token({ role: 'recruiter' }));
+        const res = await postFeedback({ bearer: token({ role: 'recruiter' }) });
         expect(res.status).toBe(403);
         expect(db.query).not.toHaveBeenCalled();
-        expect(aiServiceMock.generateJobFeedback).not.toHaveBeenCalled();
+        expect(aiService.generateJobFeedback).not.toHaveBeenCalled();
     });
 
-    test.each(['0', '-1', '1abc', '9007199254740992'])(
-        'rejects invalid job ID %s', 
-        async (invalidId) => {
-            const res = await getFeedback(invalidId);
-            expect(res.status).toBe(400);
-            expect(aiServiceMock.generateJobFeedback).not.toHaveBeenCalled();
-        }
-    );
-
-    // Precondition Checks (Job existence, active status)
-    test('returns 404 when the job posting does not exist', async () => {
-        db.query.mockResolvedValueOnce([[]]); // No job found
-
-        const res = await getFeedback('999');
-        expect(res.status).toBe(404);
-        expect(aiServiceMock.generateJobFeedback).not.toHaveBeenCalled();
+    test.each(['0', '-1', '1abc', '9007199254740992'])('rejects invalid job ID %s', async (invalidId) => {
+        const res = await postFeedback({ id: invalidId });
+        expect(res.status).toBe(400);
+        expect(aiService.generateJobFeedback).not.toHaveBeenCalled();
     });
 
-    test.each(['paused', 'closed'])(
-        'rejects feedback requests for %s job postings',
-        async (status) => {
-            db.query.mockResolvedValueOnce([[{ ...mockJobPosting, status }]]); // Job found but not open
-
-            const res = await getFeedback('5');
-            expect(res.status).toBe(409);
-            expect(aiServiceMock.generateJobFeedback).not.toHaveBeenCalled();
-        }
-    );
-
-    test('returns 400 when for missing or invalid resume selection', async () => {
-        const result = await getFeedback();
-        store.get.mockResolvedValueOnce(null); // Simulate missing resume
-        expect([404, 400]).toContain(result.status);
-        expect(aiServiceMock.generateJobFeedback).not.toHaveBeenCalled();
+    // Request body validation
+    test('returns 400 when the request has no body at all', async () => {
+        const res = await postFeedback({ body: NO_BODY });
+        expect(res.status).toBe(400);
+        expect(aiService.generateJobFeedback).not.toHaveBeenCalled();
     });
 
-    // AI Feedback Generation
-    test('successfully generates AI feedback aggregating profile, selected resume, and job posting', async () => {
-        successfulJobQuery();
-
-        // Mock user profile skills & job history queries
-        app.profileService.getParsedProfile.mockResolvedValueOnce(mockParsedProfile);
-
-        const result = await getFeedback({resume_id: resumeId});
-
-        expect(result.status).toBe(200);
-        expect(result.body).toHaveProperty('strengths');
-        expect(result.body).toHaveProperty('missing_skills');
-        expect(result.body).toHaveProperty('suggestions');
-
-        expect(aiServiceMock.generateJobFeedback).toHaveBeenCalledTimes(1);
-        const aiCallArg = aiServiceMock.generateJobFeedback.mock.calls[0][0];
-        expect(aiCallArg).toHaveProperty('jobDescription');
-        expect(aiCallArg).toHaveProperty('resumeText');
-        expect(aiCallArg).toHaveProperty('userProfile');
+    test.each([
+        ['missing', {}],
+        ['an empty string', { resume_id: '' }],
+        ['null', { resume_id: null }],
+        ['a number', { resume_id: 123 }],
+        ['not a UUID', { resume_id: 'not-a-uuid' }]
+    ])('returns 400 when resume_id is %s', async (_label, body) => {
+        const res = await postFeedback({ body });
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error');
+        expect(aiService.generateJobFeedback).not.toHaveBeenCalled();
     });
 
-    test('gracefully handles AI service timeouts with 504 Gateway Timeout', async () => {
-        successfulJobQuery();
-        db.query.mockResolvedValueOnce([[mockParsedProfile]]); // Mock profile retrieval
-        aiServiceMock.generateJobFeedback.mockRejectedValueOnce(new Error('AI service timeout'));
+    // Preconditions (the service signals these by throwing; the controller maps them to HTTP statuses)
+    test.each([
+        ['JOB_NOT_FOUND', 404],
+        ['JOB_NOT_OPEN', 409],            // paused or closed postings
+        ['RESUME_NOT_FOUND', 404],        // missing, or owned by another user
+        ['RESUME_FILE_MISSING', 409],
+        ['JOB_MISSING_REQUIRED_SKILLS', 422]   // postings without required skills are unsupported
+    ])('maps service error %s to %i', async (code, status) => {
+        aiService.generateJobFeedback.mockRejectedValueOnce(new Error(code));
 
-        const result = await getFeedback();
-
-        expect(result.status).toBe(504);
-        expect(result.body).toHaveProperty('error');
+        const res = await postFeedback();
+        expect(res.status).toBe(status);
+        expect(res.body).toHaveProperty('error');
     });
 
-    test('gracefully handles AI model generation failures with 500 Internal Server Error', async () => {
-        successfulJobQuery();
-        db.query.mockResolvedValueOnce([[]]).mockResolvedValueOnce();
-        aiServiceMock.generateJobFeedback.mockRejectedValueOnce(new Error('AI connection refused'));
+    // AI feedback generation
+    test('passes the job, user, resume and dependencies to the service and returns its feedback', async () => {
+        const res = await postFeedback({ id: '5' });
 
-        const result = await getFeedback();
+        expect(res.status).toBe(200);
+        expect(res.body).toMatchObject(mockAIResponse);
+        expect(res.body.disclaimer).toBe('AI-Generated Content');
 
-        expect(result.status).toBe(500);
-        expect(result.body).toHaveProperty('error');
+        expect(aiService.generateJobFeedback).toHaveBeenCalledTimes(1);
+        expect(aiService.generateJobFeedback).toHaveBeenCalledWith({
+            jobId: '5',
+            userId: 1,
+            resumeId,
+            store: expect.anything(),
+            uploadDir: expect.any(String),
+            db
+        });
     });
-})
+
+    test('accepts tokens that carry the user id as userId instead of id', async () => {
+        const bearer = jwt.sign({ userId: 7, role: 'job_seeker' }, process.env.JWT_SECRET);
+
+        const res = await postFeedback({ bearer });
+        expect(res.status).toBe(200);
+        expect(aiService.generateJobFeedback).toHaveBeenCalledWith(expect.objectContaining({ userId: 7 }));
+    });
+
+    test.each([
+        'AI service timeout',
+        'Headers Timeout Error',
+        'The request timed out'
+    ])('maps "%s" to 504 Gateway Timeout', async (message) => {
+        aiService.generateJobFeedback.mockRejectedValueOnce(new Error(message));
+
+        const res = await postFeedback();
+        expect(res.status).toBe(504);
+        expect(res.body).toHaveProperty('error');
+    });
+
+    describe('unexpected failures', () => {
+        let consoleError;
+        beforeEach(() => { consoleError = jest.spyOn(console, 'error').mockImplementation(() => {}); });
+        afterEach(() => { consoleError.mockRestore(); });
+
+        test('maps generic AI failures to 500 without leaking internal details', async () => {
+            aiService.generateJobFeedback.mockRejectedValueOnce(new Error('AI connection refused at 127.0.0.1:11434'));
+
+            const res = await postFeedback();
+            expect(res.status).toBe(500);
+            expect(res.body).toEqual({ error: 'Internal server error' });
+            expect(consoleError).toHaveBeenCalled();
+        });
+
+        test('maps rejections that are not Error objects to 500', async () => {
+            aiService.generateJobFeedback.mockRejectedValueOnce(undefined);
+
+            const res = await postFeedback();
+            expect(res.status).toBe(500);
+            expect(res.body).toHaveProperty('error');
+        });
+    });
+});
+
+// required_skills is a JSON column: mysql2 hands back an array, other drivers a string.
+describe('parseRequiredSkills', () => {
+    const { parseRequiredSkills } = jest.requireActual('../src/api/services/aiResumeService');
+
+    test.each([
+        ['an already-parsed array (mysql2 JSON column)', ['Node.js', ' React ', '', 42]],
+        ['a JSON string', '["Node.js"," React ","",42]']
+    ])('returns the cleaned skill list when stored as %s', (_label, raw) => {
+        expect(parseRequiredSkills(raw)).toEqual(['Node.js', 'React']);
+    });
+
+    test.each([[null], [undefined], [''], ['[]'], [[]], ['not json'], ['{"a":1}']])(
+        'returns [] when nothing usable is stored (%p)', (raw) => {
+            expect(parseRequiredSkills(raw)).toEqual([]);
+        });
+});
