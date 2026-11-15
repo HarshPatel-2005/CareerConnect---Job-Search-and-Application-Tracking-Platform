@@ -1,4 +1,4 @@
-# AI LOG – Debugging VS Code and Local Development Issues
+# AI LOG 1 – Debugging VS Code and Local Development Issues
 
 **Task:** Resolve errors encountered while running the CareerConnect application in VS Code during Sprint 3.
 
@@ -8,7 +8,6 @@
 
 While working on my Application Analytics and History Dashboard, I tried running CareerConnect using `npm run dev` in the VS Code terminal, but I encountered errors that prevented the application from running properly. Can you help me understand the errors and guide me step by step to fix them?
 
-*This prompt is a reconstruction of my request rather than a verbatim transcript.*
 
 ## AI Response
 
@@ -143,11 +142,7 @@ I verified the AI-suggested solutions by:
 - Submitting a test job application.
 - Confirming that the application statistics and monthly activity chart displayed the correct information.
 
-## Reflection
 
-Using ChatGPT helped me understand the causes of errors instead of simply copying commands without knowing their purpose.
-
-I learned that Docker must be running for the application's database to be accessible, that `npm install` is necessary when new dependencies are introduced, and that database migrations may be required after pulling changes from GitHub.
 
 The step-by-step explanations were especially useful because I was unfamiliar with some of these development tools. I executed the commands myself, checked the terminal output, and tested the application to confirm that the suggested solutions worked.
 
