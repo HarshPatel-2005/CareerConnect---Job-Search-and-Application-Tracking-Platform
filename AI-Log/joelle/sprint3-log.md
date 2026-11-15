@@ -256,3 +256,100 @@ The dashboard displayed the expected statistics for my submitted test applicatio
 
 ChatGPT helped me understand how JavaScript uses curly braces to organize conditional statements and error-handling blocks.
 
+# AI LOG 3 – Sprint 3
+## Troubleshooting CSS Layout Problems in the Application Analytics Dashboard
+
+**Task:** Fix CSS layout and responsive design issues in the Application Analytics and History Dashboard.
+
+### 1. Problem Encountered
+
+While implementing the Application Analytics and History Dashboard, I needed to make sure the statistics cards and monthly applications chart were displayed properly on the My Applications page.
+
+The dashboard included four statistics: Total Applications, Under Review, Interviews, and Offers.
+
+One challenge was organizing these elements so that they looked consistent, had appropriate spacing, and could adapt to different screen sizes without affecting the existing application history section.
+
+I used ChatGPT to help me understand how to structure the CSS and make the dashboard responsive.
+
+### 2. Prompt Given to ChatGPT
+
+"I'm working on the Application Analytics and History Dashboard for my CareerConnect project. I added four statistics cards and a monthly applications chart, but I need help making the layout look organized and responsive.
+
+I want the cards to appear next to each other on larger screens and adjust properly on smaller screens. I also want to avoid breaking the existing styling of the My Applications page.
+
+### 3. AI Response and Suggested Solution
+
+It suggested using a grid layout with four columns on larger screens and reducing the number of columns on smaller screens.
+
+Example CSS suggested by AI:
+
+```css
+.analytics-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.analytics-card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+}
+```
+
+ChatGPT explained that:
+
+- `display: grid` organizes elements into a grid.
+- `grid-template-columns` controls the number of columns.
+- `gap` adds spacing between the cards.
+- `padding` adds space inside each card.
+- `border-radius` makes the corners rounded.
+
+This helped me understand how to control the dashboard's appearance without modifying the HTML structure.
+
+### 4. Making the Dashboard Responsive
+
+ChatGPT also suggested using CSS media queries to make the layout work on smaller screens.
+
+Example:
+
+```css
+@media (max-width: 768px) {
+    .analytics-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .analytics-summary {
+        grid-template-columns: 1fr;
+    }
+}
+```
+
+The AI explained that media queries apply different CSS rules depending on the screen width.
+
+With this approach, the four cards can appear in one row on larger screens, two columns on tablets, and one column on narrow mobile screens.
+
+### 5. Applying the Solution
+
+I used the AI's explanation to understand how to organize the dashboard styling.
+
+The CSS for the analytics dashboard was kept separate from the main application styling in:
+
+`src/public/css/application-analytics.css`
+
+This helped keep the new dashboard styles organized and reduced the risk of interfering with existing page elements.
+
+I also reviewed how the chart and statistics cards fit within the My Applications page.
+
+
+### 7. Reflection
+
+ChatGPT helped me better understand CSS Grid, spacing, and responsive design.
+
+The AI provided examples and explained what each CSS property did instead of only giving me code to copy.
+
+
