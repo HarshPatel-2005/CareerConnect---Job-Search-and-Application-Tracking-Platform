@@ -83,3 +83,76 @@ Decisions:
 
 - Everyone updated with their progress regardless of where we are
 - Looking over at what is there left to do for the future of our work
+
+Sprint #3:
+
+Meeting Minutes #6
+
+Attendance: Joelle, Lucas, Harsh, Maz
+
+Discussions:
+
+- Dividing our works
+- Discussing about progress and how much there is left
+- Keeping everyone up to date and making sure everyone knows what must be completed
+
+Decisions:
+
+- Everyone had their works divided fairly
+- Everyone had a friendly discussion to make sure that everyone is comfortable with the progress that is being made
+- We were able to synchronize our works properly and make sure everything is working as it's supposed to be
+
+Meeting Minutes #7
+
+Attendance: Joelle, Lucas, Harsh, Maz
+
+Discussions:
+
+- Updating one another about the progress that is being made
+- Clarifying any problems anyone is having
+
+Decisions:
+
+- Everyone gave their progress and made sure that the work completed has progress being made
+- Anyone that had issues were able to share their thoughts and solutions about it and had the assistance of everyone else to solve that issue.
+
+Meeting Minutes #8
+
+Attendance: Joelle, Lucas, Harsh, Maz
+
+Discussions:
+
+- Updating one another about the progress that is being made
+- Preparing to merge our works and cleaning up any bugs
+
+Decisions:
+
+- Everyone gave their progress and made sure that the work completed has progress being made
+- We started thinking about any issues we may have with our works and when we wish to merge everything together
+
+Meeting Minutes #9
+
+Attendance: Joelle, Lucas, Harsh, Maz
+
+Discussions:
+
+- Updating one another about the progress that is being made
+- Resolving any conflicts between our files
+
+Decisions:
+
+- Everyone gave their progress and made sure that the work completed has progress being made
+- Any conflicts were resolved
+
+Meeting Minutes #10
+
+Attendance: Joelle, Lucas, Harsh, Maz
+
+Discussions:
+
+- Preparing to merge
+
+Decisions:
+
+- Everyone was up to date with their features
+- We discussed merging the files, filling our contribution logs, etc.
