@@ -84,6 +84,80 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             await loadJob(picker.value);
             if (!jobs.length) message.textContent = 'Create a job posting first to receive applications.';
-        } else if (!recruiter) render((await json('/api/applications')).applications);
-    } catch (error) { message.textContent = error.message; message.className = 'error'; }
+         } else if (!recruiter) {
+    const data = await json('/api/applications');
+    const applications = data.applications;
+
+    render(applications);
+
+    // Sprint 3: Application Analytics
+    document.getElementById('total-applications').textContent = applications.length;
+
+    document.getElementById('under-review-count').textContent =
+        applications.filter(app => app.status === 'under_review').length;
+
+    document.getElementById('interview-count').textContent =
+        applications.filter(app => app.status === 'interview').length;
+
+    document.getElementById('offer-count').textContent =
+        applications.filter(app => app.status === 'offered').length;
+
+            
+            // Sprint 3: Application Analytics
+            const analytics = calculateApplicationAnalytics(applications);
+
+            document.getElementById('total-applications').textContent =
+                analytics.total;
+
+            document.getElementById('under-review-count').textContent =
+                analytics.underReview;
+
+            document.getElementById('interview-count').textContent =
+                analytics.interviews;
+
+            document.getElementById('offer-count').textContent =
+                analytics.offers;
+
+            // Applications submitted by month
+            const chart = document.getElementById('applications-chart');
+            chart.replaceChildren();
+
+            const months = Object.keys(analytics.monthlyCounts).sort();
+
+            if (months.length === 0) {
+                chart.textContent = 'No application activity to display yet.';
+            } else {
+                const maxCount = Math.max(
+                    ...Object.values(analytics.monthlyCounts)
+                );
+
+                months.forEach(month => {
+                    const count = analytics.monthlyCounts[month];
+
+                    const row = document.createElement('div');
+                    row.className = 'analytics-chart-row';
+
+                    const label = document.createElement('span');
+                    const [year, monthNumber] = month.split('-').map(Number);
+                    label.textContent = new Date(year, monthNumber - 1, 1)
+                        .toLocaleDateString('en-US', {
+                            month: 'short',
+                            year: 'numeric'
+                        });
+
+                    const bar = document.createElement('div');
+                    bar.className = 'analytics-chart-bar';
+                    bar.style.width = `${(count / maxCount) * 100}%`;
+                    bar.textContent = count;
+
+                    row.append(label, bar);
+                    chart.append(row);
+                });
+            }
+
+
+}
+    } catch (error) {
+         message.textContent = error.message; message.className = 'error';
+         }
 });
