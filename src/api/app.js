@@ -4,8 +4,9 @@ const { createResumeRouter } = require('./routes/resumesRoutes');
 const authRoutes = require('./routes/authRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const recruiterRoutes = require('./routes/recruiterRoutes');
-const jobPostingRoutes = require('./routes/jobPostingRoutes');   // NEW
-const archiveRoutes = require('./routes/archiveRoutes');         // NEW: archive feature
+const jobPostingRoutes = require('./routes/jobPostingRoutes');
+const archiveRoutes = require('./routes/archiveRoutes');           // archive feature
+const candidatesRoutes = require('./routes/candidatesRoutes');     // candidates feature
 const { createJobsRouter } = require('./routes/jobsRoutes');
 const jobSearchRoutes = require('./routes/jobSearchRoutes');
 
@@ -17,9 +18,9 @@ function createApp(options = {}) {
     app.use('/api/auth', authRoutes);
     app.use('/api/profile', profileRoutes);
     app.use('/api/applications', require('./routes/applicationsRoutes'));
+    app.use('/api/candidates', candidatesRoutes);                  // candidates feature
     // Keep legacy/bookmarked paths useful while using a single page per workflow.
     app.get('/jobs.html', (_req, res) => res.redirect('/job-search.html'));
-    app.get('/cadidates-dashboard.html', (req, res) => res.redirect('/candidates-dashboard.html' + (req.originalUrl.includes('?') ? req.originalUrl.slice(req.originalUrl.indexOf('?')) : '')));
     app.use(express.static(path.join(__dirname, '../public')));
     const resumes = createResumeRouter(options.resume || {});
     app.use('/api/resumes', resumes);
@@ -33,7 +34,7 @@ function createApp(options = {}) {
 
     app.use('/api/recruiter', recruiterRoutes);
     app.use('/api/recruiter', jobPostingRoutes);
-    app.use('/api/recruiter', archiveRoutes);                    // NEW: archive feature
+    app.use('/api/recruiter', archiveRoutes);                      // archive feature
 
     // Health check endpoint
     app.get('/health', (req, res) => {
