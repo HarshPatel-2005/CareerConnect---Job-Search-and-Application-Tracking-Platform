@@ -60,7 +60,7 @@ During Sprint 3, I continued ownership of the recruiter-facing side of the platf
 
 ## 4. AI Usage
 
-I used Claude as an assistant for the archive feature, the status menu fix and the auto-close rule, and for drafting the unit tests and user stories. I reviewed the generated code, ran the database migration, and tested the behaviour in the running application before keeping it.
+I used Claude as an assistant for the archive feature, the status menu fix and the auto-close rule, and for drafting the unit tests and user stories. I reviewed the generated code and tested the behaviour in the running application before keeping it.
 
 | Use | What the AI produced | How I validated and modified it |
 | :--- | :--- | :--- |
