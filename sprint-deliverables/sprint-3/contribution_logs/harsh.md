@@ -67,5 +67,5 @@ I used Claude as an assistant for the archive feature, the status menu fix and t
 | Diagnosing the archive "endpoint not found" error | Identified that the server route and database columns did not exist | Confirmed against `app.js` and the 404 handler |
 | Archive controller, routes, and list filters | First draft of the files | Adjusted the `require` paths and checked ownership scoping by `company_id` |
 | Status menu fix | CSS and JavaScript change | Tested in the browser |
-| Auto-close rule | Transaction logic in `applicationsRoutes.js` | Tested with two job seekers; confirmed the response includes `job_closed` and the second applicant becomes Rejected |
+| Auto-close rule | Transaction logic in `applicationsRoutes.js` | Tested with two job seekers; confirmed the response includes `job_closed` and the second applicant becomes rejected |
 | Unit tests | Updated and new Jest tests | Updated the existing test I had; confirm `archive.test.js` passes in CI before submitting |
