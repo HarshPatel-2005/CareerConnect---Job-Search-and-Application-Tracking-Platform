@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS jobs (
     language VARCHAR(100) DEFAULT NULL,
     job_type ENUM('full_time', 'part_time', 'contract', 'temporary', 'internship', 'co_op') DEFAULT NULL,
     description TEXT DEFAULT NULL,
+    deadline DATE DEFAULT NULL,
     status ENUM('open', 'paused', 'closed') DEFAULT 'open',
     candidates_count INT DEFAULT 0,
     awaiting_count INT DEFAULT 0,
@@ -106,4 +107,27 @@ CREATE TABLE IF NOT EXISTS resumes (
     updated_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
     INDEX idx_resumes_user_id (user_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS saved_jobs (
+    user_id INT NOT NULL,
+    job_id INT NOT NULL,
+    saved_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    PRIMARY KEY (user_id, job_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    job_id INT NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    deadline DATE NOT NULL,
+    read_at TIMESTAMP(3) NULL DEFAULT NULL,
+    created_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    UNIQUE KEY uq_notification_event (user_id, job_id, type, deadline),
+    INDEX idx_notifications_user_created (user_id, created_at, id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE
 );
