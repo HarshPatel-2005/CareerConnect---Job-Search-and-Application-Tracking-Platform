@@ -1,0 +1,56 @@
+
+# AI LOG 1 (SPRINT 3)
+
+Task: US-09: Saved jobs and deadline reminders
+Purpose of the AI:  guidance for the feature implementation regarding security
+AI-suggested content: The AI generated suggestions.
+Validation: Read through the suggested changes, looked  for the specific lines mentionned, and made necessary adjustments to ensure security
+Reflection: The AI managed to find actual security risks within the code and changes were made to resolve the issue
+
+## Prompt
+
+Look into the feature branch of notification and go look for any known vulnerabilities
+
+## Response
+
+
+I confirmed the pagination bug in a browser and reproduced the authentication fallback issue with fixture data: when JWT_SECRET is absent, a forged token can access a chosen user’s notification endpoint. The 34 existing notification/reminder tests pass, but they don’t cover these cases. MySQL is unavailable locally, so I couldn’t run the database integration tests.
+I found one security risk and two bugs:
+
+1. High — predictable authentication fallback.
+   jwt.js:4 (/C:/Users/mazma/Documents/Projects/CareerConnect---Job-Search-and-Application-Tracking-Platform/src/api/utils/jwt.js:4) uses a hardcoded signing secret when JWT_SECRET is missing. In that configuration, someone can forge a token for another user and read or mark their notifications. I reproduced this using fixture data.
+   Fix: require a strong configured secret and refuse to start without it. This affects shared authentication, beyond notifications.
+2. Medium — archived jobs still generate reminders.
+   deadlineReminders.js:14 (/C:/Users/mazma/Documents/Projects/CareerConnect---Job-Search-and-Application-Tracking-Platform/src/api/services/deadlineReminders.js:14) checks status, deadline, and applications, but ignores archived. Archiving leaves the status unchanged, so an archived open job can still trigger “apply” reminders.
+   Fix: exclude archived jobs from reminder generation.
+3. Medium — “Mark all as read” ignores unread notifications on older pages.
+   notifications.js:63 (/C:/Users/mazma/Documents/Projects/CareerConnect---Job-Search-and-Application-Tracking-Platform/src/public/js/notifications.js:63) enables the button only when a currently displayed card is unread. If the newest 20 are read, older unread notifications remain while the button is disabled. I reproduced this in a browser.
+   Fix: use the account’s total unread count, or allow the bulk action regardless of the loaded page.
+
+The reviewed routes scope queries to the authenticated owner and use SQL parameters. Notification text is rendered with textContent; the HTML injection check rendered no injected elements.
+
+
+
+# AI LOG 2 (SPRINT 3)
+
+Task: US-09: Saved jobs and deadline reminders
+Purpose of the AI:  guidance for validating the notification feature and checking its reliability
+AI-suggested content: The AI suggested testing the reminder generation 
+Validation: Tan the tests myself, looked  for the jest tests and MySQL integration checks, and made necessary adjustments to ensure security
+Reflection: The AI managed to find actual security risks within the code and changes were made to resolve the issue
+
+## Prompt
+
+Check whether the saved jobs and notification feature works correctly. Verify that reminders are not duplicated, marking notifications as read persists after refreshing, and changing a deadline creates a new reminder without resetting the previous notification.
+
+## Response
+
+The acceptance tests passed for the saved jobs and deadline reminder workflow.
+
+1. Saving and removing jobs: Saved postings remained available after refreshing. Removing a saved job removed it from the saved list while preserving notification history.
+2. Duplicate prevention: Repeated scheduler runs did not create another reminder for the same user, job, and deadline.
+3. Persistent read state: Notifications remained marked as read after refreshing and after subsequent scheduler runs.
+4. Deadline changes: Changing a posting’s deadline generated exactly one new unread reminder. The earlier reminder retained its original deadline and read state.
+5. Authentication: Signed-out users were redirected to login when opening saved jobs or notifications.
+
+The reviewed routes scope queries to the authenticated owner and use SQL parameters. Notification text is rendered with textContent; the HTML injection check rendered no injected elements.
