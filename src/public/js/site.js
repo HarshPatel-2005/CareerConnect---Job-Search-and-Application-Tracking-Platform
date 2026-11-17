@@ -22,7 +22,7 @@
         const next = new URLSearchParams(location.search).get('next');
         if (next) {
             const url = new URL(next, location.origin);
-            const allowed = ['/job-details.html', '/resumes.html', '/profile.html', '/settings.html', '/applications.html', '/job-posting.html', '/candidates-dashboard.html'];
+            const allowed = ['/job-details.html', '/resumes.html', '/profile.html', '/settings.html', '/applications.html', '/job-posting.html', '/candidates-dashboard.html', '/saved-jobs.html', '/notifications.html'];
             if (url.origin === location.origin && allowed.includes(url.pathname)) {
                 const recruiterOnly = ['/job-posting.html', '/candidates-dashboard.html'];
                 if (!recruiterOnly.includes(url.pathname) || session()?.user.role === 'recruiter') return url.pathname + url.search;
@@ -69,8 +69,8 @@
         if (label && user) { label.textContent = `${user.full_name} · ${user.role === 'recruiter' ? 'Recruiter' : 'Job seeker'}`; label.title = user.email; }
     });
     const recruiterPages = ['/recruiter-dashboard.html', '/job-posting.html', '/candidates-dashboard.html'];
-    const seekerPages = ['/resumes.html', '/applications.html'];
-    const privatePage = [...recruiterPages, ...seekerPages, '/settings.html'].includes(location.pathname)
+    const seekerPages = ['/resumes.html', '/applications.html', '/saved-jobs.html'];
+    const privatePage = [...recruiterPages, ...seekerPages, '/settings.html', '/notifications.html'].includes(location.pathname)
         || (location.pathname === '/profile.html' && !new URLSearchParams(location.search).has('id'));
     if (privatePage && !current) location.replace(loginUrl());
     if (current && ((recruiterPages.includes(location.pathname) && current.user.role !== 'recruiter')
@@ -95,8 +95,24 @@
         } else if (current) {
             link('My applications', '/applications.html', nav);
             link('My resumes', '/resumes.html', nav);
+            link('Saved jobs', '/saved-jobs.html', nav);
         }
         if (current) {
+            const notificationsLink = link('Notifications', '/notifications.html', nav);
+            async function refreshUnreadCount() {
+                if (document.hidden || !session()) return;
+                try {
+                    const response = await request('/api/notifications/unread-count');
+                    if (!response.ok) throw new Error('Unable to load unread count.');
+                    const { unread_count: unread } = await response.json();
+                    notificationsLink.textContent = unread ? `Notifications (${unread})` : 'Notifications';
+                    notificationsLink.title = `${unread} unread notification${unread === 1 ? '' : 's'}`;
+                } catch { notificationsLink.title = 'Unread count unavailable. Open notifications to try again.'; }
+            }
+            refreshUnreadCount();
+            setInterval(refreshUnreadCount, 30000);
+            document.addEventListener('visibilitychange', refreshUnreadCount);
+            window.addEventListener('notifications-changed', refreshUnreadCount);
             link('My profile', '/profile.html', nav);
             link('Settings', '/settings.html', nav);
         }

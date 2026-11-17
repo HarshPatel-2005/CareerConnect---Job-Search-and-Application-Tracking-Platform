@@ -30,6 +30,14 @@ async function run() {
             .attach('resume', file, { filename: 'integration.pdf', contentType: 'application/pdf' });
         assert.equal(uploaded.status, 201);
         const resumeId = uploaded.body.resume.id;
+        // Enforce the same UTC deadline rule in the real apply transaction.
+        await db.query('UPDATE jobs SET deadline = DATE_SUB(UTC_DATE(), INTERVAL 1 DAY) WHERE id = ?', [jobId]);
+        const expired = await request(app).post(`/api/jobs/${jobId}/apply`)
+            .set('Authorization', authorization).send({ resume_id: resumeId });
+        assert.equal(expired.status, 409);
+        const search = await request(app).get('/api/jobs').query({ search: 'Integration fixture' });
+        assert.ok(search.body.jobs.every(job => job.id !== jobId), 'Expired postings must not appear in search');
+        await db.query('UPDATE jobs SET deadline = UTC_DATE() WHERE id = ?', [jobId]);
         const start = Date.now();
         const results = await Promise.all([1, 2].map(() => request(app).post(`/api/jobs/${jobId}/apply`)
             .set('Authorization', authorization).send({ resume_id: resumeId })));
@@ -51,7 +59,7 @@ async function run() {
         const [counters] = await db.query('SELECT candidates_count, awaiting_count FROM jobs WHERE id = ?', [jobId]);
         assert.equal(counters[0].candidates_count, 1);
         assert.equal(counters[0].awaiting_count, 1);
-        console.log('PASS: real upload, concurrent apply (201/409), DB uniqueness, UTC timestamp, details, counters, and retained resume snapshot.');
+        console.log('PASS: real upload, expired-job rejection and search exclusion, same-day applications, concurrent apply (201/409), DB uniqueness, UTC timestamp, details, counters, and retained resume snapshot.');
     } finally {
         if (userId && jobId) await db.query('DELETE FROM applications WHERE user_id = ? AND job_id = ?', [userId, jobId]);
         if (jobId) await db.query('DELETE FROM jobs WHERE id = ?', [jobId]);

@@ -10,6 +10,8 @@ const candidatesRoutes = require('./routes/candidatesRoutes');     // candidates
 const { createJobsRouter } = require('./routes/jobsRoutes');
 const jobSearchRoutes = require('./routes/jobSearchRoutes');
 const { create404Middleware } = require('./middleware/404Middleware');
+const { createSavedJobsRouter } = require('./routes/savedJobsRoutes');
+const { createNotificationsRouter } = require('./routes/notificationsRoutes');
 
 function createApp(options = {}) {
     const app = express();
@@ -18,6 +20,8 @@ function createApp(options = {}) {
 
     app.use('/api/auth', authRoutes);
     app.use('/api/profile', profileRoutes);
+    app.use('/api/saved-jobs', createSavedJobsRouter(options.savedJobs));
+    app.use('/api/notifications', createNotificationsRouter(options.notifications));
     app.use('/api/applications', require('./routes/applicationsRoutes'));
     app.use('/api/candidates', candidatesRoutes);                  // candidates feature
     // Keep legacy/bookmarked paths useful while using a single page per workflow.

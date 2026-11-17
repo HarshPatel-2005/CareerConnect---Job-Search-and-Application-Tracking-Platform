@@ -23,7 +23,8 @@ async function migrate() {
         country: 'VARCHAR(100) DEFAULT NULL',
         language: 'VARCHAR(100) DEFAULT NULL',
         job_type: "ENUM('full_time', 'part_time', 'contract', 'temporary', 'internship', 'co_op') DEFAULT NULL",
-        description: 'TEXT DEFAULT NULL'
+        description: 'TEXT DEFAULT NULL',
+        deadline: 'DATE DEFAULT NULL'
     };
     for (const [name, definition] of Object.entries(additions)) {
         if (!names.has(name)) await db.query(`ALTER TABLE jobs ADD COLUMN ${name} ${definition}`);
@@ -33,7 +34,7 @@ async function migrate() {
     if (!applicationColumns.some(column => column.Field === 'status')) {
         await db.query("ALTER TABLE applications ADD COLUMN status ENUM('applied', 'under_review', 'interview', 'offered', 'rejected') NOT NULL DEFAULT 'applied'");
     }
-    console.log('Profile and applications schemas are ready. Existing records were preserved.');
+    console.log('Profile, applications, saved jobs, and notifications schemas are ready. Existing records were preserved.');
 }
 
 migrate().catch(error => {

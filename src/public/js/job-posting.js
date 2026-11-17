@@ -13,7 +13,7 @@ const saveButton = document.getElementById('save-btn');
 const errorBox   = document.getElementById('form-error');
 
 // The form fields; each id matches a column name the backend expects
-const FIELDS = ['title', 'openings', 'country', 'language', 'location', 'job_type', 'description'];
+const FIELDS = ['title', 'openings', 'country', 'language', 'location', 'job_type', 'description', 'deadline'];
 
 function request(method, url, body) {
     return fetch(url, {

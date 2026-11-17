@@ -17,11 +17,13 @@ const searchJobs = async (req, res) => {
                 jobs.description,
                 jobs.openings,
                 jobs.created_at,
+                DATE_FORMAT(jobs.deadline, '%Y-%m-%d') AS deadline,
                 companies.name AS company_name
             FROM jobs
             JOIN companies ON jobs.company_id = companies.id
             WHERE jobs.status = 'open'
               AND jobs.archived = FALSE
+              AND (jobs.deadline IS NULL OR jobs.deadline >= UTC_DATE())
         `;
 
         const params = [];

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications | CareerConnect</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/pages/jobs.css">
+    <link rel="stylesheet" href="/css/site.css">
+    <script src="/js/site.js"></script>
+    <script src="/js/notifications.js" defer></script>
+</head>
+<body>
+    <main class="jobs-shell">
+        <h1>Notifications</h1>
+        <p>Deadline reminders for your saved jobs. Dates shown on reminders reflect the deadline when they were sent; check the posting for the current deadline.</p>
+        <div class="application-actions">
+            <button id="refresh-notifications" class="app-button" type="button">Refresh</button>
+            <button id="read-all" class="app-button" type="button" disabled>Mark all as read</button>
+        </div>
+        <p id="message" role="status" aria-live="polite">Loading notifications...</p>
+        <section id="notifications" class="jobs-list" aria-label="Your notifications"></section>
+        <button id="load-more" type="button" class="app-button" hidden>Load more</button>
+    </main>
+</body>
+</html>

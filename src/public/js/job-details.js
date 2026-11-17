@@ -88,13 +88,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('location').textContent = [job.location, job.country].filter(Boolean).join(', ');
         document.getElementById('job-meta').textContent = [job.job_type?.replaceAll('_', ' '), job.language, `${job.openings} opening(s)`].filter(Boolean).join(' · ');
         document.getElementById('description').textContent = job.description || 'No description provided.';
+        document.getElementById('deadline').textContent = CareerConnect.deadlineLabel(job.deadline);
         document.getElementById('job').hidden = false;
         if (CareerConnect.session()?.user.role === 'recruiter') {
             showMessage('You are viewing this job as a recruiter. Job seeker accounts can submit applications.');
             return;
         }
+        document.getElementById('save-job-action').append(CareerConnect.createSaveButton(job, document.getElementById('save-message')));
         if (application) { showSubmitted(application); return; }
-        if (job.status !== 'open') { showMessage('This job is no longer accepting applications.'); return; }
+        if (job.status !== 'open' || job.expired) { showMessage('This job is no longer accepting applications.'); return; }
         panel.hidden = false;
         await loadResumes();
     } catch (error) { showMessage(error.message, 'error'); }

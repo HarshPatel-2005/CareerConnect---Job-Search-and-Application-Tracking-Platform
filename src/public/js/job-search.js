@@ -71,6 +71,12 @@ const jobType = document.getElementById('job-type').value;
                 applyLink.href = detailsLink.href;
                 applyLink.textContent = 'View details and apply';
                 card.append(title, company, meta, description, applyLink);
+                const deadline = document.createElement('p');
+                deadline.textContent = CareerConnect.deadlineLabel(job.deadline);
+                card.append(deadline);
+                if (CareerConnect.session()?.user.role === 'job_seeker') {
+                    card.append(CareerConnect.createSaveButton(job, status));
+                }
                 results.appendChild(card);
             });
         } catch (error) {
