@@ -20,29 +20,33 @@ services:
     volumes:
       - ollama_data:/root/.ollama
     entrypoint: ["/bin/sh", "-c"]
-    command: 
+    command:
       - |
-        # Start the Ollama server in the background
+        set -e
         ollama serve &
+        SERVER_PID=$$!
 
-        # Wait for the server to be ready
         until ollama list > /dev/null 2>&1; do
           sleep 1
         done
 
-        # Check if the model is already downloaded
-        if !ollama list | grep -q "qwen2.5:3b-instruct"; then
+        if ! ollama list | grep -q "qwen2.5:3b-instruct"; then
           echo "Model qwen2.5:3b-instruct not found. Downloading..."
           ollama pull qwen2.5:3b-instruct
         else
           echo "Model qwen2.5:3b-instruct already downloaded."
         fi
 
-        # Keep the container running
-        wait
-    restart:
-      unless-stopped
+        wait "$$SERVER_PID"
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list | grep -q qwen2.5:3b-instruct"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10m
+    restart: unless-stopped
 
 volumes:
   mysql_data:
+    name: career_connect_db_data
   ollama_data:
