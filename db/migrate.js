@@ -24,7 +24,9 @@ async function migrate() {
         language: 'VARCHAR(100) DEFAULT NULL',
         job_type: "ENUM('full_time', 'part_time', 'contract', 'temporary', 'internship', 'co_op') DEFAULT NULL",
         description: 'TEXT DEFAULT NULL',
-        deadline: 'DATE DEFAULT NULL'
+        deadline: 'DATE DEFAULT NULL',
+        archived: 'BOOLEAN NOT NULL DEFAULT FALSE',
+        archived_at: 'TIMESTAMP NULL DEFAULT NULL'
     };
     for (const [name, definition] of Object.entries(additions)) {
         if (!names.has(name)) await db.query(`ALTER TABLE jobs ADD COLUMN ${name} ${definition}`);
