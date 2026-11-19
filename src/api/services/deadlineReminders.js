@@ -12,6 +12,7 @@ async function generateDeadlineReminders(db = defaultDb, savedJob = null) {
         JOIN users u ON u.id = s.user_id AND u.role = 'job_seeker'
         JOIN jobs j ON j.id = s.job_id
         WHERE j.status = 'open'
+          AND j.archived = FALSE
           AND j.deadline BETWEEN UTC_DATE() AND DATE_ADD(UTC_DATE(), INTERVAL ? DAY)
           AND NOT EXISTS (SELECT 1 FROM applications a WHERE a.user_id = s.user_id AND a.job_id = s.job_id)
           ${savedJob ? 'AND s.user_id = ? AND s.job_id = ?' : ''}

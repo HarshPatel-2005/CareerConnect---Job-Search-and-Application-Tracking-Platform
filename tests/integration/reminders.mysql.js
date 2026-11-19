@@ -41,13 +41,15 @@ async function run() {
         for (const [name, days, status] of [
             ['today', 0, 'open'], ['three', 3, 'open'], ['four', 4, 'open'], ['expired', -1, 'open'],
             ['none', null, 'open'], ['paused', 2, 'paused'], ['closed', 2, 'closed'],
-            ['applied', 1, 'open'], ['removed', 4, 'open']
+            ['applied', 1, 'open'], ['removed', 4, 'open'],
+            ['archived', 2, 'open'], ['archived_later', 4, 'open']
         ]) {
             const [job] = await db.query(`INSERT INTO jobs (company_id, title, location, status, deadline)
                 VALUES (?, ?, 'Montreal', ?, ${days === null ? 'NULL' : 'DATE_ADD(UTC_DATE(), INTERVAL ? DAY)'})`,
             days === null ? [company.insertId, name, status] : [company.insertId, name, status, days]);
             jobs[name] = job.insertId;
         }
+        await db.query('UPDATE jobs SET archived = TRUE WHERE id = ?', [jobs.archived]);
         const save = (job, user = owner) => request(app).put(`/api/saved-jobs/${job}`).set('Authorization', user.authorization);
         const count = async user => (await request(app).get('/api/notifications/unread-count').set('Authorization', user.authorization)).body.unread_count;
         await db.query(`INSERT INTO applications (user_id, job_id, resume_id, resume_name, resume_mime_type, resume_content)
@@ -55,6 +57,8 @@ async function run() {
         const saves = await Promise.all([save(jobs.today), save(jobs.today)]);
         assert.deepEqual(saves.map(res => res.status), [200, 200]);
         for (const job of Object.values(jobs)) assert.equal((await save(job)).status, 200);
+        const [[archivedImmediate]] = await db.query('SELECT COUNT(*) AS count FROM notifications WHERE job_id = ?', [jobs.archived]);
+        assert.equal(archivedImmediate.count, 0, 'Saving an archived open job must not create an immediate reminder');
         assert.equal((await save(jobs.today, other)).status, 200);
         assert.equal((await save(jobs.today, recruiter)).status, 403);
         assert.equal((await save(999999)).status, 404);
@@ -71,6 +75,8 @@ async function run() {
         await save(jobs.today);
         assert.equal(await count(owner), 2, 'Immediate checks are scoped to the saved job');
         await db.query('UPDATE jobs SET deadline = DATE_ADD(UTC_DATE(), INTERVAL 4 DAY) WHERE id = ?', [jobs.four]);
+        // A previously saved posting can be archived before its deadline enters the window.
+        await db.query('UPDATE jobs SET archived = TRUE, deadline = DATE_ADD(UTC_DATE(), INTERVAL 1 DAY) WHERE id = ?', [jobs.archived_later]);
 
         // Retry concurrent transactions if MySQL chooses one as a deadlock victim.
         const concurrent = await Promise.allSettled([generateDeadlineReminders(db), generateDeadlineReminders(db)]);
@@ -81,6 +87,8 @@ async function run() {
             }
         }
         await generateDeadlineReminders(db);
+        const [[archivedScheduled]] = await db.query('SELECT COUNT(*) AS count FROM notifications WHERE job_id IN (?, ?)', [jobs.archived, jobs.archived_later]);
+        assert.equal(archivedScheduled.count, 0, 'Scheduled checks must exclude archived jobs, including jobs archived after saving');
         const [records] = await db.query('SELECT * FROM notifications WHERE user_id = ? ORDER BY job_id', [owner.id]);
         assert.deepEqual(records.map(row => row.job_id), [jobs.today, jobs.three], 'Only open, unapplied saved jobs due in 0–3 days receive reminders');
         assert.equal(await count(owner), 2); assert.equal(await count(other), 1);
