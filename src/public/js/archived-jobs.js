@@ -2,13 +2,14 @@
    ARCHIVED JOBS – JAVASCRIPT
    ---------------------------------------------------------------------
    1. Loads the recruiter's archived jobs from the server
-   2. Lets the recruiter filter and sort them
+   2. Lets the recruiter filter (title, location, status) and sort them
    3. Lets the recruiter unarchive a job (it moves back to the Jobs tab)
    ===================================================================== */
 
 const jobList       = document.getElementById('list');
 const titleBox      = document.getElementById('q');
 const locationBox   = document.getElementById('loc');
+const statusFilter  = document.getElementById('status-filter');   // NEW: "Job status" dropdown
 const sortDropdown  = document.getElementById('sort');
 const orderDropdown = document.getElementById('order');
 const countLabel    = document.getElementById('count');
@@ -17,7 +18,8 @@ const messageBox    = document.getElementById('dashboard-message');
 
 const allJobs = [];   // one element per archived job row
 
-const STATUS_LABELS = { open: 'Open', paused: 'Paused', closed: 'Closed' };
+// CHANGED: "paused" was removed. A job is either open or closed.
+const STATUS_LABELS = { open: 'Open', closed: 'Closed' };
 
 function escapeHTML(str) {
     return String(str).replace(/[&<>'"]/g,
@@ -31,12 +33,15 @@ function escapeHTML(str) {
 function filterJobs() {
     const wantedTitle    = titleBox.value.trim().toLowerCase();
     const wantedLocation = locationBox.value.trim().toLowerCase();
+    const wantedStatus   = statusFilter.value;   // NEW: "" (all), "open" or "closed"
     let shownCount = 0;
 
     for (let i = 0; i < allJobs.length; i++) {
         const job = allJobs[i];
+        // CHANGED: a third check was added. "" means "All statuses", so every job passes it.
         const matches = job.dataset.title.toLowerCase().includes(wantedTitle) &&
-                        job.dataset.loc.toLowerCase().includes(wantedLocation);
+                        job.dataset.loc.toLowerCase().includes(wantedLocation) &&
+                        (wantedStatus === '' || job.dataset.status === wantedStatus);
         job.hidden = !matches;
         if (matches) shownCount++;
     }
@@ -66,6 +71,10 @@ function sortJobs() {
         let answer = 0;
         if (valueA < valueB) answer = -1;
         else if (valueA > valueB) answer = 1;
+
+        // NEW: if the two jobs tie (same date/title), the higher id is the newer job
+        if (answer === 0) answer = Number(a.dataset.id) - Number(b.dataset.id);
+
         if (orderChoice === 'desc') answer = answer * -1;
         return answer;
     });
@@ -128,13 +137,18 @@ async function loadArchivedJobs() {
             row.dataset.id = job.id;
             row.setAttribute('data-title', job.title);
             row.setAttribute('data-loc', job.location);
-            row.setAttribute('data-date', created.toISOString().split('T')[0]);
+            row.setAttribute('data-date', created.toISOString());
 
             const createdText = created.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
             const archivedText = job.archived_at
                 ? '<br>Archived: ' + new Date(job.archived_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
                 : '';
-            const status = STATUS_LABELS[job.status] ? job.status : 'open';
+
+            // CHANGED: an old status that no longer exists (like "paused") shows as "closed"
+            const status = STATUS_LABELS[job.status] ? job.status : 'closed';
+
+            // NEW: store the status on the row so the status filter can read it
+            row.setAttribute('data-status', status);
 
             row.innerHTML = `
                 <div>
@@ -169,6 +183,7 @@ async function loadArchivedJobs() {
 
 titleBox.addEventListener('input', filterJobs);
 locationBox.addEventListener('input', filterJobs);
+statusFilter.addEventListener('change', filterJobs);   // NEW
 sortDropdown.addEventListener('change', sortJobs);
 orderDropdown.addEventListener('change', sortJobs);
 

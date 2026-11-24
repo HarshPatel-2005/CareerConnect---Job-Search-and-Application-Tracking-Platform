@@ -1,14 +1,13 @@
 /* =====================================================================
    RECRUITER DASHBOARD – JAVASCRIPT
    ---------------------------------------------------------------------
-   This file does four small jobs:
-     1. Gives every job a status button (Open / Paused / Closed)
-     2. Hides job cards that don't match what you typed in the filters
+   This file does these small jobs:
+     1. Gives every job a status button (Open / Closed)
+     2. Hides job cards that don't match what you typed or picked in the filters
      3. Puts the job cards in order (by date or title)
-     4. NEW: Lets the recruiter archive a job (it moves to archived-jobs.html)
+     4. Lets the recruiter archive a job (it moves to archived-jobs.html)
 
-   ARCHIVE FEATURE: every change is marked with "NEW" or "CHANGED".
-   Search this file for those words to see what was added.
+   Changes in this version are marked with "NEW" or "CHANGED".
    ===================================================================== */
 
 
@@ -17,10 +16,9 @@
    ===================================================================== */
 
 /* The choices in the status menu.
-   To add a status, copy one line. (For a new color, add a .dot.yourvalue rule in the CSS.) */
+   CHANGED: "paused" was removed. A job is now either open or closed. */
 const STATUSES = [
     { value: 'open',   label: 'Open'   },
-    { value: 'paused', label: 'Paused' },
     { value: 'closed', label: 'Closed' }
 ];
 
@@ -32,6 +30,7 @@ const STATUSES = [
 const jobList      = document.getElementById('list');    // the area that holds all the jobs
 const titleBox     = document.getElementById('q');       // "Job title" search box
 const locationBox  = document.getElementById('loc');     // "Location" search box
+const statusFilter = document.getElementById('status-filter');  // NEW: "Job status" filter dropdown
 const sortDropdown = document.getElementById('sort');    // "Sort by" dropdown
 const orderDropdown = document.getElementById('order');  // "Order" dropdown
 const countLabel   = document.getElementById('count');   // the "(3)" next to the heading
@@ -76,9 +75,16 @@ function closeAllMenus() {
 
 /* Build the button and menu for one job. */
 function setupStatus(job) {
-    // If the job has no status written in the HTML, start it as "open"
-    if (!job.dataset.status) {
-        job.dataset.status = 'open';
+    // CHANGED: if the job has no status, or an old one that no longer exists
+    // (like "paused"), show it as "closed" so the button is never blank
+    let known = false;
+    for (let i = 0; i < STATUSES.length; i++) {
+        if (STATUSES[i].value === job.dataset.status) {
+            known = true;
+        }
+    }
+    if (!known) {
+        job.dataset.status = job.dataset.status ? 'closed' : 'open';
     }
 
     // Put the button and an empty menu inside <div class="status">
@@ -113,6 +119,7 @@ function setupStatus(job) {
                 job.dataset.status = data.status;
                 showStatus(job);
                 menu.hidden = true;
+                filterJobs();   // NEW: re-check the filters, since this job's status just changed
                 document.getElementById('dashboard-message').textContent = 'Job status saved.';
             } catch (error) {
                 document.getElementById('dashboard-message').textContent = error.message;
@@ -122,10 +129,8 @@ function setupStatus(job) {
         menu.appendChild(item);
     }
 
-    // When the status button is clicked: open its menu (and close any others)
-    /* CHANGED: the menu is now position: fixed (see the CSS), so we place it
-       ourselves under the button. That lets it float outside the table
-       instead of being clipped by it. */
+    // When the status button is clicked: open its menu (and close any others).
+    // The menu is position: fixed (see the CSS), so we place it ourselves under the button.
     button.addEventListener('click', function (event) {
         event.stopPropagation();        // stops the "click anywhere to close" rule below
 
@@ -157,14 +162,14 @@ for (let i = 0; i < allJobs.length; i++) {
 /* Clicking anywhere else on the page closes the menus. */
 document.addEventListener('click', closeAllMenus);
 
-/* CHANGED: a fixed menu would stay in place while the page moves,
+/* A fixed menu would stay in place while the page moves,
    so close it when the page scrolls or the window is resized. */
 window.addEventListener('scroll', closeAllMenus, true);
 window.addEventListener('resize', closeAllMenus);
 
 
 /* =====================================================================
-   STEP 3B (NEW): ARCHIVING
+   STEP 3B: ARCHIVING
    ---------------------------------------------------------------------
    Each job row gets an "Archive" button (added in STEP 7 below).
    Clicking it:
@@ -202,12 +207,17 @@ async function archiveJob(job, button) {
 
 /* =====================================================================
    STEP 4: FILTERING
+   ---------------------------------------------------------------------
+   A job stays visible only if it passes ALL three checks:
+   title, location, and status.
    ===================================================================== */
 
 function filterJobs() {
     // What the person typed, in lowercase so "HR" and "hr" count as the same
     const wantedTitle    = titleBox.value.trim().toLowerCase();
     const wantedLocation = locationBox.value.trim().toLowerCase();
+    // NEW: what the status dropdown says: "" (all), "open" or "closed"
+    const wantedStatus   = statusFilter.value;
 
     let shownCount = 0;
 
@@ -219,7 +229,10 @@ function filterJobs() {
         const titleMatches    = job.dataset.title.toLowerCase().includes(wantedTitle);
         const locationMatches = job.dataset.loc.toLowerCase().includes(wantedLocation);
 
-        if (titleMatches && locationMatches) {
+        // NEW: "" means "All statuses", so every job passes. Otherwise the job's status must be equal.
+        const statusMatches   = wantedStatus === '' || job.dataset.status === wantedStatus;
+
+        if (titleMatches && locationMatches && statusMatches) {
             job.hidden = false;
             shownCount = shownCount + 1;
         } else {
@@ -229,7 +242,7 @@ function filterJobs() {
 
     countLabel.textContent = '(' + shownCount + ')';   // update the number in the heading
 
-    // NEW: if every job was archived, say so; otherwise it's the filters hiding them
+    // If every job was archived, say so; otherwise it's the filters hiding them
     emptyMessage.textContent = allJobs.length === 0
         ? 'No active job postings. Choose Post a job to create one.'
         : 'No jobs match these filters. Clear a filter to see more.';
@@ -277,6 +290,11 @@ function sortJobs() {
             answer = 1;
         }
 
+        // If the two jobs tie (same date/title), the higher id is the newer job
+        if (answer === 0) {
+            answer = Number(a.dataset.id) - Number(b.dataset.id);
+        }
+
         // "Descending" flips the answer so the biggest/latest comes first
         if (orderChoice === 'desc') {
             answer = answer * -1;
@@ -301,7 +319,10 @@ function sortJobs() {
 titleBox.addEventListener('input', filterJobs);
 locationBox.addEventListener('input', filterJobs);
 
-// Changing either dropdown -> sort again
+// NEW: changing the status dropdown -> filter again
+statusFilter.addEventListener('change', filterJobs);
+
+// Changing either sort dropdown -> sort again
 sortDropdown.addEventListener('change', sortJobs);
 orderDropdown.addEventListener('change', sortJobs);
 
@@ -354,7 +375,7 @@ async function loadRecruiterJobs() {
 
         // Build HTML dynamically for each job returned from the database
         jobs.forEach(job => {
-            const formattedDate = new Date(job.created_at).toISOString().split('T')[0];
+            const formattedDate = new Date(job.created_at).toISOString();   // (keeps the time)
             const displayDate = new Date(job.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
             const rowDiv = document.createElement('div');
@@ -366,7 +387,6 @@ async function loadRecruiterJobs() {
             rowDiv.setAttribute('data-candidates', job.candidates_count);
             rowDiv.setAttribute('data-status', job.status);
 
-            /* CHANGED: added the last <div> (the Archive button cell) */
             rowDiv.innerHTML = `
                 <span><input type="checkbox" aria-label="Select job"></span>
                 <div>
@@ -395,7 +415,7 @@ async function loadRecruiterJobs() {
             allJobs.push(rowDiv);
             setupStatus(rowDiv);
 
-            // NEW: when "Archive" is clicked, run archiveJob for this row
+            // When "Archive" is clicked, run archiveJob for this row
             rowDiv.querySelector('.btn-archive').addEventListener('click', function () {
                 archiveJob(rowDiv, this);
             });

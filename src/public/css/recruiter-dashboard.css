@@ -13,8 +13,7 @@
      9. Footer
     10. Small screens
 
-   ARCHIVE FEATURE: every change is marked with "NEW" or "CHANGED".
-   Search this file for those words to see what was added.
+   Changes in this version are marked with "NEW" or "CHANGED".
    ===================================================================== */
 
 
@@ -260,7 +259,7 @@ a.btn {
     align-items: center;
 }
 
-/* NEW: small outlined button used for "Archive" and "Unarchive" */
+/* Small outlined button used for "Archive" and "Unarchive" */
 .btn-small {
     height: 38px;
     padding: 0 16px;
@@ -286,7 +285,7 @@ a.btn {
    5. FILTER BOX
    ===================================================================== */
 
-/* Heading above the filters: "Open and paused jobs (3)" */
+/* Heading above the filters: "Your job postings (3)" */
 .section-head {
     display: flex;
     align-items: baseline;
@@ -299,7 +298,7 @@ a.btn {
     font-size: .95rem;
 }
 
-/* NEW: short explanation line on the Archived page */
+/* Short explanation line on the Archived page */
 .archived-note {
     margin: 0 0 8px;
     color: var(--muted);
@@ -315,10 +314,11 @@ a.btn {
     box-shadow: 0 18px 45px rgba(26, 54, 44, .06);
 }
 
-/* Four fields side by side: title, location, sort by, order */
+/* Five fields side by side: title, location, status, sort by, order
+   CHANGED: added a 5th column (.9fr) for the new "Job status" filter. */
 .filter-row {
     display: grid;
-    grid-template-columns: 1.3fr 1.1fr .9fr .9fr;
+    grid-template-columns: 1.3fr 1.1fr .9fr .9fr .9fr;
     gap: 12px;
 }
 
@@ -355,9 +355,7 @@ a.btn {
     overflow-x: auto;
 }
 
-/* One row = checkbox | job info | candidates | status | archive button
-   CHANGED: added a 5th column (110px) for the Archive button,
-   and min-width went from 760px to 880px to make room for it. */
+/* One row = checkbox | job info | candidates | status | archive button */
 .row {
     display: grid;
     grid-template-columns: 36px minmax(220px, 1.4fr) minmax(300px, 2fr) 160px 110px;
@@ -367,7 +365,7 @@ a.btn {
     padding: 18px 20px;
 }
 
-/* NEW: the Archived page has no checkbox column and a read-only status,
+/* The Archived page has no checkbox column and a read-only status,
    so it uses its own column layout. "row arch" is more specific than
    ".row", so these values win on that page. */
 .row.arch {
@@ -514,7 +512,7 @@ a.job-title:hover {
     transform: rotate(45deg) translateY(-2px);
 }
 
-/* NEW: plain (non-clickable) status shown on the Archived page */
+/* Plain (non-clickable) status shown on the Archived page */
 .status-static {
     display: flex;
     align-items: center;
@@ -523,7 +521,8 @@ a.job-title:hover {
     font-weight: 700;
 }
 
-/* Colored dot: green = open, amber = paused, red = closed */
+/* Colored dot: green = open, red = closed.
+   CHANGED: the amber ".dot.paused" rule was removed with the paused status. */
 .dot {
     flex: none;
     width: 9px;
@@ -532,18 +531,14 @@ a.job-title:hover {
     background: var(--green);
 }
 
-.dot.paused {
-    background: var(--amber);
-}
-
 .dot.closed {
     background: var(--red);
 }
 
 /* The dropdown that appears under the button.
-   CHANGED: position is now "fixed" (was "absolute") so the menu floats
-   over the page instead of being clipped by the table. The JS sets its
-   left / top / width each time it opens. */
+   position is "fixed" so the menu floats over the page instead of
+   being clipped by the table. The JS sets its left / top / width
+   each time it opens. */
 .menu {
     position: fixed;
     z-index: 1000;

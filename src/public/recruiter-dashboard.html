@@ -26,7 +26,6 @@
     <div class="subnav">
         <nav class="tabs" aria-label="Sections">
             <a class="active" href="recruiter-dashboard.html">Jobs</a>
-            <!-- NEW: link to the archived jobs page -->
             <a href="archived-jobs.html">Archived</a>
             <a href="candidates-dashboard.html">Candidates</a>
         </nav>
@@ -51,6 +50,16 @@
             <div class="field">
                 <label for="loc">Location</label>
                 <input type="text" id="loc" placeholder="Search locations…">
+            </div>
+
+            <!-- NEW: JOB STATUS FILTER. The empty value means "no filter". -->
+            <div class="field">
+                <label for="status-filter">Job status</label>
+                <select id="status-filter">
+                    <option value="">All statuses</option>
+                    <option value="open">Open</option>
+                    <option value="closed">Closed</option>
+                </select>
             </div>
 
             <!-- SORT BY: write your own options here. -->
@@ -83,7 +92,6 @@
                 <span>Job title</span>
                 <span>Candidates</span>
                 <span>Job status</span>
-                <!-- NEW: header for the Archive button column -->
                 <span>Action</span>
             </div>
 

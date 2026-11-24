@@ -53,6 +53,17 @@
                 <label for="loc">Location</label>
                 <input type="text" id="loc" placeholder="Search locations…">
             </div>
+
+            <!-- NEW: JOB STATUS FILTER. The empty value means "no filter". -->
+            <div class="field">
+                <label for="status-filter">Job status</label>
+                <select id="status-filter">
+                    <option value="">All statuses</option>
+                    <option value="open">Open</option>
+                    <option value="closed">Closed</option>
+                </select>
+            </div>
+
             <div class="field">
                 <label for="sort">Sort by</label>
                 <select id="sort">
