@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="/js/site.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Career Connect – Invite recruiters</title>
+<link rel="stylesheet" href="css/recruiter-dashboard.css">
+<link rel="stylesheet" href="css/invite.css">
+    <link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+
+<header class="topbar">
+    <div class="topbar-inner">
+        <a class="brand" href="#">Career Connect<small>for recruiters</small></a>
+        <nav class="topnav" aria-label="Main">
+            <a class="active" href="recruiter-dashboard.html">Dashboard</a>
+        </nav>
+    </div>
+</header>
+
+<main class="wrap">
+
+    <div class="subnav">
+        <nav class="tabs" aria-label="Sections">
+            <a href="recruiter-dashboard.html">Jobs</a>
+            <a href="archived-jobs.html">Archived</a>
+            <a href="candidates-dashboard.html">Candidates</a>
+            <a class="active" href="invite.html">Invite</a>
+        </nav>
+        <div class="subnav-actions">
+            <a class="btn" href="job-posting.html">Post a job</a>
+        </div>
+    </div>
+
+    <p id="invite-message" class="page-message" role="status" aria-live="polite"></p>
+
+    <!-- ===== Company invite code (owner only; hidden for other recruiters) ===== -->
+    <section class="invite-panel" id="invite-panel" hidden aria-label="Company invite code">
+        <div class="section-head">
+            <h1>Invite a recruiter</h1>
+        </div>
+        <p class="archived-note">Share your company's invite code. Recruiters enter it when they register to join your company.</p>
+
+        <button type="button" class="btn" id="reveal">Show invite code</button>
+
+        <div id="code-area" hidden>
+            <div class="code-box">
+                <span class="code-value" id="code-value"></span>
+                <button type="button" class="btn-small" id="copy">Copy</button>
+                <button type="button" class="btn-small" id="hide">Hide</button>
+            </div>
+
+            <div class="code-edit field">
+                <label for="custom-code">Set your own code</label>
+                <div class="code-edit-row">
+                    <input type="text" id="custom-code" maxlength="32" placeholder="6 to 32 letters or numbers" autocomplete="off">
+                    <button type="button" class="btn-small" id="save-code">Save code</button>
+                    <button type="button" class="btn-small" id="random-code">Generate random code</button>
+                </div>
+                <p class="archived-note">Changing the code stops the old one from working. Current team members are not affected.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== Team ===== -->
+    <div class="section-head team-head">
+        <h1>Your team</h1>
+        <span class="count" id="team-count">(0)</span>
+    </div>
+
+    <section id="team" aria-label="Company recruiters">
+        <!-- Filled by js/invite.js: CEO card, a gap, then the other recruiters -->
+    </section>
+
+    <footer>
+        <span>© 2026 Career Connect</span>
+        <span>Privacy · Terms · Contact</span>
+    </footer>
+</main>
+
+<script src="js/invite.js"></script>
+</body>
+</html>

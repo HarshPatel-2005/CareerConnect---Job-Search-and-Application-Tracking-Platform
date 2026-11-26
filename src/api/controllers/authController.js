@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const { generateToken } = require('../utils/jwt');
 const db = require('../../config/db');
+const { findCompanyByInviteCode } = require('./inviteController');   // CHANGED: new helper
 
 async function registerUser(req, res) {
     try {
@@ -23,26 +24,21 @@ async function registerUser(req, res) {
         const passwordHash = await bcrypt.hash(password, saltRounds);
 
         let companyId = null;
-        let usedInviteCode = null;
+        let createdCompany = false;   // CHANGED: true when this user is creating the company (they become the owner)
 
         // Handle recruiter registration
         if (role === 'recruiter') {
-            if (invite_code) {
-                // Join existing company via invite code
-                const [invites] = await db.query(
-                    'SELECT company_id FROM company_invites WHERE code = ? AND is_used = FALSE', 
-                    [invite_code]
-                );
+            if (invite_code && String(invite_code).trim()) {
+                // CHANGED: join an existing company with its single invite code.
+                // The code is reusable, so nothing is marked as used.
+                companyId = await findCompanyByInviteCode(db, invite_code);
 
-                if (invites.length === 0) {
+                if (!companyId) {
                     return res.status(400).json({ error: 'Invalid invite code' });
                 }
-
-                companyId = invites[0].company_id;
-                usedInviteCode = invite_code;
             } else if (company_name) {
                 const [existingCompanies] = await db.query(
-                    'SELECT id FROM companies WHERE name = ?', 
+                    'SELECT id FROM companies WHERE name = ?',
                     [company_name]
                 );
 
@@ -52,10 +48,11 @@ async function registerUser(req, res) {
 
                 const [newCompany] = await db.query(
                     'INSERT INTO companies (name) VALUES (?)',
-                    [company_name] 
+                    [company_name]
                 );
 
                 companyId = newCompany.insertId;
+                createdCompany = true;
             } else {
                 return res.status(400).json({ error: 'Recruiters must provide either a company name or an invite code' });
             }
@@ -67,12 +64,9 @@ async function registerUser(req, res) {
             [full_name, email, passwordHash, role, companyId]
         );
 
-        // If they used an invite code, mark it as used
-        if (usedInviteCode) {
-            await db.query(
-                'UPDATE company_invites SET is_used = TRUE WHERE code = ?',
-                [usedInviteCode]
-            );
+        // CHANGED: the person who created the company is its owner (shown as CEO)
+        if (createdCompany) {
+            await db.query('UPDATE companies SET owner_id = ? WHERE id = ?', [newUser.insertId, companyId]);
         }
 
         // Generate JWT token for the new user
@@ -165,7 +159,8 @@ async function loginUser(req, res) {
 }
 
 
-
+// CHANGED: debug helper now sets the company's single invite code
+// (the company_invites table is no longer used).
 async function generateDebugInviteCode(req, res) {
     try {
         const { company_id } = req.body;
@@ -174,18 +169,21 @@ async function generateDebugInviteCode(req, res) {
             return res.status(400).json({ error: 'Please provide a company_id' });
         }
 
-        // Generate a random 8-character alphanumeric invite code
+        // Random 8-character alphanumeric invite code
         const inviteCode = crypto.randomBytes(4).toString('hex').toUpperCase();
 
-        await db.query(
-            'INSERT INTO company_invites (company_id, code, is_used) VALUES (?, ?, FALSE)',
-            [company_id, inviteCode]
+        const [result] = await db.query(
+            'UPDATE companies SET invite_code = ? WHERE id = ?',
+            [inviteCode, company_id]
         );
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Company not found' });
+        }
 
-        res.status(201).json({ 
-            message: 'Invite code generated successfully', 
+        res.status(201).json({
+            message: 'Invite code set successfully',
             company_id: company_id,
-            invite_code: inviteCode 
+            invite_code: inviteCode
         });
     } catch (error) {
         console.error('Error generating invite code:', error);
