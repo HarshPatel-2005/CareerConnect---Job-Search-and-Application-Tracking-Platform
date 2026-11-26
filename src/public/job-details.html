@@ -40,5 +40,37 @@
             <button type="button" id="refresh-resumes">Refresh resume list</button>
         </section>
     </main>
+
+    <div class="modal hidden" id="feedback-modal" aria-modal="true">
+        <div class="card">
+
+            <div id="feedback-processing" class="hidden">
+                <div class="card-row">
+                    <h1 class="card-title">Generating feedback...</h1>
+                </div>
+
+                <div class="card-row">
+                    <div class="loader">
+                        <div class="loader-dot"></div>
+                        <div class="loader-dot"></div>
+                        <div class="loader-dot"></div>
+                    </div>
+                </div>
+
+                <div class="card-row">
+                    <p class="card-field-value">Please wait a moment, we are generating feedback from your resume and profile...<br>This may take a few seconds depending on the length of your resume and profile.</p>
+                </div>
+            </div>
+
+
+            <div id="feedback-content" class="hidden">
+                <div class="card-row">
+                    <p id="feedback-message" role="status" aria-live="polite"></p>
+                </div>
+            </div>
+
+            <button type="button" id="feedback-close" class="btn-secondary">Close</button>
+        </div>
+    </div>
 </body>
 </html>
