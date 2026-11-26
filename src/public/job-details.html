@@ -31,7 +31,10 @@
             <form id="apply-form" hidden>
                 <label for="resume">Choose your resume</label>
                 <select id="resume" name="resume_id" required></select>
-                <button class="btn-primary" id="apply-button" type="submit">Submit application</button>
+                <div class="form-row">
+                    <button class="btn-primary" id="apply-button" type="submit">Submit application</button>
+                    <button class="btn-secondary" id="feedback-button" type="button">Get AI Feedback</button>
+                </div>
             </form>
             <p><a id="manage-resumes" href="/resumes.html">Manage saved resumes</a></p>
             <button type="button" id="refresh-resumes">Refresh resume list</button>
