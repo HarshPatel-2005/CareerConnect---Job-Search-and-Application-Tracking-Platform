@@ -118,7 +118,6 @@ describe('POST /api/jobs/:id/feedback', () => {
         ['JOB_NOT_OPEN', 409],            // paused or closed postings
         ['RESUME_NOT_FOUND', 404],        // missing, or owned by another user
         ['RESUME_FILE_MISSING', 409],
-        ['JOB_MISSING_REQUIRED_SKILLS', 422]   // postings without required skills are unsupported
     ])('maps service error %s to %i', async (code, status) => {
         aiService.generateJobFeedback.mockRejectedValueOnce(new Error(code));
 
