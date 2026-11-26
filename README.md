@@ -31,6 +31,57 @@ migrated, `npm run test:applications:db` verifies concurrent submissions, the
 database unique constraint, timestamps, counters, and retained resume snapshots.
 It creates temporary fixtures and removes only those fixtures afterward.
 
+### Saved jobs and deadline reminders (US-09 / #10)
+
+Run `npm run db:migrate` after pulling this feature, then restart with `npm start`.
+Recruiters can set or clear an optional application deadline when creating or
+editing a posting. Deadlines use `YYYY-MM-DD` and remain open through the end
+of that date in UTC. Expired postings are excluded from search and cannot
+receive new applications. Existing jobs without deadlines continue to work.
+
+Job seekers can **Save job** or **Unsave job** from search results or job details,
+and revisit them under **Saved jobs**. Saved jobs persist across sessions,
+including paused, closed, and expired postings, which show their availability.
+
+While the server is running, a background task runs at startup and every minute.
+It creates one in-app reminder per user, job, and deadline when an open saved
+job is due within three days (including today). Jobs without deadlines and jobs
+the user has already applied to are excluded. Saving inside that window creates
+the eligible reminder immediately, in the same transaction as the save, and
+updates the navigation unread count. Scheduled checks handle saved jobs whose
+deadlines enter the window later; restarting catches up on deadlines still in it.
+Removing a save stops future reminders and retains previous notification history.
+Changing a deadline can generate a new reminder for the new date. Database
+uniqueness prevents duplicate reminders across retries and server instances.
+
+**Notifications** shows reminder history, with individual and bulk **Mark as read**
+actions and a paginated **Load more** button. The navigation displays the unread
+count and refreshes it every 30 seconds while the page is visible. Use **Refresh**
+in the notification center to fetch newly generated reminders. Read state is
+stored per account. Reminder dates are snapshots; the posting shows the current
+deadline. This story covers deadline reminders; company following and application
+or interview event notifications are separate features.
+
+All endpoints below require a Bearer token and scope records to its owner:
+
+| Endpoint | Behavior |
+| --- | --- |
+| `GET /api/saved-jobs` | Job seeker's saved postings |
+| `PUT /api/saved-jobs/:id` | Save a job; repeated saves are safe |
+| `DELETE /api/saved-jobs/:id` | Unsave a job; repeated removals are safe |
+| `GET /api/notifications?limit=20&before=<id>` | Newest first; limit 1–100; response includes `next_before` |
+| `GET /api/notifications/unread-count` | Current account's unread count |
+| `PATCH /api/notifications/:id/read` | Mark one owned notification as read |
+| `PATCH /api/notifications/read-all` | Mark all owned notifications as read |
+
+Run `npm test` for endpoint validation, account isolation, deadline validation,
+and scheduler lifecycle tests. `npm run test:reminders:db` uses a disposable MySQL
+schema to verify concurrent saves, reminder deduplication, UTC date boundaries,
+excluded postings, pagination, and persisted read state. It requires permission
+to create and drop its generated test schema and leaves the application database
+untouched. `npm run test:e2e` covers desktop and mobile navigation through saving,
+reminders, read actions, and removing saved jobs.
+
 **A job search and application tracking platform for job seekers and recruiters.**
 
 SOEN 341 Software Process, Fall 2026 | Concordia University

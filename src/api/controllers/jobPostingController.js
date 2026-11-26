@@ -21,13 +21,21 @@ function readJobBody(body) {
         country: String(body.country || '').trim(),
         language: String(body.language || '').trim(),
         job_type: body.job_type,
-        description: String(body.description || '').trim() || null
+        description: String(body.description || '').trim() || null,
+        deadline: body.deadline === '' || body.deadline == null ? null : body.deadline
     };
 
     if (!job.title || !job.location) return { error: 'Title and location are required' };
     if (!(job.openings >= 1)) return { error: 'Openings must be at least 1' };
     if (!job.country || !job.language) return { error: 'Country and language are required' };
     if (!JOB_TYPES.includes(job.job_type)) return { error: 'Invalid job type' };
+    if (job.deadline !== null) {
+        const date = typeof job.deadline === 'string' && /^[1-9]\d{3}-\d{2}-\d{2}$/.test(job.deadline)
+            ? new Date(`${job.deadline}T00:00:00.000Z`) : null;
+        if (!date || Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== job.deadline) {
+            return { error: 'Deadline must be a valid date in YYYY-MM-DD format' };
+        }
+    }
 
     return { job };
 }
@@ -39,7 +47,8 @@ const getJob = async (req, res) => {
         if (!companyId) return;
 
         const [rows] = await db.query(
-            `SELECT id, title, location, openings, country, language, job_type, description
+            `SELECT id, title, location, openings, country, language, job_type, description,
+                    DATE_FORMAT(deadline, '%Y-%m-%d') AS deadline
              FROM jobs WHERE id = ? AND company_id = ?`,
             [req.params.id, companyId]
         );
@@ -65,9 +74,9 @@ const createJob = async (req, res) => {
         if (error) return res.status(400).json({ error });
 
         const [result] = await db.query(
-            `INSERT INTO jobs (company_id, title, location, openings, country, language, job_type, description)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            [companyId, job.title, job.location, job.openings, job.country, job.language, job.job_type, job.description]
+            `INSERT INTO jobs (company_id, title, location, openings, country, language, job_type, description, deadline)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [companyId, job.title, job.location, job.openings, job.country, job.language, job.job_type, job.description, job.deadline]
         );
 
         res.status(201).json({ id: result.insertId });
@@ -88,9 +97,9 @@ const updateJob = async (req, res) => {
 
         const [result] = await db.query(
             `UPDATE jobs
-             SET title = ?, location = ?, openings = ?, country = ?, language = ?, job_type = ?, description = ?
+             SET title = ?, location = ?, openings = ?, country = ?, language = ?, job_type = ?, description = ?, deadline = ?
              WHERE id = ? AND company_id = ?`,
-            [job.title, job.location, job.openings, job.country, job.language, job.job_type, job.description,
+            [job.title, job.location, job.openings, job.country, job.language, job.job_type, job.description, job.deadline,
              req.params.id, companyId]
         );
 

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +8,9 @@
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/pages/jobs.css">
     <link rel="stylesheet" href="/css/site.css">
+    <link rel="stylesheet" href="/css/application-analytics.css">
     <script src="/js/site.js"></script>
+    <script src="/js/application-analytics.js" defer></script>
     <script src="/js/applications.js" defer></script>
 </head>
 <body>
@@ -15,6 +18,38 @@
         <h1>My applications</h1>
         <p>Follow your applications from submission to a decision.</p>
         <p id="message" role="status" aria-live="polite">Loading applications…</p>
+
+        <!-- Sprint 3: Application Analytics Dashboard -->
+        <section id="application-analytics" aria-label="Application analytics">
+            <h2>Application Overview</h2>
+
+            <div class="analytics-summary">
+                <article class="analytics-card">
+                    <h3>Total Applications</h3>
+                    <p id="total-applications">0</p>
+                </article>
+
+                <article class="analytics-card">
+                    <h3>Under Review</h3>
+                    <p id="under-review-count">0</p>
+                </article>
+
+                <article class="analytics-card">
+                    <h3>Interviews</h3>
+                    <p id="interview-count">0</p>
+                </article>
+
+                <article class="analytics-card">
+                    <h3>Offers</h3>
+                    <p id="offer-count">0</p>
+                </article>
+            </div>
+
+            <h2>Applications Over Time</h2>
+            <div id="applications-chart" aria-label="Applications submitted by month"></div>
+        </section>
+
+        <!-- Existing application history -->
         <section id="applications" class="jobs-list" aria-label="Submitted applications"></section>
     </main>
 </body>

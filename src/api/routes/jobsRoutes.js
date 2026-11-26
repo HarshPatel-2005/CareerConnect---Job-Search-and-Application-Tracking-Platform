@@ -34,7 +34,8 @@ function createJobsRouter({ store, uploadDir, db = defaultDb }) {
         try {
             const [jobs] = await db.query(`
                 SELECT j.id, j.title, j.location, j.status, j.description,
-                       j.job_type, j.country, j.language, j.openings, c.name AS company_name
+                       j.job_type, j.country, j.language, j.openings, c.name AS company_name,
+                       DATE_FORMAT(j.deadline, '%Y-%m-%d') AS deadline, (j.deadline < UTC_DATE()) AS expired
                 FROM jobs j JOIN companies c ON c.id = j.company_id WHERE j.id = ?`, [req.params.id]);
             if (!jobs.length) return res.status(404).json({ error: 'Job not found.' });
             const [applications] = await db.query(`
@@ -67,7 +68,7 @@ function createJobsRouter({ store, uploadDir, db = defaultDb }) {
             connection = await db.getConnection();
             await connection.beginTransaction();
             // Serialize applications with job status changes and counter updates.
-            const result = await connection.query('SELECT id, status FROM jobs WHERE id = ? FOR UPDATE', [req.params.id]);
+            const result = await connection.query('SELECT id, status, (deadline < UTC_DATE()) AS expired FROM jobs WHERE id = ? FOR UPDATE', [req.params.id]);
             const rows = Array.isArray(result) ? result[0] : result;
             const jobs = Array.isArray(rows) ? rows : [rows];
             if (!jobs.length) {
@@ -81,7 +82,7 @@ function createJobsRouter({ store, uploadDir, db = defaultDb }) {
                 await connection.rollback();
                 return res.status(409).json({ error: 'You have already applied to this job.', code: 'ALREADY_APPLIED' });
             }
-            if (jobs[0].status !== 'open') {
+            if (jobs[0].status !== 'open' || jobs[0].expired) {
                 await connection.rollback();
                 return res.status(409).json({ error: 'This job is no longer accepting applications.' });
             }

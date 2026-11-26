@@ -214,7 +214,7 @@ describe('Job posting routes', () => {
             expect(db.query).toHaveBeenCalledTimes(1);
             expect(db.query).toHaveBeenCalledWith(
                 expect.stringContaining('INSERT INTO jobs'),
-                [7, 'Backend Developer', 'Montreal', 3, 'Canada', 'English', 'co_op', 'Build APIs.']
+                [7, 'Backend Developer', 'Montreal', 3, 'Canada', 'English', 'co_op', 'Build APIs.', null]
             );
         });
 
@@ -249,7 +249,7 @@ describe('Job posting routes', () => {
 
             expect(db.query).toHaveBeenCalledWith(
                 expect.any(String),
-                [7, 'Backend Developer', 'Montreal', 3, 'Canada', 'English', 'co_op', null]
+                [7, 'Backend Developer', 'Montreal', 3, 'Canada', 'English', 'co_op', null, null]
             );
         });
 
@@ -336,7 +336,7 @@ describe('Job posting routes', () => {
             expect(db.query).toHaveBeenCalledTimes(1);
             expect(db.query).toHaveBeenCalledWith(
                 expect.stringContaining('WHERE id = ? AND company_id = ?'),
-                ['Backend Developer', 'Montreal', 3, 'Canada', 'English', 'co_op', 'Build APIs.', '5', 7]
+                ['Backend Developer', 'Montreal', 3, 'Canada', 'English', 'co_op', 'Build APIs.', null, '5', 7]
             );
         });
 

@@ -4,9 +4,14 @@ const { createResumeRouter } = require('./routes/resumesRoutes');
 const authRoutes = require('./routes/authRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const recruiterRoutes = require('./routes/recruiterRoutes');
-const jobPostingRoutes = require('./routes/jobPostingRoutes');   // NEW
+const jobPostingRoutes = require('./routes/jobPostingRoutes');
+const archiveRoutes = require('./routes/archiveRoutes');           // archive feature
+const candidatesRoutes = require('./routes/candidatesRoutes');     // candidates feature
 const { createJobsRouter } = require('./routes/jobsRoutes');
 const jobSearchRoutes = require('./routes/jobSearchRoutes');
+const { create404Middleware } = require('./middleware/404Middleware');
+const { createSavedJobsRouter } = require('./routes/savedJobsRoutes');
+const { createNotificationsRouter } = require('./routes/notificationsRoutes');
 
 function createApp(options = {}) {
     const app = express();
@@ -15,10 +20,12 @@ function createApp(options = {}) {
 
     app.use('/api/auth', authRoutes);
     app.use('/api/profile', profileRoutes);
+    app.use('/api/saved-jobs', createSavedJobsRouter(options.savedJobs));
+    app.use('/api/notifications', createNotificationsRouter(options.notifications));
     app.use('/api/applications', require('./routes/applicationsRoutes'));
+    app.use('/api/candidates', candidatesRoutes);                  // candidates feature
     // Keep legacy/bookmarked paths useful while using a single page per workflow.
     app.get('/jobs.html', (_req, res) => res.redirect('/job-search.html'));
-    app.get('/cadidates-dashboard.html', (req, res) => res.redirect('/candidates-dashboard.html' + (req.originalUrl.includes('?') ? req.originalUrl.slice(req.originalUrl.indexOf('?')) : '')));
     app.use(express.static(path.join(__dirname, '../public')));
     const resumes = createResumeRouter(options.resume || {});
     app.use('/api/resumes', resumes);
@@ -32,6 +39,7 @@ function createApp(options = {}) {
 
     app.use('/api/recruiter', recruiterRoutes);
     app.use('/api/recruiter', jobPostingRoutes);
+    app.use('/api/recruiter', archiveRoutes);                      // archive feature
 
     // Health check endpoint
     app.get('/health', (req, res) => {
@@ -44,6 +52,10 @@ function createApp(options = {}) {
         console.error('Request failed:', error);
         res.status(500).json({ error: 'Unable to complete the request right now.' });
     });
+
+    // 404 handler for all other routes (HTML, JSON, text)
+    app.use(create404Middleware());
+
     return app;
 }
 

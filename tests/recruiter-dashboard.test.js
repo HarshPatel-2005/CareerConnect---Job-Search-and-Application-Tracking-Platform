@@ -126,8 +126,22 @@ describe('GET /api/recruiter/jobs', () => {
 
             expect(db.query).toHaveBeenCalledTimes(1);
             expect(db.query).toHaveBeenCalledWith(
-                expect.stringContaining('WHERE company_id = ?'),
-                [7]
+                expect.stringContaining('WHERE company_id = ? AND archived = ?'),
+                [7, false]   // CHANGED: active jobs only by default
+            );
+        });
+
+        it('queries archived jobs when ?archived=true is sent', async () => { // New Test
+            const token = createRecruiterToken(1, 7);
+            db.query.mockResolvedValueOnce([[]]);
+
+            await request(app)
+                .get('/api/recruiter/jobs?archived=true')
+                .set('Authorization', `Bearer ${token}`);
+
+            expect(db.query).toHaveBeenCalledWith(
+                expect.stringContaining('archived = ?'),
+                [7, true]
             );
         });
 

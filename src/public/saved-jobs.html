@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved jobs | CareerConnect</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/pages/jobs.css">
+    <link rel="stylesheet" href="/css/site.css">
+    <script src="/js/site.js"></script>
+    <script src="/js/job-saves.js" defer></script>
+    <script src="/js/saved-jobs.js" defer></script>
+</head>
+<body>
+    <main class="jobs-shell">
+        <h1 tabindex="-1">Saved jobs</h1>
+        <p>Keep opportunities here for later. We remind you when an open job's deadline is within 3 days, unless you have already applied. Removing a saved job stops future reminders.</p>
+        <p id="message" role="status" aria-live="polite">Loading saved jobs...</p>
+        <button id="retry" type="button" class="app-button" hidden>Try again</button>
+        <section id="saved-jobs" class="jobs-list" aria-label="Saved job postings"></section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,28 @@
+.error-header {
+    font-size: clamp(2rem, 7vw, 10rem);
+    margin-bottom: var(--space-lg);
+}
+
+.redirect-links {
+    margin-top: var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 0;
+}
+
+.redirect-links ul {
+    margin-top: var(--space-sm);
+}
+
+.redirect-links a {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+.redirect-links a:hover {
+    color: var(--color-primary-hover);
+    text-decoration: underline;
+}

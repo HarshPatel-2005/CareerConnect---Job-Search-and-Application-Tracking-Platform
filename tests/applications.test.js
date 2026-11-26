@@ -103,6 +103,15 @@ test.each(['paused', 'closed'])('rejects %s jobs', async status => {
     expect(connection.query).toHaveBeenCalledTimes(2);
     expect(connection.rollback).toHaveBeenCalled();
 });
+test('rejects jobs whose deadline has passed without recording an application', async () => {
+    connection.query.mockResolvedValueOnce([[{ id: 5, status: 'open', expired: 1 }]])
+        .mockResolvedValueOnce([[]]);
+    expect((await apply()).status).toBe(409);
+    expect(connection.query).toHaveBeenCalledTimes(2);
+    expect(connection.rollback).toHaveBeenCalled();
+    expect(connection.commit).not.toHaveBeenCalled();
+});
+
 test('rejects an existing application without incrementing counters', async () => {
     connection.query.mockResolvedValueOnce([[{ id: 5, status: 'open' }]])
         .mockResolvedValueOnce([[{ id: 12 }]]);
