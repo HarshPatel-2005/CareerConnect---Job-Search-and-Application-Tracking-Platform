@@ -7,7 +7,6 @@ const KNOWN_ERRORS = new Map([
     ['JOB_NOT_OPEN', [409, 'Job is not open for feedback']],
     ['RESUME_NOT_FOUND', [404, 'Resume not found']],
     ['RESUME_FILE_MISSING', [409, 'Resume file is missing. Upload it again before requesting feedback.']],
-    ['JOB_MISSING_REQUIRED_SKILLS', [422, 'This job posting has no required skills listed, so feedback is unavailable.']]
 ]);
 
 async function getJobFeedback(req, res, { store, uploadDir, db }) {

@@ -119,9 +119,6 @@ async function generateJobFeedback({ jobId, userId, resumeId, store, uploadDir, 
 
     // Fetch user profile (skills & experience) 
     const requiredSkills = parseRequiredSkills(job.required_skills);
-    if (requiredSkills.length === 0) {
-        throw new Error('JOB_MISSING_REQUIRED_SKILLS');
-    }
 
     const [skills] = await db.query('SELECT name, level FROM skills WHERE user_id = ?', [userId]);
     const [experience] = await db.query('SELECT company_name, title, start_date, end_date, is_current, details FROM experiences WHERE user_id = ? ORDER BY is_current DESC, start_date DESC', [userId]);
