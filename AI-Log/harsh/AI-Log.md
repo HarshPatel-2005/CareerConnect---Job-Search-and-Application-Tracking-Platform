@@ -302,8 +302,9 @@ AI Log #11 (Sprint #4):
 Task: Code generation for company invites
 Purpose of AI: Code generation
 Link: https://claude.ai/share/5884362e-83ab-4e73-b1e3-d22814ee809a
-AI-Suggested Content: The AI model added the filtering based off the status
-Validation: Peer review and manual review
-Decision: Accepted
-Reflection: Accepted and learned how the behavior works, how it pulls jobs based off what filter was chosen
+AI-Suggested Content: The AI model added the company invite feature as I asked
+Validation: Peer review and manual review, testing for bugs.
+Decision: Accepted with modifications
+Reflection: We had to verify how multiple recruiters can affect the program, and also see if there are any bugs that appear from this. With multiple members of the team testing it, we're making sure that we don't miss out 
+on any bugs and fix out anything.
 Responsible Person: Harsh Patel (40341498)
