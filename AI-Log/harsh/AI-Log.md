@@ -296,3 +296,14 @@ Validation: Peer review and manual review
 Decision: Accepted
 Reflection: Accepted and learned how the behavior works, how it pulls jobs based off what filter was chosen
 Responsible Person: Harsh Patel (40341498)
+
+AI Log #11 (Sprint #4):
+
+Task: Code generation for company invites
+Purpose of AI: Code generation
+Link: https://claude.ai/share/5884362e-83ab-4e73-b1e3-d22814ee809a
+AI-Suggested Content: The AI model added the filtering based off the status
+Validation: Peer review and manual review
+Decision: Accepted
+Reflection: Accepted and learned how the behavior works, how it pulls jobs based off what filter was chosen
+Responsible Person: Harsh Patel (40341498)
