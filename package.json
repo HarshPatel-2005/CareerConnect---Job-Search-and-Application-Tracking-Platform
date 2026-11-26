@@ -9,7 +9,7 @@
         "db:up": "docker compose up -d mysql && node db/migrate.js",
         "db:migrate": "node db/migrate.js",
         "db:down": "docker compose rm -sf mysql",
-        "db:reset": "docker compose rm -sf mysql && docker volume rm -f career_connect_mysql_data && node -e \"require('fs').rmSync('uploads/resumes', { recursive: true, force: true })\"",
+        "db:reset": "docker compose rm -sf mysql && docker volume rm -f career_connect_db_data && node -e \"require('fs').rmSync('uploads/resumes', { recursive: true, force: true })\"",
         "ai:install": "docker compose up -d --wait ollama",
         "ai:down": "docker compose stop ollama",
         "start": "node src/api/server.js",

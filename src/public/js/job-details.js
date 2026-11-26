@@ -1,3 +1,14 @@
+function handleAuthError(response) {
+    if (response.status === 401 || response.status === 403) {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+        window.location.href = '/login.html';
+        return true;
+    }
+
+    return false;
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     const token = sessionStorage.getItem('token');
     const id = new URLSearchParams(window.location.search).get('id');
@@ -18,6 +29,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             ...options,
             headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
         });
+
+        if (handleAuthError(response)) {
+            throw new Error('Authentication error. Redirecting to login.');
+        }
+
         const data = await response.json();
         if (!response.ok) {
             const error = new Error(data.error || 'Request failed. Please try again.');
@@ -100,4 +116,90 @@ document.addEventListener('DOMContentLoaded', async () => {
         panel.hidden = false;
         await loadResumes();
     } catch (error) { showMessage(error.message, 'error'); }
+
+    // AI Feedback Modal
+    const feedbackButton = document.getElementById('feedback-button');
+    const feedbackModal = document.getElementById('feedback-modal');
+    const feedbackProcessing = document.getElementById('feedback-processing');
+    const feedbackContent = document.getElementById('feedback-content');
+    const feedbackClose = document.getElementById('feedback-close');
+    const feedbackMissingSkillsList = document.getElementById('feedback-missing-skills');
+    const feedbackStrengths = document.getElementById('feedback-strengths');
+    const feedbackSuggestions = document.getElementById('feedback-suggestions');
+
+    feedbackButton.addEventListener('click', async () => {
+        feedbackButton.disabled = true;
+        // Fetch AI feedback from the server
+
+        feedbackProcessing.classList.remove('hidden');
+        feedbackContent.classList.add('hidden');
+        feedbackModal.classList.remove('hidden');
+
+        try {
+            const feedbackData = await api(`/api/jobs/${id}/feedback`, {
+                method: 'POST',
+                body: JSON.stringify({ resume_id: select.value })
+            });
+
+            console.log('AI feedback received:', feedbackData);
+
+
+            const missing_skills = feedbackData.missing_skills || [];
+            const strengths = feedbackData.strengths || [];
+            const suggestions = feedbackData.suggestions || [];
+
+            feedbackMissingSkillsList.innerHTML = '';
+            feedbackStrengths.innerHTML = '';
+            feedbackSuggestions.innerHTML = '';
+
+            if (missing_skills.length === 0) {
+                const p = document.createElement('p');
+                p.textContent = 'No missing skills identified.';
+                feedbackMissingSkillsList.appendChild(p);
+            } else {
+                missing_skills.forEach(skill => {
+                    const p = document.createElement('p');
+                    p.textContent = skill;
+                    feedbackMissingSkillsList.appendChild(p);
+                });
+            }
+
+            if (strengths.length === 0) {
+                const p = document.createElement('p');
+                p.textContent = 'No strengths identified.';
+                feedbackStrengths.appendChild(p);
+            } else {
+                strengths.forEach(strength => {
+                    const p = document.createElement('p');
+                    p.textContent = strength;
+                    feedbackStrengths.appendChild(p);
+                });
+            }
+
+            if (suggestions.length === 0) {
+                const p = document.createElement('p');
+                p.textContent = 'No suggestions provided.';
+                feedbackSuggestions.appendChild(p);
+            } else {    
+                suggestions.forEach(suggestion => {
+                    const p = document.createElement('p');
+                    p.textContent = suggestion;
+                    feedbackSuggestions.appendChild(p);
+                });
+            }
+            
+            feedbackProcessing.classList.add('hidden');
+            feedbackContent.classList.remove('hidden');
+        } catch (error) {
+            console.error('Error fetching AI feedback:', error);
+            feedbackProcessing.classList.add('hidden');
+            feedbackContent.classList.remove('hidden');
+            feedbackMessage.textContent = 'Error fetching AI feedback. Please try again later.';
+        }
+    });
+
+    feedbackClose.addEventListener('click', () => {
+        feedbackModal.classList.add('hidden');
+        feedbackButton.disabled = false;
+    });
 });

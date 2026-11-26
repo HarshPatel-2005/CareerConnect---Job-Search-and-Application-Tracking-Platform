@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS jobs (
     description TEXT DEFAULT NULL,
     deadline DATE DEFAULT NULL,
     status ENUM('open', 'paused', 'closed') DEFAULT 'open',
+    required_skills JSON DEFAULT NULL,
     candidates_count INT DEFAULT 0,
     awaiting_count INT DEFAULT 0,
     reviewed_count INT DEFAULT 0,
@@ -54,6 +55,7 @@ CREATE TABLE IF NOT EXISTS jobs (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
 );
+
 -- Create experiences table
 CREATE TABLE IF NOT EXISTS experiences (
     id INT AUTO_INCREMENT PRIMARY KEY,

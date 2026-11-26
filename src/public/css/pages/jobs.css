@@ -13,3 +13,11 @@
 #message.success { color: var(--color-success); }
 button:disabled { opacity: .6; cursor: wait; }
 [hidden] { display: none !important; }
+
+.modal .card {
+    max-width: 80%;
+}
+
+.modal .card h2 {
+    margin-top: var(--space-md);
+}
